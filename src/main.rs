@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::path::PathBuf;
 
 use sbrd_gen::*;
 
@@ -7,8 +8,9 @@ fn main() {
         key: Some("KeyA".to_string()),
         condition: Some("$KeyA$ == 10".to_string()),
         generator_type: GeneratorType::Select,
+        nullable: false,
         bound: Some((0.0..=19.0).into()),
-        path: Some("hoge.csv".to_string()),
+        path: Some(PathBuf::from("hoge.csv")),
         select_values: Some(vec![
             DataValue::String("KeyA".to_string()),
             DataValue::Bool(false),
@@ -24,8 +26,9 @@ fn main() {
                 key: Some("KeyA-1".to_string()),
                 condition: Some("$KeyA == 10".to_string()),
                 generator_type: GeneratorType::DistIntUniform,
+                nullable: false,
                 bound: Some((0.0..=19.0).into()),
-                path: Some("hoge.csv".to_string()),
+                path: Some(PathBuf::from("hoge.csv")),
                 select_values: Some(vec![
                     DataValue::String("KeyA".to_string()),
                     DataValue::Bool(false),
@@ -42,6 +45,7 @@ fn main() {
                 key: None,
                 condition: None,
                 generator_type: GeneratorType::Int,
+                nullable: true,
                 bound: None,
                 path: None,
                 select_values: None,

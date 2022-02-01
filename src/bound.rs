@@ -11,8 +11,8 @@ pub struct ValueBound<T> {
 
 impl<T: Serialize> Serialize for ValueBound<T> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         let mut field_count = 0;
         if self.start.is_some() {

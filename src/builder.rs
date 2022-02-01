@@ -1,4 +1,5 @@
 use std::collections::btree_map::BTreeMap;
+use std::path::PathBuf;
 
 use serde::Serialize;
 
@@ -15,10 +16,11 @@ pub struct GeneratorBuilder {
     pub condition: Option<String>,
     #[serde(rename = "type")]
     pub generator_type: GeneratorType,
+    pub nullable: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bound: Option<ValueBound<f32>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub path: Option<String>,
+    pub path: Option<PathBuf>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub select_values: Option<Vec<DataValue>>,
     #[serde(skip_serializing_if = "Option::is_none")]

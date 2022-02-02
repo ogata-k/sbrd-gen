@@ -9,7 +9,11 @@ fn main() {
         condition: Some("$KeyA$ == 10".to_string()),
         generator_type: GeneratorType::Select,
         nullable: Nullable::new_as_nullable(),
-        bound: Some((0.0..=19.0).into()),
+        bound: Some(ValueBound{
+            start: Some("0.0".to_string()),
+            end: Some("19.0".to_string()),
+            include_end: false
+        }),
         path: Some(PathBuf::from("hoge.csv")),
         select_values: Some(vec![
             DataValue::String("KeyA".to_string()),
@@ -27,7 +31,11 @@ fn main() {
                 condition: Some("$KeyA == 10".to_string()),
                 generator_type: GeneratorType::DistIntUniform,
                 nullable: Nullable::new_as_required(),
-                bound: Some((0.0..=19.0).into()),
+                bound:  Some(ValueBound{
+                    start: None,
+                    end: Some("19.0".to_string()),
+                    include_end: false
+                }),
                 path: Some(PathBuf::from("hoge.csv")),
                 select_values: Some(vec![
                     DataValue::String("KeyA".to_string()),
@@ -46,7 +54,11 @@ fn main() {
                 condition: None,
                 generator_type: GeneratorType::Int,
                 nullable: Nullable::new_as_required(),
-                bound: None,
+                bound: Some(ValueBound{
+                    start: Some("0.0".to_string()),
+                    end: None,
+                    include_end: false
+                }),
                 path: None,
                 select_values: None,
                 format: None,

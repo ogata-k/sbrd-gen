@@ -20,7 +20,7 @@ pub struct GeneratorBuilder {
     #[serde(skip_serializing_if = "Nullable::is_required")]
     pub nullable: Nullable,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub bound: Option<ValueBound<f32>>,
+    pub bound: Option<ValueBound<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<PathBuf>,
     #[serde(skip_serializing_if = "Option::is_none")]

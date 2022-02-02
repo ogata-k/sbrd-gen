@@ -1,48 +1,28 @@
-use serde::{Serialize, Serializer};
-use serde::ser::SerializeStruct;
+use serde::Serialize;
 
 // TODO fieldのpubを外す
-#[derive(Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
+#[derive(Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
 pub struct ValueBound<T> {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub start: Option<T>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub end: Option<T>,
+   #[serde(skip_serializing_if = "use_include_end")]
     pub include_end: bool,
 }
 
-impl<T: Serialize> Serialize for ValueBound<T> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut field_count = 0;
-        if self.start.is_some() {
-            field_count += 1;
-        }
-        if self.end.is_some() {
-            field_count += 2;
-        }
-
-        let mut state = serializer.serialize_struct("ValueBounds", field_count)?;
-
-        if let Some(v) = &self.start {
-            state.serialize_field("start", v)?;
-        }
-        if let Some(v) = &self.end {
-            state.serialize_field("end", v)?;
-            state.serialize_field("include_end", &self.include_end)?;
-        }
-
-        state.end()
-    }
+fn use_include_end(b: &bool) -> bool
+{
+    *b
 }
 
 impl<T: Serialize> ValueBound<T> {
-    pub fn get_start(&self) -> Option<&T> {
-        self.start.as_ref()
+    pub fn get_start(&self) -> &Option<T> {
+        &self.start
     }
 
-    pub fn get_end(&self) -> Option<&T> {
-        self.end.as_ref()
+    pub fn get_end(&self) -> &Option<T> {
+        &self.end
     }
 
     pub fn is_include_end(&self) -> bool {

@@ -9,6 +9,6 @@ mod bound;
 mod builder;
 mod generator_type;
 pub mod generators;
+mod nullable;
 mod scheme;
 mod value;
-mod nullable;

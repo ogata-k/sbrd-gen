@@ -7,12 +7,11 @@ pub struct ValueBound<T> {
     pub start: Option<T>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end: Option<T>,
-   #[serde(skip_serializing_if = "use_include_end")]
+    #[serde(skip_serializing_if = "use_include_end")]
     pub include_end: bool,
 }
 
-fn use_include_end(b: &bool) -> bool
-{
+fn use_include_end(b: &bool) -> bool {
     *b
 }
 

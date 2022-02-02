@@ -1,6 +1,7 @@
 pub use bound::*;
 pub use builder::*;
 pub use generator_type::*;
+pub use nullable::*;
 pub use scheme::*;
 pub use value::*;
 
@@ -10,3 +11,4 @@ mod generator_type;
 pub mod generators;
 mod scheme;
 mod value;
+mod nullable;

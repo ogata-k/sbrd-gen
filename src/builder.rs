@@ -5,6 +5,7 @@ use serde::Serialize;
 
 use crate::bound::ValueBound;
 use crate::generator_type::GeneratorType;
+use crate::Nullable;
 use crate::value::DataValue;
 
 // TODO fieldのpubを外す
@@ -16,7 +17,8 @@ pub struct GeneratorBuilder {
     pub condition: Option<String>,
     #[serde(rename = "type")]
     pub generator_type: GeneratorType,
-    pub nullable: bool,
+    #[serde(skip_serializing_if = "Nullable::is_required")]
+    pub nullable: Nullable,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bound: Option<ValueBound<f32>>,
     #[serde(skip_serializing_if = "Option::is_none")]

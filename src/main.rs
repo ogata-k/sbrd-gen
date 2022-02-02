@@ -8,7 +8,7 @@ fn main() {
         key: Some("KeyA".to_string()),
         condition: Some("$KeyA$ == 10".to_string()),
         generator_type: GeneratorType::Select,
-        nullable: false,
+        nullable: Nullable::new_as_nullable(),
         bound: Some((0.0..=19.0).into()),
         path: Some(PathBuf::from("hoge.csv")),
         select_values: Some(vec![
@@ -26,7 +26,7 @@ fn main() {
                 key: Some("KeyA-1".to_string()),
                 condition: Some("$KeyA == 10".to_string()),
                 generator_type: GeneratorType::DistIntUniform,
-                nullable: false,
+                nullable: Nullable::new_as_required(),
                 bound: Some((0.0..=19.0).into()),
                 path: Some(PathBuf::from("hoge.csv")),
                 select_values: Some(vec![
@@ -45,7 +45,7 @@ fn main() {
                 key: None,
                 condition: None,
                 generator_type: GeneratorType::Int,
-                nullable: true,
+                nullable: Nullable::new_as_required(),
                 bound: None,
                 path: None,
                 select_values: None,

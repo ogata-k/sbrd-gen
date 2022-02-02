@@ -1,6 +1,8 @@
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
+use chrono::{NaiveDate, NaiveTime};
+
 use sbrd_gen::*;
 
 fn main() {
@@ -19,6 +21,9 @@ fn main() {
             DataValue::String("KeyA".to_string()),
             DataValue::Bool(false),
             DataValue::Int(32),
+            DataValue::DateTime(NaiveDate::from_ymd(2015, 9, 5).and_hms(23, 56, 4)),
+            DataValue::Date(NaiveDate::from_ymd(2015, 9, 5)),
+            DataValue::Time(NaiveTime::from_hms(23, 56, 4)),
         ]),
         format: Some("$KeyA$KeyA".to_string()),
         dist_parameters: Some(BTreeMap::from([(

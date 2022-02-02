@@ -16,5 +16,9 @@ pub enum GeneratorType {
     DistRealUniform,
     DistRealNormal,
     When,
+    // 下限のみサポート
     IncrementId,
+    DateTime,
+    Date,
+    Time,
 }

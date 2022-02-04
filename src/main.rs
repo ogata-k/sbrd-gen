@@ -26,6 +26,7 @@ fn main() {
             NaiveTime::from_hms(23, 56, 4).to_string(),
         ]),
         format: Some("$KeyA$KeyA".to_string()),
+        chars: Some("$KeyA$KeyA".to_string()),
         dist_parameters: Some(BTreeMap::from([(
             "hogheoge".to_string(),
             DataValue::Int(10),
@@ -48,6 +49,7 @@ fn main() {
                     (32.0 as f32).to_string(),
                 ]),
                 format: Some("$KeyA$KeyA".to_string()),
+                chars: Some("$KeyA$KeyA".to_string()),
                 dist_parameters: Some(BTreeMap::from([(
                     "hogheoge".to_string(),
                     DataValue::Int(10),
@@ -67,6 +69,7 @@ fn main() {
                 path: None,
                 select_values: None,
                 format: None,
+                chars: None,
                 dist_parameters: None,
                 children: None,
             },
@@ -79,6 +82,7 @@ fn main() {
                 path: None,
                 select_values: None,
                 format: None,
+                chars: None,
                 dist_parameters: None,
                 children: None,
             },

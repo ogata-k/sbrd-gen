@@ -11,8 +11,10 @@ pub enum GeneratorType {
     // evaluate
     EvalInt,
     EvalReal,
-    // format
+    // join
     Format,
+    // join (use bound parameter as count)
+    DuplicatePermutation,
     // random select
     SelectInt,
     SelectReal,

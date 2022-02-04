@@ -28,6 +28,8 @@ pub struct GeneratorBuilder {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub chars: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub dist_parameters: Option<BTreeMap<String, DataValue>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<GeneratorBuilder>>,

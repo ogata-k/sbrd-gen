@@ -70,6 +70,18 @@ fn main() {
                 dist_parameters: None,
                 children: None,
             },
+            GeneratorBuilder {
+                key: None,
+                condition: None,
+                generator_type: GeneratorType::AlwaysNull,
+                nullable: Nullable::new_as_required(),
+                bound: None,
+                path: None,
+                select_values: None,
+                format: None,
+                dist_parameters: None,
+                children: None,
+            },
         ]),
     };
 

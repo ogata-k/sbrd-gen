@@ -6,6 +6,7 @@ pub enum GeneratorType {
     Int,
     Real,
     Bool,
+    AlwaysNull,
     UnsignedInt,
     UnsignedReal,
     EvalInt,

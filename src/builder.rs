@@ -24,7 +24,7 @@ pub struct GeneratorBuilder {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<PathBuf>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub select_values: Option<Vec<DataValue>>,
+    pub select_values: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]

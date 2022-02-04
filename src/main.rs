@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::btree_map::BTreeMap;
 use std::path::PathBuf;
 
 use chrono::{NaiveDate, NaiveTime};
@@ -9,7 +9,7 @@ fn main() {
     let generator_a = GeneratorBuilder {
         key: Some("KeyA".to_string()),
         condition: Some("$KeyA$ == 10".to_string()),
-        generator_type: GeneratorType::Select,
+        generator_type: GeneratorType::SelectReal,
         nullable: Nullable::new_as_nullable(),
         bound: Some(ValueBound {
             start: Some("0.0".to_string()),
@@ -18,12 +18,12 @@ fn main() {
         }),
         path: Some(PathBuf::from("hoge.csv")),
         select_values: Some(vec![
-            DataValue::String("KeyA".to_string()),
-            DataValue::Bool(false),
-            DataValue::Int(32),
-            DataValue::DateTime(NaiveDate::from_ymd(2015, 9, 5).and_hms(23, 56, 4)),
-            DataValue::Date(NaiveDate::from_ymd(2015, 9, 5)),
-            DataValue::Time(NaiveTime::from_hms(23, 56, 4)),
+            "KeyA".to_string(),
+            false.to_string(),
+            (32 as u8).to_string(),
+            NaiveDate::from_ymd(2015, 9, 5).and_hms(23, 56, 4).to_string(),
+            NaiveDate::from_ymd(2015, 9, 5).to_string(),
+            NaiveTime::from_hms(23, 56, 4).to_string(),
         ]),
         format: Some("$KeyA$KeyA".to_string()),
         dist_parameters: Some(BTreeMap::from([(
@@ -43,9 +43,9 @@ fn main() {
                 }),
                 path: Some(PathBuf::from("hoge.csv")),
                 select_values: Some(vec![
-                    DataValue::String("KeyA".to_string()),
-                    DataValue::Bool(false),
-                    DataValue::Int(32),
+                    "KeyA".to_string(),
+                    false.to_string(),
+                    (32.0 as f32).to_string(),
                 ]),
                 format: Some("$KeyA$KeyA".to_string()),
                 dist_parameters: Some(BTreeMap::from([(

@@ -3,11 +3,11 @@ use serde::Serialize;
 // TODO fieldのpubを外す
 #[derive(Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
 pub struct ValueBound<T> {
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", rename = "min")]
     pub start: Option<T>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", rename = "max")]
     pub end: Option<T>,
-    #[serde(skip_serializing_if = "use_include_end")]
+    #[serde(skip_serializing_if = "use_include_end", rename = "include_max")]
     pub include_end: bool,
 }
 

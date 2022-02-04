@@ -11,17 +11,19 @@ fn main() {
         condition: Some("$KeyA$ == 10".to_string()),
         generator_type: GeneratorType::SelectReal,
         nullable: Nullable::new_as_nullable(),
-        bound: Some(ValueBound {
+        range: Some(ValueBound {
             start: Some("0.0".to_string()),
             end: Some("19.0".to_string()),
             include_end: false,
         }),
-        path: Some(PathBuf::from("hoge.csv")),
+        file: Some(PathBuf::from("hoge.csv")),
         select_values: Some(vec![
             "KeyA".to_string(),
             false.to_string(),
             (32 as u8).to_string(),
-            NaiveDate::from_ymd(2015, 9, 5).and_hms(23, 56, 4).to_string(),
+            NaiveDate::from_ymd(2015, 9, 5)
+                .and_hms(23, 56, 4)
+                .to_string(),
             NaiveDate::from_ymd(2015, 9, 5).to_string(),
             NaiveTime::from_hms(23, 56, 4).to_string(),
         ]),
@@ -37,12 +39,12 @@ fn main() {
                 condition: Some("$KeyA == 10".to_string()),
                 generator_type: GeneratorType::DistIntUniform,
                 nullable: Nullable::new_as_required(),
-                bound: Some(ValueBound {
+                range: Some(ValueBound {
                     start: None,
                     end: Some("19.0".to_string()),
                     include_end: false,
                 }),
-                path: Some(PathBuf::from("hoge.csv")),
+                file: Some(PathBuf::from("hoge.csv")),
                 select_values: Some(vec![
                     "KeyA".to_string(),
                     false.to_string(),
@@ -61,12 +63,12 @@ fn main() {
                 condition: None,
                 generator_type: GeneratorType::DateTime,
                 nullable: Nullable::new_as_required(),
-                bound: Some(ValueBound {
+                range: Some(ValueBound {
                     start: Some("0.0".to_string()),
                     end: None,
                     include_end: false,
                 }),
-                path: None,
+                file: None,
                 select_values: None,
                 format: None,
                 chars: None,
@@ -78,8 +80,8 @@ fn main() {
                 condition: None,
                 generator_type: GeneratorType::AlwaysNull,
                 nullable: Nullable::new_as_required(),
-                bound: None,
-                path: None,
+                range: None,
+                file: None,
                 select_values: None,
                 format: None,
                 chars: None,

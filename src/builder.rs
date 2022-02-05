@@ -30,6 +30,8 @@ pub struct GeneratorBuilder {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub file: Option<PathBuf>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub separator: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dist_parameters: Option<BTreeMap<String, DataValue>>,

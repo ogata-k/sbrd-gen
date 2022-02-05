@@ -17,6 +17,7 @@ fn main() {
             include_end: false,
         }),
         file: Some(PathBuf::from("hoge.csv")),
+        separator: None,
         select_values: Some(vec![
             "KeyA".to_string(),
             false.to_string(),
@@ -45,6 +46,7 @@ fn main() {
                     include_end: false,
                 }),
                 file: Some(PathBuf::from("hoge.csv")),
+                separator: None,
                 select_values: Some(vec![
                     "KeyA".to_string(),
                     false.to_string(),
@@ -69,6 +71,7 @@ fn main() {
                     include_end: false,
                 }),
                 file: None,
+                separator: None,
                 select_values: None,
                 format: None,
                 chars: None,
@@ -82,6 +85,7 @@ fn main() {
                 nullable: Nullable::new_as_required(),
                 range: None,
                 file: None,
+                separator: None,
                 select_values: None,
                 format: None,
                 chars: None,

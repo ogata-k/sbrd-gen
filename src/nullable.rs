@@ -1,17 +1,17 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
 pub struct Nullable {
     use_null: bool,
 }
 
 impl Nullable {
     pub fn new_as_required() -> Self {
-        Self { use_null: true }
+        Self { use_null: false }
     }
 
     pub fn new_as_nullable() -> Self {
-        Self { use_null: false }
+        Self { use_null: true }
     }
 
     pub fn is_required(&self) -> bool {

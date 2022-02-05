@@ -1,7 +1,7 @@
 use std::collections::btree_map::BTreeMap;
 use std::path::PathBuf;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::bound::ValueBound;
 use crate::generator_type::GeneratorType;
@@ -9,11 +9,14 @@ use crate::Nullable;
 use crate::value::DataValue;
 
 // TODO fieldのpubを外す
-#[derive(Serialize, Debug, PartialEq, Clone)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct GeneratorBuilder {
     #[serde(rename = "type")]
     pub generator_type: GeneratorType,
-    #[serde(skip_serializing_if = "Nullable::is_required")]
+    #[serde(
+        skip_serializing_if = "Nullable::is_required",
+        default = "Nullable::new_as_required"
+    )]
     pub nullable: Nullable,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub key: Option<String>,

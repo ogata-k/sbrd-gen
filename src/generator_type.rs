@@ -1,6 +1,6 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
 #[serde(rename_all = "kebab-case")]
 pub enum GeneratorType {
     // primitive

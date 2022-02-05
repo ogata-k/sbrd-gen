@@ -99,5 +99,8 @@ fn main() {
         vec!["KeyA".to_string(), "KeyB".to_string()],
         vec![generator_a],
     );
-    println!("{}", serde_yaml::to_string(&dummy).unwrap());
+    let yaml_string = serde_yaml::to_string(&dummy).unwrap();
+    println!("{}", &yaml_string);
+    let deserialized: Scheme = serde_yaml::from_str(&yaml_string).unwrap();
+    assert_eq!(deserialized, dummy);
 }

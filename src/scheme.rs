@@ -1,8 +1,8 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::builder::GeneratorBuilder;
 
-#[derive(Serialize, Debug, PartialEq, Clone)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct Scheme {
     keys: Vec<String>,
     generators: Vec<GeneratorBuilder>,

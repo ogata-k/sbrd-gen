@@ -1,7 +1,7 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 // TODO fieldのpubを外す
-#[derive(Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
 pub struct ValueBound<T> {
     #[serde(skip_serializing_if = "Option::is_none", rename = "min")]
     pub start: Option<T>,

@@ -6,11 +6,11 @@ pub struct Nullable {
 }
 
 impl Nullable {
-    pub fn new_as_required() -> Self {
+    pub fn new_required() -> Self {
         Self { use_null: false }
     }
 
-    pub fn new_as_nullable() -> Self {
+    pub fn new_nullable() -> Self {
         Self { use_null: true }
     }
 

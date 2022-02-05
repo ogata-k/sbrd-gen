@@ -1,103 +1,64 @@
-use std::collections::btree_map::BTreeMap;
-use std::path::PathBuf;
-
 use chrono::{NaiveDate, NaiveTime};
 
 use sbrd_gen::*;
 
 fn main() {
-    let generator_a = GeneratorBuilder {
-        key: Some("KeyA".to_string()),
-        condition: Some("$KeyA$ == 10".to_string()),
-        generator_type: GeneratorType::SelectReal,
-        nullable: Nullable::new_as_nullable(),
-        range: Some(ValueBound {
-            start: Some("0.0".to_string()),
-            end: Some("19.0".to_string()),
-            include_end: false,
-        }),
-        file: Some(PathBuf::from("hoge.csv")),
-        separator: None,
-        select_values: Some(vec![
-            "KeyA".to_string(),
-            false.to_string(),
-            (32 as u8).to_string(),
-            NaiveDate::from_ymd(2015, 9, 5)
-                .and_hms(23, 56, 4)
-                .to_string(),
-            NaiveDate::from_ymd(2015, 9, 5).to_string(),
-            NaiveTime::from_hms(23, 56, 4).to_string(),
-        ]),
-        format: Some("$KeyA$KeyA".to_string()),
-        chars: Some("$KeyA$KeyA".to_string()),
-        dist_parameters: Some(BTreeMap::from([(
-            "hogheoge".to_string(),
-            DataValue::Int(10),
-        )])),
-        children: Some(vec![
-            GeneratorBuilder {
-                key: Some("KeyA-1".to_string()),
-                condition: Some("$KeyA == 10".to_string()),
-                generator_type: GeneratorType::DistIntUniform,
-                nullable: Nullable::new_as_required(),
-                range: Some(ValueBound {
-                    start: None,
-                    end: Some("19.0".to_string()),
-                    include_end: false,
-                }),
-                file: Some(PathBuf::from("hoge.csv")),
-                separator: None,
-                select_values: Some(vec![
-                    "KeyA".to_string(),
-                    false.to_string(),
-                    (32.0 as f32).to_string(),
-                ]),
-                format: Some("$KeyA$KeyA".to_string()),
-                chars: Some("$KeyA$KeyA".to_string()),
-                dist_parameters: Some(BTreeMap::from([(
-                    "hogheoge".to_string(),
-                    DataValue::Int(10),
-                )])),
-                children: None,
-            },
-            GeneratorBuilder {
-                key: None,
-                condition: None,
-                generator_type: GeneratorType::DateTime,
-                nullable: Nullable::new_as_required(),
-                range: Some(ValueBound {
-                    start: Some("0.0".to_string()),
-                    end: None,
-                    include_end: false,
-                }),
-                file: None,
-                separator: None,
-                select_values: None,
-                format: None,
-                chars: None,
-                dist_parameters: None,
-                children: None,
-            },
-            GeneratorBuilder {
-                key: None,
-                condition: None,
-                generator_type: GeneratorType::AlwaysNull,
-                nullable: Nullable::new_as_required(),
-                range: None,
-                file: None,
-                separator: None,
-                select_values: None,
-                format: None,
-                chars: None,
-                dist_parameters: None,
-                children: None,
-            },
-        ]),
-    };
+    let int_generator = GeneratorBuilder::new_int(None).with_key("KeyA");
+    let select_sting_generator = GeneratorBuilder::new_select_string_with_values([
+        "KeyA".to_string(),
+        false.to_string(),
+        (32 as u8).to_string(),
+        NaiveDate::from_ymd(2015, 9, 5)
+            .and_hms(23, 56, 4)
+            .to_string(),
+        NaiveDate::from_ymd(2015, 9, 5).to_string(),
+        NaiveTime::from_hms(23, 56, 4).to_string(),
+    ])
+    .with_key("KeyB");
+    let duplicate_permutation_generator = GeneratorBuilder::new_duplicate_permutation_with_chars(
+        None,
+        "",
+        "abcdefghijklmn!\"#$%&'\\",
+    )
+    .nullable()
+    .with_key("KeyC");
+    // other case get error or null(when nullable)
+    let when_generator = GeneratorBuilder::new_when([
+        (
+            "{KeyA} < 0",
+            GeneratorBuilder::new_date_time(Some(ValueBound::new(
+                Some(NaiveDate::from_ymd(2021, 12, 25).and_hms(0, 0, 0)),
+                Some((false, NaiveDate::from_ymd(2021, 12, 26).and_hms(0, 0, 0))),
+            )))
+            .nullable(),
+        ),
+        (
+            "0 <= {KeyA} && {KeyA} < 100",
+            GeneratorBuilder::new_date(Some(ValueBound::new(
+                Some(NaiveDate::from_ymd(2021, 12, 25)),
+                None,
+            ))),
+        ),
+        (
+            "100 <= {KeyA} && {KeyA} < 200",
+            GeneratorBuilder::new_time(Some(ValueBound::new(
+                None,
+                Some((true, NaiveTime::from_hms(23, 59, 59))),
+            ))),
+        ),
+    ])
+    .with_key("KeyD");
+    let format_generator = GeneratorBuilder::new_format("{KeyC} {KeyD}").with_key("KeyE");
 
     let dummy = Scheme::new(
-        vec!["KeyA".to_string(), "KeyB".to_string()],
-        vec![generator_a],
+        vec!["KeyA".to_string(), "KeyB".to_string(), "KeyE".to_string()],
+        vec![
+            int_generator,
+            select_sting_generator,
+            duplicate_permutation_generator,
+            when_generator,
+            format_generator,
+        ],
     );
     let yaml_string = serde_yaml::to_string(&dummy).unwrap();
     println!("{}", &yaml_string);

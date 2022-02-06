@@ -7,6 +7,7 @@ pub use value::*;
 
 mod bound;
 mod builder;
+pub mod error;
 mod generator_type;
 pub mod generators;
 mod nullable;

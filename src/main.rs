@@ -1,6 +1,7 @@
 use chrono::{NaiveDate, NaiveTime};
 
 use sbrd_gen::*;
+use sbrd_gen::error::{ErrorKind, SbrdGenError};
 
 fn main() {
     let int_generator = GeneratorBuilder::new_int(None).with_key("KeyA");
@@ -60,8 +61,15 @@ fn main() {
             format_generator,
         ],
     );
-    let yaml_string = serde_yaml::to_string(&dummy).unwrap();
+    let yaml_string = serde_yaml::to_string(&dummy)
+        .map_err(|e| e.into_sbrd_gen_error(ErrorKind::SerializeError))
+        .unwrap();
     println!("{}", &yaml_string);
-    let deserialized: Scheme = serde_yaml::from_str(&yaml_string).unwrap();
+
+    let deserialized: Scheme = serde_yaml::from_str(&yaml_string)
+        .map_err(|e| e.into_sbrd_gen_error(ErrorKind::ParseError))
+        .unwrap();
+    // println!("{:?}", deserialized);
+
     assert_eq!(deserialized, dummy);
 }

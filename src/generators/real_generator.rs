@@ -38,6 +38,7 @@ impl Generator for RealGenerator {
                         .map_err(|e| CompileError::InvalidValue(e.to_string()))
                 })
                 .map(|range| {
+                    // 範囲指定がないと[0, 1)で生成されてしまうため上限下限を設定する
                     range.without_no_bound(i16::MIN as SbrdReal, i16::MAX as SbrdReal)
                 })?,
         };

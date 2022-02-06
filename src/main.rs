@@ -5,10 +5,11 @@ use sbrd_gen::error::{ErrorKind, SbrdGenError};
 
 fn main() {
     let int_generator = GeneratorBuilder::new_int(None).with_key("KeyA");
+
     let select_sting_generator = GeneratorBuilder::new_select_string_with_values([
         "KeyA".to_string(),
         false.to_string(),
-        (32 as u8).to_string(),
+        32_u8.to_string(),
         NaiveDate::from_ymd(2015, 9, 5)
             .and_hms(23, 56, 4)
             .to_string(),
@@ -64,12 +65,32 @@ fn main() {
     let yaml_string = serde_yaml::to_string(&dummy)
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::SerializeError))
         .unwrap();
-    println!("{}", &yaml_string);
+    println!("[schema]\n{}", &yaml_string);
 
     let deserialized: Scheme = serde_yaml::from_str(&yaml_string)
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::ParseError))
         .unwrap();
-    // println!("{:?}", deserialized);
+    // println!("[schema]\n{:?}", deserialized);
 
     assert_eq!(deserialized, dummy);
+
+    println!("\n---------------------------------------------------------------------------\n");
+
+    let builder = GeneratorBuilder::new_int(Some((-100..100).into()))
+        .with_key("KeyA")
+        .nullable();
+    let yaml_string = serde_yaml::to_string(&builder)
+        .map_err(|e| e.into_sbrd_gen_error(ErrorKind::SerializeError))
+        .unwrap();
+    println!("[builder]\n{}", &yaml_string);
+
+    let deserialized: GeneratorBuilder = serde_yaml::from_str(&yaml_string)
+        .map_err(|e| e.into_sbrd_gen_error(ErrorKind::ParseError))
+        .unwrap();
+    // println!("[builder]\n{:?}", deserialized);
+
+    assert_eq!(deserialized, builder);
+
+    let int_generator = builder.build().unwrap();
+    println!("[generate]\n{:?}", int_generator.generate());
 }

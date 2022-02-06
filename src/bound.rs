@@ -1,3 +1,6 @@
+use rand::{Rng, RngCore};
+use rand::distributions::{Distribution, Standard};
+use rand::distributions::uniform::{SampleRange, SampleUniform, UniformSampler};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
@@ -24,11 +27,15 @@ fn default_not_include() -> bool {
 
 impl<T> Default for ValueBound<T> {
     fn default() -> Self {
-        ValueBound::<T>::new(None, None)
+        ValueBound::<T>::new_full()
     }
 }
 
 impl<T> ValueBound<T> {
+    pub fn new_full() -> Self {
+        Self::new(None, None)
+    }
+
     pub fn new(start: Option<T>, end: Option<(bool, T)>) -> Self {
         let (_include_end, _end): (bool, Option<T>) = match end {
             None => (false, None),
@@ -77,59 +84,136 @@ impl<T> ValueBound<T> {
             end: end.map(|e| convert(e)),
         }
     }
+
+    pub fn try_convert_with<F, U, E>(self, mut convert: F) -> Result<ValueBound<U>, E>
+    where
+        F: FnMut(T) -> Result<U, E>,
+    {
+        let Self {
+            start,
+            include_end,
+            end,
+        } = self;
+
+        let _start = match start {
+            None => None,
+            Some(s) => Some(convert(s)?),
+        };
+
+        let _end = match end {
+            None => None,
+            Some(e) => Some(convert(e)?),
+        };
+
+        Ok(ValueBound {
+            start: _start,
+            include_end,
+            end: _end,
+        })
+    }
+}
+
+impl<T: std::cmp::PartialOrd> ValueBound<T> {
+    pub fn contains(&self, v: &T) -> bool {
+        let Self {
+            start,
+            include_end,
+            end,
+        } = &self;
+
+        match (start, end) {
+            (Some(s), Some(e)) => s <= v && ((*include_end && v <= e) || (!*include_end && v < e)),
+            (Some(s), None) => s <= v,
+            (None, Some(e)) => (*include_end && v <= e) || (!*include_end && v < e),
+            (None, None) => true,
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        let Self {
+            start,
+            include_end,
+            end,
+        } = &self;
+
+        match (start, end) {
+            (Some(s), Some(e)) => !((*include_end && s <= e) || (!*include_end && s < e)),
+            // 厳密には違う時があるが判定ができないのであきらめる
+            (_, _) => false,
+        }
+    }
+}
+
+impl<T: PartialOrd> From<std::ops::RangeFull> for ValueBound<T> {
+    fn from(_range: std::ops::RangeFull) -> Self {
+        ValueBound::new(None, None)
+    }
 }
 
 impl<T: PartialOrd> From<std::ops::Range<T>> for ValueBound<T> {
     fn from(range: std::ops::Range<T>) -> Self {
         let std::ops::Range { start, end } = range;
-        ValueBound {
-            start: Some(start),
-            include_end: false,
-            end: Some(end),
-        }
+        ValueBound::new(Some(start), Some((false, end)))
     }
 }
 
 impl<T: PartialOrd> From<std::ops::RangeFrom<T>> for ValueBound<T> {
     fn from(range: std::ops::RangeFrom<T>) -> Self {
         let std::ops::RangeFrom { start } = range;
-        ValueBound {
-            start: Some(start),
-            include_end: false,
-            end: None,
-        }
+        ValueBound::new(Some(start), None)
     }
 }
 
 impl<T: PartialOrd> From<std::ops::RangeInclusive<T>> for ValueBound<T> {
     fn from(range: std::ops::RangeInclusive<T>) -> Self {
         let (start, end) = range.into_inner();
-        ValueBound {
-            start: Some(start),
-            include_end: true,
-            end: Some(end),
-        }
+        ValueBound::new(Some(start), Some((true, end)))
     }
 }
 
 impl<T: PartialOrd> From<std::ops::RangeTo<T>> for ValueBound<T> {
     fn from(range: std::ops::RangeTo<T>) -> Self {
         let std::ops::RangeTo { end } = range;
-        ValueBound {
-            start: None,
-            include_end: false,
-            end: Some(end),
-        }
+        ValueBound::new(None, Some((false, end)))
     }
 }
 
 impl<T: PartialOrd> From<std::ops::RangeToInclusive<T>> for ValueBound<T> {
     fn from(range: std::ops::RangeToInclusive<T>) -> Self {
         let std::ops::RangeToInclusive { end } = range;
-        ValueBound {
-            start: None,
-            include_end: true,
-            end: Some(end),
+        ValueBound::new(None, Some((true, end)))
+    }
+}
+
+impl<T: SampleUniform + PartialOrd> SampleRange<T> for ValueBound<T>
+where
+    Standard: Distribution<T>,
+{
+    #[inline]
+    fn sample_single<R: RngCore + ?Sized>(self, rng: &mut R) -> T {
+        if self.start.is_none() || self.end.is_none() {
+            loop {
+                let s = rng.gen::<T>();
+                if self.contains(&s) {
+                    return s;
+                }
+            }
         }
+
+        match (self.start, self.end) {
+            (Some(s), Some(e)) => {
+                if self.include_end {
+                    T::Sampler::sample_single_inclusive(s, e, rng)
+                } else {
+                    T::Sampler::sample_single(s, e, rng)
+                }
+            }
+            (_, _) => unreachable!(),
+        }
+    }
+
+    #[inline]
+    fn is_empty(&self) -> bool {
+        self.is_empty()
     }
 }

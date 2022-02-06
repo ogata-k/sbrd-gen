@@ -4,43 +4,74 @@ use std::path::PathBuf;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use serde::{Deserialize, Serialize};
 
+use crate::{Nullable, SbrdInt, SbrdReal};
 use crate::bound::ValueBound;
 use crate::generator_type::GeneratorType;
-use crate::Nullable;
+use crate::generators::{Generator, IntGenerator};
+use crate::generators::error::CompileError;
 use crate::value::DataValue;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct GeneratorBuilder {
     #[serde(rename = "type")]
-    generator_type: GeneratorType,
+    pub(crate) generator_type: GeneratorType,
     #[serde(
         skip_serializing_if = "Nullable::is_required",
         default = "Nullable::new_required"
     )]
-    nullable: Nullable,
+    pub(crate) nullable: Nullable,
     #[serde(skip_serializing_if = "Option::is_none")]
-    key: Option<String>,
+    pub(crate) key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    range: Option<ValueBound<String>>,
+    pub(crate) range: Option<ValueBound<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    condition: Option<String>,
+    pub(crate) condition: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    children: Option<Vec<GeneratorBuilder>>,
+    pub(crate) children: Option<Vec<GeneratorBuilder>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    chars: Option<String>,
+    pub(crate) chars: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    values: Option<Vec<String>>,
+    pub(crate) values: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    file: Option<PathBuf>,
+    pub(crate) file: Option<PathBuf>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    separator: Option<String>,
+    pub(crate) separator: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    format: Option<String>,
+    pub(crate) format: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    parameters: Option<BTreeMap<String, DataValue>>,
+    pub(crate) parameters: Option<BTreeMap<String, DataValue>>,
 }
 
+// create builder impl
 impl GeneratorBuilder {
+    pub fn build(self) -> Result<Box<dyn Generator>, CompileError> {
+        let generator_type = self.generator_type;
+        match generator_type {
+            GeneratorType::Int => {
+                let generator = IntGenerator::create(self)?;
+                Ok(Box::new(generator))
+            }
+            GeneratorType::Real => unimplemented!(),
+            GeneratorType::Bool => unimplemented!(),
+            GeneratorType::AlwaysNull => unimplemented!(),
+            GeneratorType::EvalInt => unimplemented!(),
+            GeneratorType::EvalReal => unimplemented!(),
+            GeneratorType::Format => unimplemented!(),
+            GeneratorType::DuplicatePermutation => unimplemented!(),
+            GeneratorType::SelectInt => unimplemented!(),
+            GeneratorType::SelectReal => unimplemented!(),
+            GeneratorType::SelectString => unimplemented!(),
+            GeneratorType::DistIntUniform => unimplemented!(),
+            GeneratorType::DistRealUniform => unimplemented!(),
+            GeneratorType::DistRealNormal => unimplemented!(),
+            GeneratorType::When => unimplemented!(),
+            GeneratorType::DateTime => unimplemented!(),
+            GeneratorType::Date => unimplemented!(),
+            GeneratorType::Time => unimplemented!(),
+            GeneratorType::IncrementId => unimplemented!(),
+        }
+    }
+
     //
     // constructor functions following:
     //
@@ -62,7 +93,7 @@ impl GeneratorBuilder {
         }
     }
 
-    pub fn new_int(range: Option<ValueBound<u64>>) -> Self {
+    pub fn new_int(range: Option<ValueBound<SbrdInt>>) -> Self {
         let mut this = Self::new(GeneratorType::Int);
         if let Some(range) = range {
             this = this.range(range.convert_with(|v| format!("{}", v)));
@@ -71,7 +102,7 @@ impl GeneratorBuilder {
         this
     }
 
-    pub fn new_real(range: Option<ValueBound<f64>>) -> Self {
+    pub fn new_real(range: Option<ValueBound<SbrdReal>>) -> Self {
         let mut this = Self::new(GeneratorType::Real);
         if let Some(range) = range {
             this = this.range(range.convert_with(|v| format!("{}", v)));
@@ -109,7 +140,7 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::Format).format(format.into())
     }
 
-    fn new_duplicate_permutation<S>(range: Option<ValueBound<u64>>, separator: S) -> Self
+    fn new_duplicate_permutation<S>(range: Option<ValueBound<SbrdInt>>, separator: S) -> Self
     where
         S: Into<String>,
     {
@@ -122,7 +153,7 @@ impl GeneratorBuilder {
     }
 
     pub fn new_duplicate_permutation_with_chars<S1, S2>(
-        range: Option<ValueBound<u64>>,
+        range: Option<ValueBound<SbrdInt>>,
         separator: S1,
         chars: S2,
     ) -> Self
@@ -134,7 +165,7 @@ impl GeneratorBuilder {
     }
 
     pub fn new_duplicate_permutation_with_children<S, V>(
-        range: Option<ValueBound<u64>>,
+        range: Option<ValueBound<SbrdInt>>,
         separator: S,
         builders: V,
     ) -> Self
@@ -151,7 +182,7 @@ impl GeneratorBuilder {
 
     pub fn new_select_int_with_values<V>(values: V) -> Self
     where
-        V: Into<Vec<u64>>,
+        V: Into<Vec<SbrdInt>>,
     {
         Self::new_select_int().values(
             values
@@ -175,7 +206,7 @@ impl GeneratorBuilder {
 
     pub fn new_select_real_with_values<V>(values: V) -> Self
     where
-        V: Into<Vec<f64>>,
+        V: Into<Vec<SbrdReal>>,
     {
         Self::new_select_real().values(
             values
@@ -286,7 +317,7 @@ impl GeneratorBuilder {
         this
     }
 
-    pub fn new_increment_id(range: Option<ValueBound<u64>>) -> Self {
+    pub fn new_increment_id(range: Option<ValueBound<SbrdInt>>) -> Self {
         let mut this = Self::new(GeneratorType::IncrementId);
         if let Some(range) = range {
             this = this.range(range.convert_with(|v| format!("{}", v)));

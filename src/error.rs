@@ -1,3 +1,5 @@
+use crate::generators::error::CompileError;
+
 #[derive(Debug)]
 pub struct Error {
     kind: ErrorKind,
@@ -31,6 +33,12 @@ struct ErrorInfo(Box<dyn std::error::Error>);
 impl std::fmt::Display for ErrorInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+impl From<CompileError> for Error {
+    fn from(e: CompileError) -> Self {
+        e.into_sbrd_gen_error(ErrorKind::CompileError)
     }
 }
 

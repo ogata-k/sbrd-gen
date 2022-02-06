@@ -4,10 +4,13 @@ use chrono::naive::{NaiveDate, NaiveDateTime, NaiveTime};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::{Error, Unexpected, Visitor};
 
+pub type SbrdInt = isize;
+pub type SbrdReal = f64;
+
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub enum DataValue {
-    Int(isize),
-    Real(f64),
+    Int(SbrdInt),
+    Real(SbrdReal),
     Bool(bool),
     String(String),
     DateTime(NaiveDateTime),
@@ -28,7 +31,7 @@ impl<'de> Visitor<'de> for DataValueVisitor {
     where
         E: Error,
     {
-        let i = isize::try_from(v);
+        let i = SbrdInt::try_from(v);
         match i {
             Err(_) => Err(Error::invalid_value(Unexpected::Signed(v), &self)),
             Ok(parsed) => Ok(DataValue::Int(parsed)),
@@ -39,9 +42,9 @@ impl<'de> Visitor<'de> for DataValueVisitor {
     where
         E: Error,
     {
-        let i = isize::try_from(v);
+        let i = SbrdInt::try_from(v);
         match i {
-            Err(_) => Err(Error::invalid_value(Unexpected::Signed(v as i64), &self)),
+            Err(_) => Err(Error::invalid_value(Unexpected::Unsigned(v as u64), &self)),
             Ok(parsed) => Ok(DataValue::Int(parsed)),
         }
     }
@@ -50,7 +53,7 @@ impl<'de> Visitor<'de> for DataValueVisitor {
     where
         E: Error,
     {
-        Ok(DataValue::Real(v))
+        Ok(DataValue::Real(v as SbrdReal))
     }
 
     fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
@@ -98,7 +101,7 @@ impl Serialize for DataValue {
     {
         match &self {
             DataValue::Int(v) => serializer.serialize_i64(*v as i64),
-            DataValue::Real(v) => serializer.serialize_f64(*v),
+            DataValue::Real(v) => serializer.serialize_f64(*v as f64),
             DataValue::Bool(v) => serializer.serialize_bool(*v),
             DataValue::String(v) => serializer.serialize_str(v),
             // need 0 padding

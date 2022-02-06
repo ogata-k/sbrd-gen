@@ -158,6 +158,25 @@ impl<T: std::cmp::PartialOrd> ValueBound<T> {
     }
 }
 
+impl <T: std::fmt::Display> std::fmt::Display for ValueBound<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let Self {
+            start,
+            include_end,
+            end,
+        } = &self;
+
+        match (start, end, include_end) {
+            (Some(s), Some(e), true) => write!(f, "{}..={}", s, e),
+            (Some(s), Some(e), false) => write!(f, "{}..{}", s, e),
+            (Some(s), None, _) =>  write!(f, "{}..", s),
+            (None, Some(e), true) =>  write!(f, "..={}",e),
+            (None, Some(e), false) =>  write!(f, "..{}",e),
+            (None, None, _) =>  write!(f, "..",),
+        }
+    }
+}
+
 impl<T: PartialOrd> From<std::ops::RangeFull> for ValueBound<T> {
     fn from(_range: std::ops::RangeFull) -> Self {
         ValueBound::new(None, None)

@@ -90,6 +90,8 @@ fn main() {
 
     assert_eq!(deserialized, builder);
 
-    let int_generator = builder.build().unwrap();
-    println!("[generate]\n{:?}", int_generator.generate());
+    let generator = builder.build()
+        .map_err(|e| e.into_sbrd_gen_error(ErrorKind::GenerateError))
+        .unwrap();
+    println!("[generate]\n{:?}", generator.generate());
 }

@@ -1,7 +1,7 @@
 use rand::{Rng, thread_rng};
 
 use crate::{DataValue, GeneratorBuilder, Nullable};
-use crate::generators::error::CompileError;
+use crate::generators::error::{CompileError, GenerateError};
 
 pub fn get_rng() -> impl Rng {
     thread_rng()
@@ -26,17 +26,17 @@ pub trait Generator {
         self.get_nullable().is_required()
     }
 
-    fn generate(&self) -> DataValue {
+    fn generate(&self) -> Result<DataValue, GenerateError> {
         if self.is_required() {
             self.generate_without_null()
         } else {
             if Rng::gen_bool(&mut get_rng(), 0.1) {
-                return DataValue::Null;
+                return Ok(DataValue::Null);
             }
 
             self.generate_without_null()
         }
     }
 
-    fn generate_without_null(&self) -> DataValue;
+    fn generate_without_null(&self) -> Result<DataValue, GenerateError> ;
 }

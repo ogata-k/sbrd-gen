@@ -1,4 +1,4 @@
-use crate::GeneratorType;
+use crate::{GeneratorType, ValueBound};
 
 #[derive(Debug)]
 pub enum CompileError {
@@ -16,3 +16,19 @@ impl std::fmt::Display for CompileError {
 }
 
 impl std::error::Error for CompileError {}
+
+#[derive(Debug)]
+pub enum GenerateError {
+    // 文字列に変換して範囲を持つようにする
+    RangeEmpty(ValueBound<String>),
+}
+
+impl std::fmt::Display for GenerateError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            GenerateError::RangeEmpty(range) => write!(f, "Empty Range: {}", range),
+        }
+    }
+}
+
+impl std::error::Error for GenerateError {}

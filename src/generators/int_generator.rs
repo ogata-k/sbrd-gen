@@ -2,7 +2,7 @@ use rand::Rng;
 
 use crate::{DataValue, GeneratorBuilder, GeneratorType, Nullable, SbrdInt, ValueBound};
 use crate::generators::{Generator, get_rng};
-use crate::generators::error::CompileError;
+use crate::generators::error::{CompileError, GenerateError};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
 pub struct IntGenerator {
@@ -59,10 +59,13 @@ impl Generator for IntGenerator {
         &self.nullable
     }
 
-    fn generate_without_null(&self) -> DataValue {
+    fn generate_without_null(&self) ->  Result<DataValue, GenerateError>  {
+        if self.range.is_empty(){
+            return Err(GenerateError::RangeEmpty(self.range.convert_with(|i| i.to_string())));
+        }
         let v: SbrdInt = get_rng().gen_range(self.range);
 
-        DataValue::Int(v)
+        Ok(DataValue::Int(v))
     }
 }
 

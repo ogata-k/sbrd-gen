@@ -5,7 +5,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::{Error, Unexpected, Visitor};
 
 pub type SbrdInt = i32;
-pub type SbrdReal = f64;
+pub type SbrdReal = f32;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub enum DataValue {

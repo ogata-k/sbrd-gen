@@ -1,6 +1,6 @@
 use rand::Rng;
 
-use crate::{DataValue, GeneratorBuilder, GeneratorType, Nullable, SbrdInt, SbrdReal, ValueBound};
+use crate::{DataValue, GeneratorBuilder, GeneratorType, Nullable, SbrdReal, ValueBound};
 use crate::generators::{Generator, get_rng};
 use crate::generators::error::CompileError;
 
@@ -38,7 +38,7 @@ impl Generator for RealGenerator {
                         .map_err(|e| CompileError::InvalidValue(e.to_string()))
                 })
                 .map(|range| {
-                    range.without_no_bound(SbrdInt::MIN as SbrdReal, SbrdInt::MAX as SbrdReal)
+                    range.without_no_bound(i16::MIN as SbrdReal, i16::MAX as SbrdReal)
                 })?,
         };
 

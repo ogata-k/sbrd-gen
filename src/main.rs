@@ -76,9 +76,8 @@ fn main() {
 
     println!("\n---------------------------------------------------------------------------\n");
 
-    let builder = GeneratorBuilder::new_real(Some((..).into()))
-        .with_key("KeyA")
-        .nullable();
+    let builder = GeneratorBuilder::new_real(Some((0.0..=1.0).into()))
+        .with_key("KeyA");
     let yaml_string = serde_yaml::to_string(&builder)
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::SerializeError))
         .unwrap();

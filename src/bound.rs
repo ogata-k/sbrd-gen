@@ -111,6 +111,20 @@ impl<T> ValueBound<T> {
             end: _end,
         })
     }
+
+    pub fn without_no_bound(self, lower_bound: T, upper_bound: T) -> ValueBound<T> {
+        let Self {
+            start,
+            include_end,
+            end,
+        } = self;
+
+        ValueBound {
+            start: start.or(Some(lower_bound)),
+            include_end: if end.is_some() { include_end } else { true },
+            end: end.or(Some(upper_bound)),
+        }
+    }
 }
 
 impl<T: std::cmp::PartialOrd> ValueBound<T> {

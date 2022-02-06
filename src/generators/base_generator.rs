@@ -1,10 +1,10 @@
-use rand::Rng;
+use rand::{Rng, thread_rng};
 
 use crate::{DataValue, GeneratorBuilder, Nullable};
 use crate::generators::error::CompileError;
 
 pub fn get_rng() -> impl Rng {
-    rand::thread_rng()
+    thread_rng()
 }
 
 pub trait Generator {
@@ -30,7 +30,7 @@ pub trait Generator {
         if self.is_required() {
             self.generate_without_null()
         } else {
-            if get_rng().gen_bool(0.1) {
+            if Rng::gen_bool(&mut get_rng(), 0.1) {
                 return DataValue::Null;
             }
 

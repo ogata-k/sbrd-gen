@@ -76,7 +76,7 @@ fn main() {
 
     println!("\n---------------------------------------------------------------------------\n");
 
-    let builder = GeneratorBuilder::new_int(Some((-100..100).into()))
+    let builder = GeneratorBuilder::new_real(Some((..).into()))
         .with_key("KeyA")
         .nullable();
     let yaml_string = serde_yaml::to_string(&builder)

@@ -4,7 +4,7 @@ use chrono::naive::{NaiveDate, NaiveDateTime, NaiveTime};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::{Error, Unexpected, Visitor};
 
-pub type SbrdInt = isize;
+pub type SbrdInt = i32;
 pub type SbrdReal = f64;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]

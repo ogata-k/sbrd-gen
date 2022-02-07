@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::{Nullable, SbrdInt, SbrdReal};
 use crate::bound::ValueBound;
 use crate::generator_type::GeneratorType;
-use crate::generators::{Generator, IntGenerator, RealGenerator};
+use crate::generators::{BoolGenerator, Generator, IntGenerator, RealGenerator};
 use crate::generators::error::CompileError;
 use crate::value::DataValue;
 
@@ -55,7 +55,10 @@ impl GeneratorBuilder {
                 let generator = RealGenerator::create(self)?;
                 Ok(Box::new(generator))
             }
-            GeneratorType::Bool => unimplemented!(),
+            GeneratorType::Bool =>  {
+                let generator = BoolGenerator::create(self)?;
+                Ok(Box::new(generator))
+            },
             GeneratorType::AlwaysNull => unimplemented!(),
             GeneratorType::EvalInt => unimplemented!(),
             GeneratorType::EvalReal => unimplemented!(),

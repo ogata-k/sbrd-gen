@@ -2,6 +2,7 @@ use std::collections::btree_map::BTreeMap;
 use std::path::PathBuf;
 
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 
 use crate::{Nullable, SbrdBool, SbrdInt, SbrdReal};
@@ -48,35 +49,35 @@ pub struct GeneratorBuilder {
 
 // create builder impl
 impl GeneratorBuilder {
-    pub fn build(self) -> Result<Box<dyn Generator>, CompileError> {
+    pub fn build<R: Rng + ?Sized>(self) -> Result<Box<dyn Generator<R>>, CompileError> {
         let generator_type = self.generator_type;
         match generator_type {
             GeneratorType::Int => {
-                let generator = IntGenerator::create(self)?;
+                let generator: IntGenerator = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
             GeneratorType::Real => {
-                let generator = RealGenerator::create(self)?;
+                let generator: RealGenerator = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
             GeneratorType::Bool => {
-                let generator = BoolGenerator::create(self)?;
+                let generator: BoolGenerator = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
             GeneratorType::AlwaysNull => {
-                let generator = AlwaysNullGenerator::create(self)?;
+                let generator: AlwaysNullGenerator = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
             GeneratorType::EvalInt => {
-                let generator = EvalGenerator::<SbrdInt>::create(self)?;
+                let generator: EvalGenerator::<SbrdInt> = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
             GeneratorType::EvalReal => {
-                let generator = EvalGenerator::<SbrdReal>::create(self)?;
+                let generator: EvalGenerator::<SbrdReal> = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
             GeneratorType::EvalBool => {
-                let generator = EvalGenerator::<SbrdBool>::create(self)?;
+                let generator: EvalGenerator::<SbrdBool> = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
             GeneratorType::Format => unimplemented!(),

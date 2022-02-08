@@ -3,8 +3,8 @@ use rand::Rng;
 use crate::{
     DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdReal, ValueBound,
 };
-use crate::generators::{Generator, get_rng};
 use crate::generators::error::{CompileError, GenerateError};
+use crate::generators::Generator;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct RealGenerator {
@@ -13,7 +13,7 @@ pub struct RealGenerator {
     nullable: Nullable,
     range: ValueBound<SbrdReal>,
 }
-impl Generator for RealGenerator {
+impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,
@@ -67,6 +67,7 @@ impl Generator for RealGenerator {
 
     fn generate_without_null(
         &self,
+        rng: &mut R,
         _value_map: &DataValueMap<String>,
     ) -> Result<DataValue, GenerateError> {
         if self.range.is_empty() {
@@ -75,8 +76,7 @@ impl Generator for RealGenerator {
             ));
         }
 
-        let mut rng = get_rng();
-        let real = Rng::gen_range(&mut rng, self.range);
+        let real = rng.gen_range(self.range);
         Ok(DataValue::Real(real))
     }
 }

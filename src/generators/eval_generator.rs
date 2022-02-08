@@ -2,6 +2,7 @@ use std::marker::PhantomData;
 use std::str::FromStr;
 
 use eval::eval;
+use rand::Rng;
 
 use crate::{
     DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, replace_values, SbrdBool,
@@ -21,7 +22,7 @@ pub struct EvalGenerator<T: FromStr> {
     script: String,
     _calculated_type: PhantomData<T>,
 }
-impl<F: ForEvalGeneratorType> Generator for EvalGenerator<F> {
+impl<R: Rng + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F> {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,
@@ -65,6 +66,7 @@ impl<F: ForEvalGeneratorType> Generator for EvalGenerator<F> {
 
     fn generate_without_null(
         &self,
+        _rng: &mut R,
         value_map: &DataValueMap<String>,
     ) -> Result<DataValue, GenerateError> {
         let mut _script = replace_values(&self.script, value_map);

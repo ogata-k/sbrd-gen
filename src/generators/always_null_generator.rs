@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 use crate::generators::error::{CompileError, GenerateError};
 use crate::generators::Generator;
@@ -9,7 +11,7 @@ pub struct AlwaysNullGenerator {
     nullable: Nullable,
 }
 
-impl Generator for AlwaysNullGenerator {
+impl<R: Rng + ?Sized> Generator<R> for AlwaysNullGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,
@@ -47,6 +49,7 @@ impl Generator for AlwaysNullGenerator {
 
     fn generate_without_null(
         &self,
+        _rng: &mut R,
         _value_map: &DataValueMap<String>,
     ) -> Result<DataValue, GenerateError> {
         Ok(DataValue::Null)

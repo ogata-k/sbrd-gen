@@ -1,4 +1,5 @@
 use chrono::{NaiveDate, NaiveTime};
+use rand::thread_rng;
 
 use sbrd_gen::*;
 use sbrd_gen::error::{ErrorKind, SbrdGenError};
@@ -125,5 +126,6 @@ fn main() {
                 .to_string(),
         ),
     );
-    println!("[generate]\n{:?}", generator.generate(&value_map));
+    let mut rng = thread_rng();
+    println!("[generate]\n{:?}", generator.generate(&mut rng, &value_map));
 }

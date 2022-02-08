@@ -3,8 +3,8 @@ use rand::Rng;
 use crate::{
     DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdInt, ValueBound,
 };
-use crate::generators::{Generator, get_rng};
 use crate::generators::error::{CompileError, GenerateError};
+use crate::generators::Generator;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
 pub struct IntGenerator {
@@ -14,7 +14,7 @@ pub struct IntGenerator {
     range: ValueBound<SbrdInt>,
 }
 
-impl Generator for IntGenerator {
+impl<R: Rng + ?Sized> Generator<R> for IntGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,
@@ -63,6 +63,7 @@ impl Generator for IntGenerator {
 
     fn generate_without_null(
         &self,
+        rng: &mut R,
         _value_map: &DataValueMap<String>,
     ) -> Result<DataValue, GenerateError> {
         if self.range.is_empty() {
@@ -70,7 +71,7 @@ impl Generator for IntGenerator {
                 self.range.convert_with(|i| i.to_string()),
             ));
         }
-        let v: SbrdInt = get_rng().gen_range(self.range);
+        let v: SbrdInt = rng.gen_range(self.range);
 
         Ok(DataValue::Int(v))
     }

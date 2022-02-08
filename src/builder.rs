@@ -65,10 +65,14 @@ impl GeneratorBuilder {
                 let generator: BoolGenerator = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
+            GeneratorType::DateTime => unimplemented!(),
+            GeneratorType::Date => unimplemented!(),
+            GeneratorType::Time => unimplemented!(),
             GeneratorType::AlwaysNull => {
                 let generator: AlwaysNullGenerator = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
+            GeneratorType::IncrementId => unimplemented!(),
             GeneratorType::EvalInt => {
                 let generator: EvalGenerator<SbrdInt> = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
@@ -93,10 +97,6 @@ impl GeneratorBuilder {
             GeneratorType::DistRealUniform => unimplemented!(),
             GeneratorType::DistRealNormal => unimplemented!(),
             GeneratorType::When => unimplemented!(),
-            GeneratorType::DateTime => unimplemented!(),
-            GeneratorType::Date => unimplemented!(),
-            GeneratorType::Time => unimplemented!(),
-            GeneratorType::IncrementId => unimplemented!(),
         }
     }
 

@@ -7,7 +7,12 @@ pub enum GeneratorType {
     Int,
     Real,
     Bool,
+    DateTime,
+    Date,
+    Time,
+    // special primitive
     AlwaysNull,
+    IncrementId,
     // evaluate
     EvalInt,
     EvalReal,
@@ -26,12 +31,6 @@ pub enum GeneratorType {
     DistRealNormal,
     // case-when condition. default value is null.
     When,
-    // date, time and datetime
-    DateTime,
-    Date,
-    Time,
-    // increment value
-    IncrementId,
 }
 
 impl std::fmt::Display for GeneratorType {

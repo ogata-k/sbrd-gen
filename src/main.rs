@@ -78,7 +78,7 @@ fn main() {
     println!("\n---------------------------------------------------------------------------\n");
 
     let builder =
-        GeneratorBuilder::new_eval_bool("'{dummy_date_time}' == '{dummy_date} {dummy_time}'")
+        GeneratorBuilder::new_format("'{dummy_date_time}' == '{dummy_date} {dummy_time}'")
             .with_key("KeyA");
     let yaml_string = serde_yaml::to_string(&builder)
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::SerializeError))

@@ -13,13 +13,13 @@ pub const DATE_TIME_DEFAULT_FORMAT: &str = "%F %T";
 pub const DATE_DEFAULT_FORMAT: &str = "%F";
 pub const TIME_DEFAULT_FORMAT: &str = "%T";
 
-pub(crate) fn replace_values(base_script: &str, value_map: &DataValueMap<String>) -> String {
+pub(crate) fn replace_values(base_format: &str, value_map: &DataValueMap<String>) -> String {
     let mut result = String::new();
     for (i, (key, value)) in value_map.iter().enumerate() {
         let format = format!("{{{}}}", key);
         let eval_value = value.to_eval_value();
         if i == 0 {
-            result = base_script.replace(&format, &eval_value);
+            result = base_format.replace(&format, &eval_value);
         } else {
             result = result.replace(&format, &eval_value);
         }

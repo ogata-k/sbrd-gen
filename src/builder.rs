@@ -9,7 +9,8 @@ use crate::{Nullable, SbrdBool, SbrdInt, SbrdReal};
 use crate::bound::ValueBound;
 use crate::generator_type::GeneratorType;
 use crate::generators::{
-    AlwaysNullGenerator, BoolGenerator, EvalGenerator, Generator, IntGenerator, RealGenerator,
+    AlwaysNullGenerator, BoolGenerator, EvalGenerator, FormatGenerator, Generator, IntGenerator,
+    RealGenerator,
 };
 use crate::generators::error::CompileError;
 use crate::value::DataValue;
@@ -69,18 +70,21 @@ impl GeneratorBuilder {
                 Ok(Box::new(generator))
             }
             GeneratorType::EvalInt => {
-                let generator: EvalGenerator::<SbrdInt> = Generator::<R>::create(self)?;
+                let generator: EvalGenerator<SbrdInt> = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
             GeneratorType::EvalReal => {
-                let generator: EvalGenerator::<SbrdReal> = Generator::<R>::create(self)?;
+                let generator: EvalGenerator<SbrdReal> = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
             GeneratorType::EvalBool => {
-                let generator: EvalGenerator::<SbrdBool> = Generator::<R>::create(self)?;
+                let generator: EvalGenerator<SbrdBool> = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
-            GeneratorType::Format => unimplemented!(),
+            GeneratorType::Format => {
+                let generator: FormatGenerator = Generator::<R>::create(self)?;
+                Ok(Box::new(generator))
+            }
             GeneratorType::DuplicatePermutation => unimplemented!(),
             GeneratorType::SelectInt => unimplemented!(),
             GeneratorType::SelectReal => unimplemented!(),

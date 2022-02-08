@@ -1,6 +1,8 @@
 use rand::Rng;
 
-use crate::{DataValue, GeneratorBuilder, GeneratorType, Nullable, SbrdReal, ValueBound};
+use crate::{
+    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdReal, ValueBound,
+};
 use crate::generators::{Generator, get_rng};
 use crate::generators::error::{CompileError, GenerateError};
 
@@ -63,9 +65,14 @@ impl Generator for RealGenerator {
         &self.nullable
     }
 
-    fn generate_without_null(&self) -> Result<DataValue, GenerateError>  {
-        if self.range.is_empty(){
-            return Err(GenerateError::RangeEmpty(self.range.convert_with(|r| r.to_string())));
+    fn generate_without_null(
+        &self,
+        _value_map: &DataValueMap<String>,
+    ) -> Result<DataValue, GenerateError> {
+        if self.range.is_empty() {
+            return Err(GenerateError::RangeEmpty(
+                self.range.convert_with(|r| r.to_string()),
+            ));
         }
 
         let mut rng = get_rng();

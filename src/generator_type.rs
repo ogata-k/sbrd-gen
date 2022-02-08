@@ -11,6 +11,7 @@ pub enum GeneratorType {
     // evaluate
     EvalInt,
     EvalReal,
+    EvalBool,
     // join
     Format,
     // join (use bound parameter as count)

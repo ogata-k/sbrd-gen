@@ -1,4 +1,4 @@
-use crate::{DataValue, GeneratorBuilder, GeneratorType, Nullable};
+use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 use crate::generators::error::{CompileError, GenerateError};
 use crate::generators::Generator;
 
@@ -11,8 +11,8 @@ pub struct AlwaysNullGenerator {
 
 impl Generator for AlwaysNullGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         let GeneratorBuilder {
             generator_type,
@@ -45,7 +45,10 @@ impl Generator for AlwaysNullGenerator {
         &self.nullable
     }
 
-    fn generate_without_null(&self) ->  Result<DataValue, GenerateError>  {
+    fn generate_without_null(
+        &self,
+        _value_map: &DataValueMap<String>,
+    ) -> Result<DataValue, GenerateError> {
         Ok(DataValue::Null)
     }
 }

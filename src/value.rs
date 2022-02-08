@@ -1,11 +1,32 @@
+use std::collections::BTreeMap;
 use std::fmt;
 
-use chrono::naive::{NaiveDate, NaiveDateTime, NaiveTime};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::{Error, Unexpected, Visitor};
 
+pub type DataValueMap<K> = BTreeMap<K, DataValue>;
 pub type SbrdInt = i32;
 pub type SbrdReal = f32;
+pub type SbrdBool = bool;
+
+pub const DATE_TIME_DEFAULT_FORMAT: &str = "%F %T";
+pub const DATE_DEFAULT_FORMAT: &str = "%F";
+pub const TIME_DEFAULT_FORMAT: &str = "%T";
+
+pub(crate) fn replace_values(base_script: &str, value_map: &DataValueMap<String>) -> String {
+    let mut result = String::new();
+    for (i, (key, value)) in value_map.iter().enumerate() {
+        let format = format!("{{{}}}", key);
+        let eval_value = value.to_eval_value();
+        if i == 0 {
+            result = base_script.replace(&format, &eval_value);
+        } else {
+            result = result.replace(&format, &eval_value);
+        }
+    }
+
+    result
+}
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub enum DataValue {
@@ -13,9 +34,6 @@ pub enum DataValue {
     Real(SbrdReal),
     Bool(bool),
     String(String),
-    DateTime(NaiveDateTime),
-    Date(NaiveDate),
-    Time(NaiveTime),
     Null,
 }
 
@@ -104,13 +122,19 @@ impl Serialize for DataValue {
             DataValue::Real(v) => serializer.serialize_f64(*v as f64),
             DataValue::Bool(v) => serializer.serialize_bool(*v),
             DataValue::String(v) => serializer.serialize_str(v),
-            // need 0 padding
-            DataValue::DateTime(v) => serializer.serialize_str(&v.format("%F %T").to_string()),
-            // need 0 padding
-            DataValue::Date(v) => serializer.serialize_str(&v.format("%F").to_string()),
-            // need 0 padding
-            DataValue::Time(v) => serializer.serialize_str(&v.format("%T").to_string()),
             DataValue::Null => serializer.serialize_unit(),
+        }
+    }
+}
+
+impl DataValue {
+    pub fn to_eval_value(&self) -> String {
+        match self {
+            DataValue::Int(v) => v.to_string(),
+            DataValue::Real(v) => v.to_string(),
+            DataValue::Bool(v) => v.to_string(),
+            DataValue::String(v) => v.to_string(),
+            DataValue::Null => "null".to_string(),
         }
     }
 }

@@ -1,6 +1,6 @@
 use rand::Rng;
 
-use crate::{DataValue, GeneratorBuilder, GeneratorType, Nullable};
+use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 use crate::generators::{Generator, get_rng};
 use crate::generators::error::{CompileError, GenerateError};
 
@@ -13,8 +13,8 @@ pub struct BoolGenerator {
 
 impl Generator for BoolGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         let GeneratorBuilder {
             generator_type,
@@ -47,7 +47,10 @@ impl Generator for BoolGenerator {
         &self.nullable
     }
 
-    fn generate_without_null(&self) ->  Result<DataValue, GenerateError>  {
+    fn generate_without_null(
+        &self,
+        _value_map: &DataValueMap<String>,
+    ) -> Result<DataValue, GenerateError> {
         Ok(DataValue::Bool(get_rng().gen_bool(0.5)))
     }
 }

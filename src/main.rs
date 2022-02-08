@@ -76,8 +76,9 @@ fn main() {
 
     println!("\n---------------------------------------------------------------------------\n");
 
-    let builder = GeneratorBuilder::new_always_null()
-        .with_key("KeyA");
+    let builder =
+        GeneratorBuilder::new_eval_bool("'{dummy_date_time}' == '{dummy_date} {dummy_time}'")
+            .with_key("KeyA");
     let yaml_string = serde_yaml::to_string(&builder)
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::SerializeError))
         .unwrap();
@@ -90,8 +91,39 @@ fn main() {
 
     assert_eq!(deserialized, builder);
 
-    let generator = builder.build()
+    let generator = builder
+        .build()
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::GenerateError))
         .unwrap();
-    println!("[generate]\n{:?}", generator.generate());
+
+    let mut value_map = DataValueMap::<String>::new();
+    value_map.insert("dummy_int".to_string(), DataValue::Int(32));
+    value_map.insert("dummy_real".to_string(), DataValue::Real(3.14 as SbrdReal));
+    value_map.insert("dummy_bool".to_string(), DataValue::Bool(false));
+    value_map.insert(
+        "dummy_date_time".to_string(),
+        DataValue::String(
+            NaiveDate::from_ymd(2021, 12, 25)
+                .and_hms(0, 0, 0)
+                .format(DATE_TIME_DEFAULT_FORMAT)
+                .to_string(),
+        ),
+    );
+    value_map.insert(
+        "dummy_date".to_string(),
+        DataValue::String(
+            NaiveDate::from_ymd(2021, 12, 25)
+                .format(DATE_DEFAULT_FORMAT)
+                .to_string(),
+        ),
+    );
+    value_map.insert(
+        "dummy_time".to_string(),
+        DataValue::String(
+            NaiveTime::from_hms(0, 0, 0)
+                .format(TIME_DEFAULT_FORMAT)
+                .to_string(),
+        ),
+    );
+    println!("[generate]\n{:?}", generator.generate(&value_map));
 }

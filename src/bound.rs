@@ -158,7 +158,7 @@ impl<T: std::cmp::PartialOrd> ValueBound<T> {
     }
 }
 
-impl <T: std::fmt::Display> std::fmt::Display for ValueBound<T> {
+impl<T: std::fmt::Display> std::fmt::Display for ValueBound<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let Self {
             start,
@@ -169,10 +169,10 @@ impl <T: std::fmt::Display> std::fmt::Display for ValueBound<T> {
         match (start, end, include_end) {
             (Some(s), Some(e), true) => write!(f, "{}..={}", s, e),
             (Some(s), Some(e), false) => write!(f, "{}..{}", s, e),
-            (Some(s), None, _) =>  write!(f, "{}..", s),
-            (None, Some(e), true) =>  write!(f, "..={}",e),
-            (None, Some(e), false) =>  write!(f, "..{}",e),
-            (None, None, _) =>  write!(f, "..",),
+            (Some(s), None, _) => write!(f, "{}..", s),
+            (None, Some(e), true) => write!(f, "..={}", e),
+            (None, Some(e), false) => write!(f, "..{}", e),
+            (None, None, _) => write!(f, "..",),
         }
     }
 }

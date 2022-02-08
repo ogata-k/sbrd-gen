@@ -4,10 +4,12 @@ use std::path::PathBuf;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use serde::{Deserialize, Serialize};
 
-use crate::{Nullable, SbrdInt, SbrdReal};
+use crate::{Nullable, SbrdBool, SbrdInt, SbrdReal};
 use crate::bound::ValueBound;
 use crate::generator_type::GeneratorType;
-use crate::generators::{AlwaysNullGenerator, BoolGenerator, Generator, IntGenerator, RealGenerator};
+use crate::generators::{
+    AlwaysNullGenerator, BoolGenerator, EvalGenerator, Generator, IntGenerator, RealGenerator,
+};
 use crate::generators::error::CompileError;
 use crate::value::DataValue;
 
@@ -39,6 +41,8 @@ pub struct GeneratorBuilder {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) format: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) script: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) parameters: Option<BTreeMap<String, DataValue>>,
 }
 
@@ -55,16 +59,26 @@ impl GeneratorBuilder {
                 let generator = RealGenerator::create(self)?;
                 Ok(Box::new(generator))
             }
-            GeneratorType::Bool =>  {
+            GeneratorType::Bool => {
                 let generator = BoolGenerator::create(self)?;
                 Ok(Box::new(generator))
-            },
-            GeneratorType::AlwaysNull =>   {
+            }
+            GeneratorType::AlwaysNull => {
                 let generator = AlwaysNullGenerator::create(self)?;
                 Ok(Box::new(generator))
-            },
-            GeneratorType::EvalInt => unimplemented!(),
-            GeneratorType::EvalReal => unimplemented!(),
+            }
+            GeneratorType::EvalInt => {
+                let generator = EvalGenerator::<SbrdInt>::create(self)?;
+                Ok(Box::new(generator))
+            }
+            GeneratorType::EvalReal => {
+                let generator = EvalGenerator::<SbrdReal>::create(self)?;
+                Ok(Box::new(generator))
+            }
+            GeneratorType::EvalBool => {
+                let generator = EvalGenerator::<SbrdBool>::create(self)?;
+                Ok(Box::new(generator))
+            }
             GeneratorType::Format => unimplemented!(),
             GeneratorType::DuplicatePermutation => unimplemented!(),
             GeneratorType::SelectInt => unimplemented!(),
@@ -96,6 +110,7 @@ impl GeneratorBuilder {
             separator: None,
             values: None,
             format: None,
+            script: None,
             chars: None,
             parameters: None,
             children: None,
@@ -128,32 +143,39 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::AlwaysNull)
     }
 
-    pub fn new_eval_int<S>(format: S) -> Self
+    pub fn new_eval_int<S>(script: S) -> Self
     where
         S: Into<String>,
     {
-        Self::new(GeneratorType::EvalInt).format(format.into())
+        Self::new(GeneratorType::EvalInt).script(script)
     }
 
-    pub fn new_eval_real<S>(format: S) -> Self
+    pub fn new_eval_real<S>(script: S) -> Self
     where
         S: Into<String>,
     {
-        Self::new(GeneratorType::EvalReal).format(format.into())
+        Self::new(GeneratorType::EvalReal).script(script)
+    }
+
+    pub fn new_eval_bool<S>(script: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self::new(GeneratorType::EvalBool).script(script)
     }
 
     pub fn new_format<S>(format: S) -> Self
     where
         S: Into<String>,
     {
-        Self::new(GeneratorType::Format).format(format.into())
+        Self::new(GeneratorType::Format).format(format)
     }
 
     fn new_duplicate_permutation<S>(range: Option<ValueBound<SbrdInt>>, separator: S) -> Self
     where
         S: Into<String>,
     {
-        let mut this = Self::new(GeneratorType::DuplicatePermutation).separator(separator.into());
+        let mut this = Self::new(GeneratorType::DuplicatePermutation).separator(separator);
         if let Some(range) = range {
             this = this.range(range.convert_with(|v| format!("{}", v)));
         }
@@ -170,7 +192,7 @@ impl GeneratorBuilder {
         S1: Into<String>,
         S2: Into<String>,
     {
-        Self::new_duplicate_permutation(range, separator).chars(chars.into())
+        Self::new_duplicate_permutation(range, separator).chars(chars)
     }
 
     pub fn new_duplicate_permutation_with_children<S, V>(
@@ -255,21 +277,21 @@ impl GeneratorBuilder {
     where
         M: Into<BTreeMap<String, DataValue>>,
     {
-        Self::new(GeneratorType::DistIntUniform).parameters(parameters.into())
+        Self::new(GeneratorType::DistIntUniform).parameters(parameters)
     }
 
     pub fn new_dist_real_uniform<M>(parameters: M) -> Self
     where
         M: Into<BTreeMap<String, DataValue>>,
     {
-        Self::new(GeneratorType::DistRealUniform).parameters(parameters.into())
+        Self::new(GeneratorType::DistRealUniform).parameters(parameters)
     }
 
     pub fn new_real_normal<M>(parameters: M) -> Self
     where
         M: Into<BTreeMap<String, DataValue>>,
     {
-        Self::new(GeneratorType::DistRealNormal).parameters(parameters.into())
+        Self::new(GeneratorType::DistRealNormal).parameters(parameters)
     }
 
     pub fn new_when<S, V>(case_blocks: V) -> Self
@@ -413,6 +435,14 @@ impl GeneratorBuilder {
         S: Into<String>,
     {
         self.format = Some(format.into());
+        self
+    }
+
+    fn script<S>(mut self, script: S) -> Self
+    where
+        S: Into<String>,
+    {
+        self.script = Some(script.into());
         self
     }
 

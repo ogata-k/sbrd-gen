@@ -47,56 +47,29 @@ pub struct GeneratorBuilder {
     pub(crate) parameters: Option<BTreeMap<String, DataValue>>,
 }
 
+macro_rules! build_generator {
+    ($builder: expr,$R:ty, $builder_type: ty) => {{
+        let generator: $builder_type = Generator::<$R>::create($builder)?;
+        Ok(Box::new(generator))
+    }};
+}
+
 // create builder impl
 impl GeneratorBuilder {
     pub fn build<R: Rng + ?Sized>(self) -> Result<Box<dyn Generator<R>>, CompileError> {
-        let generator_type = self.generator_type;
-        match generator_type {
-            GeneratorType::Int => {
-                let generator: IntGenerator = Generator::<R>::create(self)?;
-                Ok(Box::new(generator))
-            }
-            GeneratorType::Real => {
-                let generator: RealGenerator = Generator::<R>::create(self)?;
-                Ok(Box::new(generator))
-            }
-            GeneratorType::Bool => {
-                let generator: BoolGenerator = Generator::<R>::create(self)?;
-                Ok(Box::new(generator))
-            }
-            GeneratorType::DateTime => {
-                let generator: DateTimeGenerator = Generator::<R>::create(self)?;
-                Ok(Box::new(generator))
-            }
-            GeneratorType::Date => {
-                let generator: DateGenerator = Generator::<R>::create(self)?;
-                Ok(Box::new(generator))
-            }
-            GeneratorType::Time => {
-                let generator: TimeGenerator = Generator::<R>::create(self)?;
-                Ok(Box::new(generator))
-            }
-            GeneratorType::AlwaysNull => {
-                let generator: AlwaysNullGenerator = Generator::<R>::create(self)?;
-                Ok(Box::new(generator))
-            }
+        match self.generator_type {
+            GeneratorType::Int => build_generator!(self, R, IntGenerator),
+            GeneratorType::Real => build_generator!(self, R, RealGenerator),
+            GeneratorType::Bool => build_generator!(self, R, BoolGenerator),
+            GeneratorType::DateTime => build_generator!(self, R, DateTimeGenerator),
+            GeneratorType::Date => build_generator!(self, R, DateGenerator),
+            GeneratorType::Time => build_generator!(self, R, TimeGenerator),
+            GeneratorType::AlwaysNull => build_generator!(self, R, AlwaysNullGenerator),
             GeneratorType::IncrementId => unimplemented!(),
-            GeneratorType::EvalInt => {
-                let generator: EvalGenerator<SbrdInt> = Generator::<R>::create(self)?;
-                Ok(Box::new(generator))
-            }
-            GeneratorType::EvalReal => {
-                let generator: EvalGenerator<SbrdReal> = Generator::<R>::create(self)?;
-                Ok(Box::new(generator))
-            }
-            GeneratorType::EvalBool => {
-                let generator: EvalGenerator<SbrdBool> = Generator::<R>::create(self)?;
-                Ok(Box::new(generator))
-            }
-            GeneratorType::Format => {
-                let generator: FormatGenerator = Generator::<R>::create(self)?;
-                Ok(Box::new(generator))
-            }
+            GeneratorType::EvalInt => build_generator!(self, R, EvalGenerator<SbrdInt>),
+            GeneratorType::EvalReal => build_generator!(self, R, EvalGenerator<SbrdReal>),
+            GeneratorType::EvalBool => build_generator!(self, R, EvalGenerator<SbrdBool>),
+            GeneratorType::Format => build_generator!(self, R, FormatGenerator),
             GeneratorType::DuplicatePermutation => unimplemented!(),
             GeneratorType::SelectInt => unimplemented!(),
             GeneratorType::SelectReal => unimplemented!(),

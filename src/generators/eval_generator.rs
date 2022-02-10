@@ -41,7 +41,7 @@ impl<R: Rng + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F>
         }
 
         match script {
-            None => Err(CompileError::NotExistValue("script".to_string())),
+            None => Err(CompileError::NotExistValueOfKey("script".to_string())),
             Some(mut _script) => Ok(Self {
                 key,
                 condition,

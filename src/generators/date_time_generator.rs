@@ -47,6 +47,11 @@ impl<R: Rng + ?Sized> Generator<R> for DateTimeGenerator {
                     range.without_no_bound_from_other(default_range)
                 })?,
         };
+        if _range.is_empty() {
+            return Err(CompileError::RangeEmpty(
+                _range.convert_with(|b| b.to_string()),
+            ));
+        }
 
         Ok(Self {
             key,
@@ -74,12 +79,6 @@ impl<R: Rng + ?Sized> Generator<R> for DateTimeGenerator {
         rng: &mut R,
         _value_map: &DataValueMap<String>,
     ) -> Result<DataValue, GenerateError> {
-        if self.range.is_empty() {
-            return Err(GenerateError::RangeEmpty(
-                self.range.convert_with(|r| r.to_string()),
-            ));
-        }
-
         let timestamp_range = self.range.convert_with(|date_time| date_time.timestamp());
         let timestamp_value = rng.gen_range(timestamp_range);
         let date_time_value =

@@ -48,6 +48,11 @@ impl<R: Rng + ?Sized> Generator<R> for DateGenerator {
                     range.without_no_bound_from_other(default_range)
                 })?,
         };
+        if _range.is_empty() {
+            return Err(CompileError::RangeEmpty(
+                _range.convert_with(|b| b.to_string()),
+            ));
+        }
 
         Ok(Self {
             key,
@@ -75,12 +80,6 @@ impl<R: Rng + ?Sized> Generator<R> for DateGenerator {
         rng: &mut R,
         _value_map: &DataValueMap<String>,
     ) -> Result<DataValue, GenerateError> {
-        if self.range.is_empty() {
-            return Err(GenerateError::RangeEmpty(
-                self.range.convert_with(|r| r.to_string()),
-            ));
-        }
-
         let num_days_range = self.range.convert_with(|date| date.num_days_from_ce());
         let num_days_value = rng.gen_range(num_days_range);
         let date_value = SbrdDate::from_num_days_from_ce_opt(num_days_value).ok_or_else(|| {

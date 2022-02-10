@@ -6,7 +6,9 @@ use crate::{GeneratorType, ValueBound};
 pub enum CompileError {
     InvalidType(GeneratorType),
     InvalidValue(String),
-    NotExistValue(String),
+    NotExistValueOfKey(String),
+    // 文字列に変換して範囲を持つようにする
+    RangeEmpty(ValueBound<String>),
 }
 
 impl std::fmt::Display for CompileError {
@@ -14,7 +16,8 @@ impl std::fmt::Display for CompileError {
         match self {
             CompileError::InvalidType(t) => write!(f, "Invalid Type: {}", t),
             CompileError::InvalidValue(s) => write!(f, "Invalid Value: {}", s),
-            CompileError::NotExistValue(s) => write!(f, "Not Exist Value: {}", s),
+            CompileError::NotExistValueOfKey(s) => write!(f, "Not Exist Value on the Key: {}", s),
+            CompileError::RangeEmpty(range) => write!(f, "Empty Range: {}", range),
         }
     }
 }
@@ -23,8 +26,6 @@ impl std::error::Error for CompileError {}
 
 #[derive(Debug)]
 pub enum GenerateError {
-    // 文字列に変換して範囲を持つようにする
-    RangeEmpty(ValueBound<String>),
     EvalError(eval::Error, String, String),
     FailGenerate(String),
 }
@@ -32,7 +33,6 @@ pub enum GenerateError {
 impl std::fmt::Display for GenerateError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            GenerateError::RangeEmpty(range) => write!(f, "Empty Range: {}", range),
             GenerateError::EvalError(e, modified_script, unmodified_script) => write!(
                 f,
                 "Eval error: {} on evaluate \"{}\" from script\"{}\"",

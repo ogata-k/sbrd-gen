@@ -30,7 +30,7 @@ impl<R: Rng + ?Sized> Generator<R> for FormatGenerator {
         }
 
         match format {
-            None => Err(CompileError::NotExistValue("format".to_string())),
+            None => Err(CompileError::NotExistValueOfKey("format".to_string())),
             Some(mut _format) => Ok(Self {
                 key,
                 condition,

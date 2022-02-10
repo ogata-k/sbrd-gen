@@ -40,6 +40,11 @@ impl<R: Rng + ?Sized> Generator<R> for IntGenerator {
                     .map_err(|e| CompileError::InvalidValue(e.to_string()))
             })?,
         };
+        if _range.is_empty() {
+            return Err(CompileError::RangeEmpty(
+                _range.convert_with(|b| b.to_string()),
+            ));
+        }
 
         Ok(Self {
             key,
@@ -66,11 +71,6 @@ impl<R: Rng + ?Sized> Generator<R> for IntGenerator {
         rng: &mut R,
         _value_map: &DataValueMap<String>,
     ) -> Result<DataValue, GenerateError> {
-        if self.range.is_empty() {
-            return Err(GenerateError::RangeEmpty(
-                self.range.convert_with(|i| i.to_string()),
-            ));
-        }
         let v: SbrdInt = rng.gen_range(self.range);
 
         Ok(DataValue::Int(v))

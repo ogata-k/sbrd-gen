@@ -1,6 +1,6 @@
-use rand::{Rng, RngCore};
-use rand::distributions::{Distribution, Standard};
 use rand::distributions::uniform::{SampleRange, SampleUniform, UniformSampler};
+use rand::distributions::{Distribution, Standard};
+use rand::{Rng, RngCore};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
@@ -112,17 +112,26 @@ impl<T> ValueBound<T> {
         })
     }
 
-    pub fn without_no_bound(self, lower_bound: T, upper_bound: T) -> ValueBound<T> {
+    pub fn without_no_bound_from_other(self, other: ValueBound<T>) -> ValueBound<T> {
         let Self {
             start,
             include_end,
             end,
         } = self;
+        let Self {
+            start: other_start,
+            include_end: other_include_end,
+            end: other_end,
+        } = other;
 
         ValueBound {
-            start: start.or(Some(lower_bound)),
-            include_end: if end.is_some() { include_end } else { true },
-            end: end.or(Some(upper_bound)),
+            start: start.or(other_start),
+            include_end: if end.is_some() {
+                include_end
+            } else {
+                other_include_end
+            },
+            end: end.or(other_end),
         }
     }
 }

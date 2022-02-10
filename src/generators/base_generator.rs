@@ -1,7 +1,7 @@
 use rand::Rng;
 
-use crate::{DataValue, DataValueMap, GeneratorBuilder, Nullable};
 use crate::generators::error::{CompileError, GenerateError};
+use crate::{DataValue, DataValueMap, GeneratorBuilder, Nullable};
 
 pub trait Generator<R: Rng + ?Sized> {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
@@ -22,7 +22,11 @@ pub trait Generator<R: Rng + ?Sized> {
         self.get_nullable().is_required()
     }
 
-    fn generate(&self, rng: &mut R, value_map: &DataValueMap<String>) -> Result<DataValue, GenerateError> {
+    fn generate(
+        &self,
+        rng: &mut R,
+        value_map: &DataValueMap<String>,
+    ) -> Result<DataValue, GenerateError> {
         if self.is_required() {
             self.generate_without_null(rng, value_map)
         } else {
@@ -35,7 +39,8 @@ pub trait Generator<R: Rng + ?Sized> {
     }
 
     fn generate_without_null(
-        &self, rng: &mut R,
+        &self,
+        rng: &mut R,
         value_map: &DataValueMap<String>,
     ) -> Result<DataValue, GenerateError>;
 }

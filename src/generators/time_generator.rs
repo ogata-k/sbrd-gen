@@ -1,19 +1,23 @@
+use chrono::Duration;
 use rand::Rng;
+use std::ops::AddAssign;
 
 use crate::generators::error::{CompileError, GenerateError};
 use crate::generators::Generator;
 use crate::{
-    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdReal, ValueBound,
+    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdTime, ValueBound,
+    TIME_DEFAULT_FORMAT,
 };
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
-pub struct RealGenerator {
+pub struct TimeGenerator {
     key: Option<String>,
     condition: Option<String>,
     nullable: Nullable,
-    range: ValueBound<SbrdReal>,
+    format: String,
+    range: ValueBound<SbrdTime>,
 }
-impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
+impl<R: Rng + ?Sized> Generator<R> for TimeGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,
@@ -23,11 +27,12 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
             nullable,
             key,
             range,
+            format,
             condition,
             ..
         } = builder;
 
-        if generator_type != GeneratorType::Real {
+        if generator_type != GeneratorType::Time {
             return Err(CompileError::InvalidType(generator_type));
         }
 
@@ -36,11 +41,11 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
             None => default_range,
             Some(r) => r
                 .try_convert_with(|s| {
-                    s.parse::<SbrdReal>()
+                    SbrdTime::parse_from_str(&s, TIME_DEFAULT_FORMAT)
                         .map_err(|e| CompileError::InvalidValue(e.to_string()))
                 })
                 .map(|range| {
-                    // 範囲指定がないと[0, 1)で生成されてしまうため上限下限を設定する
+                    // 生成可能な範囲で生成できるように範囲指定を実装
                     range.without_no_bound_from_other(default_range)
                 })?,
         };
@@ -49,6 +54,7 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
             key,
             condition,
             nullable,
+            format: format.unwrap_or_else(|| TIME_DEFAULT_FORMAT.to_string()),
             range: _range,
         })
     }
@@ -76,16 +82,38 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
             ));
         }
 
-        let real = rng.gen_range(self.range);
-        Ok(DataValue::Real(real))
+        let upper_bound = self
+            .range
+            .get_end()
+            .expect("Exist upper bound is not exist");
+        let lower_bound = self
+            .range
+            .get_start()
+            .expect("Exist lower bound is not exist");
+        let since_duration_seconds = upper_bound.signed_duration_since(lower_bound).num_seconds();
+        let diff_seconds = rng.gen_range(ValueBound::new(
+            Some(0),
+            Some((self.range.is_include_end(), since_duration_seconds)),
+        ));
+        let mut time_value = lower_bound;
+        time_value.add_assign(Duration::seconds(diff_seconds));
+        Ok(DataValue::String(
+            time_value.format(&self.format).to_string(),
+        ))
     }
 }
 
-impl RealGenerator {
-    fn default_range() -> ValueBound<SbrdReal> {
-        ValueBound::new(
-            Some(i16::MIN as SbrdReal),
-            Some((true, i16::MAX as SbrdReal)),
-        )
+impl TimeGenerator {
+    #[inline]
+    fn min_time() -> SbrdTime {
+        SbrdTime::from_hms(0, 0, 0)
+    }
+    #[inline]
+    fn max_time() -> SbrdTime {
+        SbrdTime::from_hms(23, 59, 59)
+    }
+
+    fn default_range() -> ValueBound<SbrdTime> {
+        ValueBound::new(Some(Self::min_time()), Some((true, Self::max_time())))
     }
 }

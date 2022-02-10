@@ -1,8 +1,8 @@
 use rand::Rng;
 
-use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, replace_values};
 use crate::generators::error::{CompileError, GenerateError};
 use crate::generators::Generator;
+use crate::{replace_values, DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct FormatGenerator {

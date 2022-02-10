@@ -1,17 +1,21 @@
+use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use std::collections::BTreeMap;
 use std::fmt;
 
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de::{Error, Unexpected, Visitor};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 pub type DataValueMap<K> = BTreeMap<K, DataValue>;
 pub type SbrdInt = i32;
 pub type SbrdReal = f32;
 pub type SbrdBool = bool;
+pub type SbrdDateTime = NaiveDateTime;
+pub type SbrdDate = NaiveDate;
+pub type SbrdTime = NaiveTime;
 
-pub const DATE_TIME_DEFAULT_FORMAT: &str = "%F %T";
-pub const DATE_DEFAULT_FORMAT: &str = "%F";
-pub const TIME_DEFAULT_FORMAT: &str = "%T";
+pub const DATE_TIME_DEFAULT_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+pub const DATE_DEFAULT_FORMAT: &str = "%Y-%m-%d";
+pub const TIME_DEFAULT_FORMAT: &str = "%H:%M:%S";
 
 pub(crate) fn replace_values(base_format: &str, value_map: &DataValueMap<String>) -> String {
     let mut result = String::new();

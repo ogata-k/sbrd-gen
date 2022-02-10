@@ -1,19 +1,22 @@
+use chrono::Datelike;
 use rand::Rng;
 
 use crate::generators::error::{CompileError, GenerateError};
 use crate::generators::Generator;
 use crate::{
-    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdReal, ValueBound,
+    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdDate, ValueBound,
+    DATE_DEFAULT_FORMAT,
 };
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
-pub struct RealGenerator {
+pub struct DateGenerator {
     key: Option<String>,
     condition: Option<String>,
     nullable: Nullable,
-    range: ValueBound<SbrdReal>,
+    format: String,
+    range: ValueBound<SbrdDate>,
 }
-impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
+impl<R: Rng + ?Sized> Generator<R> for DateGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,
@@ -23,11 +26,12 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
             nullable,
             key,
             range,
+            format,
             condition,
             ..
         } = builder;
 
-        if generator_type != GeneratorType::Real {
+        if generator_type != GeneratorType::Date {
             return Err(CompileError::InvalidType(generator_type));
         }
 
@@ -36,11 +40,11 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
             None => default_range,
             Some(r) => r
                 .try_convert_with(|s| {
-                    s.parse::<SbrdReal>()
+                    SbrdDate::parse_from_str(&s, DATE_DEFAULT_FORMAT)
                         .map_err(|e| CompileError::InvalidValue(e.to_string()))
                 })
                 .map(|range| {
-                    // 範囲指定がないと[0, 1)で生成されてしまうため上限下限を設定する
+                    // 生成可能な範囲で生成できるように範囲指定を実装
                     range.without_no_bound_from_other(default_range)
                 })?,
         };
@@ -49,6 +53,7 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
             key,
             condition,
             nullable,
+            format: format.unwrap_or_else(|| DATE_DEFAULT_FORMAT.to_string()),
             range: _range,
         })
     }
@@ -76,16 +81,33 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
             ));
         }
 
-        let real = rng.gen_range(self.range);
-        Ok(DataValue::Real(real))
+        let num_days_range = self.range.convert_with(|date| date.num_days_from_ce());
+        let num_days_value = rng.gen_range(num_days_range);
+        let date_value = SbrdDate::from_num_days_from_ce_opt(num_days_value).ok_or_else(|| {
+            GenerateError::FailGenerate(format!(
+                "Fail parse date from timestamp: {}",
+                num_days_value
+            ))
+        })?;
+        Ok(DataValue::String(
+            date_value.format(&self.format).to_string(),
+        ))
     }
 }
 
-impl RealGenerator {
-    fn default_range() -> ValueBound<SbrdReal> {
-        ValueBound::new(
-            Some(i16::MIN as SbrdReal),
-            Some((true, i16::MAX as SbrdReal)),
-        )
+impl DateGenerator {
+    #[inline]
+    fn min_date() -> SbrdDate {
+        // 1900/1/1
+        SbrdDate::from_num_days_from_ce(693596)
+    }
+    #[inline]
+    fn max_date() -> SbrdDate {
+        // 2151/1/1
+        SbrdDate::from_num_days_from_ce(785272)
+    }
+
+    fn default_range() -> ValueBound<SbrdDate> {
+        ValueBound::new(Some(Self::min_date()), Some((false, Self::max_date())))
     }
 }

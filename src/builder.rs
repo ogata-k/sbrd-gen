@@ -1,19 +1,18 @@
 use std::collections::btree_map::BTreeMap;
 use std::path::PathBuf;
 
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-use crate::{Nullable, SbrdBool, SbrdInt, SbrdReal};
 use crate::bound::ValueBound;
 use crate::generator_type::GeneratorType;
-use crate::generators::{
-    AlwaysNullGenerator, BoolGenerator, EvalGenerator, FormatGenerator, Generator, IntGenerator,
-    RealGenerator,
-};
 use crate::generators::error::CompileError;
+use crate::generators::{
+    AlwaysNullGenerator, BoolGenerator, DateGenerator, DateTimeGenerator, EvalGenerator,
+    FormatGenerator, Generator, IntGenerator, RealGenerator, TimeGenerator,
+};
 use crate::value::DataValue;
+use crate::{Nullable, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdTime};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct GeneratorBuilder {
@@ -65,9 +64,18 @@ impl GeneratorBuilder {
                 let generator: BoolGenerator = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
             }
-            GeneratorType::DateTime => unimplemented!(),
-            GeneratorType::Date => unimplemented!(),
-            GeneratorType::Time => unimplemented!(),
+            GeneratorType::DateTime => {
+                let generator: DateTimeGenerator = Generator::<R>::create(self)?;
+                Ok(Box::new(generator))
+            }
+            GeneratorType::Date => {
+                let generator: DateGenerator = Generator::<R>::create(self)?;
+                Ok(Box::new(generator))
+            }
+            GeneratorType::Time => {
+                let generator: TimeGenerator = Generator::<R>::create(self)?;
+                Ok(Box::new(generator))
+            }
             GeneratorType::AlwaysNull => {
                 let generator: AlwaysNullGenerator = Generator::<R>::create(self)?;
                 Ok(Box::new(generator))
@@ -144,8 +152,72 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::Bool)
     }
 
+    pub fn new_date_time<DT, S>(range: Option<ValueBound<DT>>, format: Option<S>) -> Self
+    where
+        DT: Into<SbrdDateTime>,
+        S: Into<String>,
+    {
+        let mut this = Self::new(GeneratorType::DateTime);
+        if let Some(range) = range {
+            this = this.range(
+                range.convert_with(|v| Into::<SbrdDateTime>::into(v).format("%F %T").to_string()),
+            );
+        }
+
+        if let Some(_format) = format {
+            this = this.format(_format);
+        }
+
+        this
+    }
+
+    pub fn new_date<D, S>(range: Option<ValueBound<D>>, format: Option<S>) -> Self
+    where
+        D: Into<SbrdDate>,
+        S: Into<String>,
+    {
+        let mut this = Self::new(GeneratorType::Date);
+        if let Some(range) = range {
+            this = this
+                .range(range.convert_with(|v| Into::<SbrdDate>::into(v).format("%F").to_string()));
+        }
+
+        if let Some(_format) = format {
+            this = this.format(_format);
+        }
+
+        this
+    }
+
+    pub fn new_time<T, S>(range: Option<ValueBound<T>>, format: Option<S>) -> Self
+    where
+        T: Into<SbrdTime>,
+        S: Into<String>,
+    {
+        let mut this = Self::new(GeneratorType::Time);
+        if let Some(range) = range {
+            this = this
+                .range(range.convert_with(|v| Into::<SbrdTime>::into(v).format("%T").to_string()));
+        }
+
+        if let Some(_format) = format {
+            this = this.format(_format);
+        }
+
+        this
+    }
+
     pub fn new_always_null() -> Self {
         Self::new(GeneratorType::AlwaysNull)
+    }
+
+    pub fn new_increment_id(range: Option<ValueBound<SbrdInt>>) -> Self {
+        let mut this = Self::new(GeneratorType::IncrementId);
+        if let Some(range) = range {
+            this = this.range(range.convert_with(|v| format!("{}", v)));
+        }
+
+        this
     }
 
     pub fn new_eval_int<S>(script: S) -> Self
@@ -311,55 +383,6 @@ impl GeneratorBuilder {
             .collect();
 
         Self::new(GeneratorType::When).children(builders)
-    }
-
-    pub fn new_date_time<DT>(range: Option<ValueBound<DT>>) -> Self
-    where
-        DT: Into<NaiveDateTime>,
-    {
-        let mut this = Self::new(GeneratorType::DateTime);
-        if let Some(range) = range {
-            this = this.range(
-                range.convert_with(|v| Into::<NaiveDateTime>::into(v).format("%F %T").to_string()),
-            );
-        }
-
-        this
-    }
-
-    pub fn new_date<D>(range: Option<ValueBound<D>>) -> Self
-    where
-        D: Into<NaiveDate>,
-    {
-        let mut this = Self::new(GeneratorType::Date);
-        if let Some(range) = range {
-            this = this
-                .range(range.convert_with(|v| Into::<NaiveDate>::into(v).format("%F").to_string()));
-        }
-
-        this
-    }
-
-    pub fn new_time<T>(range: Option<ValueBound<T>>) -> Self
-    where
-        T: Into<NaiveTime>,
-    {
-        let mut this = Self::new(GeneratorType::Time);
-        if let Some(range) = range {
-            this = this
-                .range(range.convert_with(|v| Into::<NaiveTime>::into(v).format("%T").to_string()));
-        }
-
-        this
-    }
-
-    pub fn new_increment_id(range: Option<ValueBound<SbrdInt>>) -> Self {
-        let mut this = Self::new(GeneratorType::IncrementId);
-        if let Some(range) = range {
-            this = this.range(range.convert_with(|v| format!("{}", v)));
-        }
-
-        this
     }
 
     //

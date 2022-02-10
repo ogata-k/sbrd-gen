@@ -1,8 +1,7 @@
-use chrono::{NaiveDate, NaiveTime};
 use rand::thread_rng;
 
-use sbrd_gen::*;
 use sbrd_gen::error::{ErrorKind, SbrdGenError};
+use sbrd_gen::*;
 
 fn main() {
     let int_generator = GeneratorBuilder::new_int(None).with_key("KeyA");
@@ -11,11 +10,11 @@ fn main() {
         "KeyA".to_string(),
         false.to_string(),
         32_u8.to_string(),
-        NaiveDate::from_ymd(2015, 9, 5)
+        SbrdDate::from_ymd(2015, 9, 5)
             .and_hms(23, 56, 4)
             .to_string(),
-        NaiveDate::from_ymd(2015, 9, 5).to_string(),
-        NaiveTime::from_hms(23, 56, 4).to_string(),
+        SbrdDate::from_ymd(2015, 9, 5).to_string(),
+        SbrdTime::from_hms(23, 56, 4).to_string(),
     ])
     .with_key("KeyB");
     let duplicate_permutation_generator = GeneratorBuilder::new_duplicate_permutation_with_chars(
@@ -29,25 +28,34 @@ fn main() {
     let when_generator = GeneratorBuilder::new_when([
         (
             "{KeyA} < 0",
-            GeneratorBuilder::new_date_time(Some(ValueBound::new(
-                Some(NaiveDate::from_ymd(2021, 12, 25).and_hms(0, 0, 0)),
-                Some((false, NaiveDate::from_ymd(2021, 12, 26).and_hms(0, 0, 0))),
-            )))
+            GeneratorBuilder::new_date_time(
+                Some(ValueBound::new(
+                    Some(SbrdDate::from_ymd(2021, 12, 25).and_hms(0, 0, 0)),
+                    Some((false, SbrdDate::from_ymd(2021, 12, 26).and_hms(0, 0, 0))),
+                )),
+                Option::<String>::None,
+            )
             .nullable(),
         ),
         (
             "0 <= {KeyA} && {KeyA} < 100",
-            GeneratorBuilder::new_date(Some(ValueBound::new(
-                Some(NaiveDate::from_ymd(2021, 12, 25)),
-                None,
-            ))),
+            GeneratorBuilder::new_date(
+                Some(ValueBound::new(
+                    Some(SbrdDate::from_ymd(2021, 12, 25)),
+                    None,
+                )),
+                Option::<String>::None,
+            ),
         ),
         (
             "100 <= {KeyA} && {KeyA} < 200",
-            GeneratorBuilder::new_time(Some(ValueBound::new(
-                None,
-                Some((true, NaiveTime::from_hms(23, 59, 59))),
-            ))),
+            GeneratorBuilder::new_time(
+                Some(ValueBound::new(
+                    None,
+                    Some((true, SbrdTime::from_hms(23, 59, 59))),
+                )),
+                Option::<String>::None,
+            ),
         ),
     ])
     .with_key("KeyD");
@@ -77,9 +85,14 @@ fn main() {
 
     println!("\n---------------------------------------------------------------------------\n");
 
-    let builder =
-        GeneratorBuilder::new_format("'{dummy_date_time}' == '{dummy_date} {dummy_time}'")
-            .with_key("KeyA");
+    let builder = GeneratorBuilder::new_time(
+        Some(
+            ValueBound::new(Some("12:00"), Some((true, "18:00")))
+                .convert_with(|s| SbrdTime::parse_from_str(s, "%H:%M").unwrap()),
+        ),
+        Some("%H:%M"),
+    )
+    .with_key("KeyA");
     let yaml_string = serde_yaml::to_string(&builder)
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::SerializeError))
         .unwrap();
@@ -104,7 +117,7 @@ fn main() {
     value_map.insert(
         "dummy_date_time".to_string(),
         DataValue::String(
-            NaiveDate::from_ymd(2021, 12, 25)
+            SbrdDate::from_ymd(2021, 12, 25)
                 .and_hms(0, 0, 0)
                 .format(DATE_TIME_DEFAULT_FORMAT)
                 .to_string(),
@@ -113,7 +126,7 @@ fn main() {
     value_map.insert(
         "dummy_date".to_string(),
         DataValue::String(
-            NaiveDate::from_ymd(2021, 12, 25)
+            SbrdDate::from_ymd(2021, 12, 25)
                 .format(DATE_DEFAULT_FORMAT)
                 .to_string(),
         ),
@@ -121,11 +134,12 @@ fn main() {
     value_map.insert(
         "dummy_time".to_string(),
         DataValue::String(
-            NaiveTime::from_hms(0, 0, 0)
+            SbrdTime::from_hms(0, 0, 0)
                 .format(TIME_DEFAULT_FORMAT)
                 .to_string(),
         ),
     );
+
     let mut rng = thread_rng();
     println!("[generate]\n{:?}", generator.generate(&mut rng, &value_map));
 }

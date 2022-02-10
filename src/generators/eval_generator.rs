@@ -4,12 +4,12 @@ use std::str::FromStr;
 use eval::eval;
 use rand::Rng;
 
-use crate::{
-    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, replace_values, SbrdBool,
-    SbrdInt, SbrdReal,
-};
 use crate::generators::error::{CompileError, GenerateError};
 use crate::generators::Generator;
+use crate::{
+    replace_values, DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdBool,
+    SbrdInt, SbrdReal,
+};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct EvalGenerator<T: FromStr> {

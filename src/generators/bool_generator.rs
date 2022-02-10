@@ -1,8 +1,8 @@
 use rand::Rng;
 
-use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 use crate::generators::error::{CompileError, GenerateError};
 use crate::generators::Generator;
+use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
 pub struct BoolGenerator {

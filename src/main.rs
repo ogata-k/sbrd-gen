@@ -85,14 +85,8 @@ fn main() {
 
     println!("\n---------------------------------------------------------------------------\n");
 
-    let builder = GeneratorBuilder::new_time(
-        Some(
-            ValueBound::new(Some("12:00"), Some((true, "18:00")))
-                .convert_with(|s| SbrdTime::parse_from_str(s, "%H:%M").unwrap()),
-        ),
-        Some("%H:%M"),
-    )
-    .with_key("KeyA");
+    let builder =
+        GeneratorBuilder::new_increment_id(Some(ValueStep::new(100, Some(-2)))).with_key("KeyA");
     let yaml_string = serde_yaml::to_string(&builder)
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::SerializeError))
         .unwrap();
@@ -112,7 +106,7 @@ fn main() {
 
     let mut value_map = DataValueMap::<String>::new();
     value_map.insert("dummy_int".to_string(), DataValue::Int(32));
-    value_map.insert("dummy_real".to_string(), DataValue::Real(3.14 as SbrdReal));
+    value_map.insert("dummy_real".to_string(), DataValue::Real(3.15));
     value_map.insert("dummy_bool".to_string(), DataValue::Bool(false));
     value_map.insert(
         "dummy_date_time".to_string(),
@@ -141,5 +135,7 @@ fn main() {
     );
 
     let mut rng = thread_rng();
-    println!("[generate]\n{:?}", generator.generate(&mut rng, &value_map));
+    for _ in 0..10 {
+        println!("[generate]\n{:?}", generator.generate(&mut rng, &value_map));
+    }
 }

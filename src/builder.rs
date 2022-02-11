@@ -9,10 +9,10 @@ use crate::generator_type::GeneratorType;
 use crate::generators::error::CompileError;
 use crate::generators::{
     AlwaysNullGenerator, BoolGenerator, DateGenerator, DateTimeGenerator, EvalGenerator,
-    FormatGenerator, Generator, IntGenerator, RealGenerator, TimeGenerator,
+    FormatGenerator, Generator, IncrementIdGenerator, IntGenerator, RealGenerator, TimeGenerator,
 };
 use crate::value::DataValue;
-use crate::{Nullable, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdTime};
+use crate::{Nullable, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdTime, ValueStep};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct GeneratorBuilder {
@@ -27,6 +27,8 @@ pub struct GeneratorBuilder {
     pub(crate) key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) range: Option<ValueBound<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) increment: Option<ValueStep<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) condition: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -65,7 +67,7 @@ impl GeneratorBuilder {
             GeneratorType::Date => build_generator!(self, R, DateGenerator),
             GeneratorType::Time => build_generator!(self, R, TimeGenerator),
             GeneratorType::AlwaysNull => build_generator!(self, R, AlwaysNullGenerator),
-            GeneratorType::IncrementId => unimplemented!(),
+            GeneratorType::IncrementId => build_generator!(self, R, IncrementIdGenerator),
             GeneratorType::EvalInt => build_generator!(self, R, EvalGenerator<SbrdInt>),
             GeneratorType::EvalReal => build_generator!(self, R, EvalGenerator<SbrdReal>),
             GeneratorType::EvalBool => build_generator!(self, R, EvalGenerator<SbrdBool>),
@@ -92,6 +94,7 @@ impl GeneratorBuilder {
             generator_type,
             nullable: Nullable::new_required(),
             range: None,
+            increment: None,
             file: None,
             separator: None,
             values: None,
@@ -184,10 +187,11 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::AlwaysNull)
     }
 
-    pub fn new_increment_id(range: Option<ValueBound<SbrdInt>>) -> Self {
+    pub fn new_increment_id(increment: Option<ValueStep<SbrdInt>>) -> Self {
         let mut this = Self::new(GeneratorType::IncrementId);
-        if let Some(range) = range {
-            this = this.range(range.convert_with(|v| format!("{}", v)));
+
+        if let Some(_increment) = increment {
+            this = this.increment(_increment.convert_with(|v| v.to_string()))
         }
 
         this
@@ -380,6 +384,14 @@ impl GeneratorBuilder {
         S: Into<String>,
     {
         self.range = Some(range.convert_into());
+        self
+    }
+
+    fn increment<S>(mut self, increment: ValueStep<S>) -> Self
+    where
+        S: Into<String>,
+    {
+        self.increment = Some(increment.convert_into());
         self
     }
 

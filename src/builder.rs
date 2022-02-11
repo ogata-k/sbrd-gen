@@ -40,9 +40,9 @@ impl WithKeyBuilder {
 
 impl<S: Into<String>> From<(S, GeneratorBuilder)> for WithKeyBuilder {
     fn from((key, builder): (S, GeneratorBuilder)) -> Self {
-        Self{
+        Self {
             key: key.into(),
-            builder
+            builder,
         }
     }
 }
@@ -67,7 +67,7 @@ impl WithConditionBuilder {
         S: Into<String>,
     {
         Self {
-            condition: condition.map(|v|v.into()),
+            condition: condition.map(|v| v.into()),
             builder,
         }
     }
@@ -80,18 +80,18 @@ impl WithConditionBuilder {
 
 impl From<GeneratorBuilder> for WithConditionBuilder {
     fn from(builder: GeneratorBuilder) -> Self {
-        Self{
+        Self {
             condition: None,
-            builder
+            builder,
         }
     }
 }
 
 impl<S: Into<String>> From<(S, GeneratorBuilder)> for WithConditionBuilder {
     fn from((condition, builder): (S, GeneratorBuilder)) -> Self {
-        Self{
+        Self {
             condition: Some(condition.into()),
-            builder
+            builder,
         }
     }
 }
@@ -106,15 +106,15 @@ pub struct GeneratorBuilder {
     )]
     pub(crate) nullable: Nullable,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) range: Option<ValueBound<String>>,
+    pub(crate) range: Option<ValueBound<DataValue>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) increment: Option<ValueStep<String>>,
+    pub(crate) increment: Option<ValueStep<DataValue>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) children: Option<Vec<WithConditionBuilder>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) chars: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) values: Option<Vec<String>>,
+    pub(crate) values: Option<Vec<DataValue>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) file: Option<PathBuf>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -266,7 +266,7 @@ impl GeneratorBuilder {
         let mut this = Self::new(GeneratorType::IncrementId);
 
         if let Some(_increment) = increment {
-            this = this.increment(_increment.convert_with(|v| v.to_string()))
+            this = this.increment(_increment.convert_with(|v| DataValue::from(v)))
         }
 
         this
@@ -348,8 +348,8 @@ impl GeneratorBuilder {
             values
                 .into()
                 .into_iter()
-                .map(|v| format!("{}", v))
-                .collect::<Vec<String>>(),
+                .map(|v| DataValue::from(v))
+                .collect::<Vec<DataValue>>(),
         )
     }
 
@@ -372,8 +372,8 @@ impl GeneratorBuilder {
             values
                 .into()
                 .into_iter()
-                .map(|v| format!("{}", v))
-                .collect::<Vec<String>>(),
+                .map(|v| DataValue::from(v))
+                .collect::<Vec<DataValue>>(),
         )
     }
 
@@ -392,7 +392,13 @@ impl GeneratorBuilder {
     where
         V: Into<Vec<String>>,
     {
-        Self::new_select_string().values(values)
+        Self::new_select_string().values(
+            values
+                .into()
+                .into_iter()
+                .map(|v| DataValue::from(v))
+                .collect::<Vec<DataValue>>(),
+        )
     }
 
     pub fn new_select_string_with_file<P>(path: P) -> Self
@@ -461,7 +467,7 @@ impl GeneratorBuilder {
 
     fn range<S>(mut self, range: ValueBound<S>) -> Self
     where
-        S: Into<String>,
+        S: Into<DataValue>,
     {
         self.range = Some(range.convert_into());
         self
@@ -469,7 +475,7 @@ impl GeneratorBuilder {
 
     fn increment<S>(mut self, increment: ValueStep<S>) -> Self
     where
-        S: Into<String>,
+        S: Into<DataValue>,
     {
         self.increment = Some(increment.convert_into());
         self
@@ -493,7 +499,7 @@ impl GeneratorBuilder {
 
     fn values<V>(mut self, values: V) -> Self
     where
-        V: Into<Vec<String>>,
+        V: Into<Vec<DataValue>>,
     {
         self.values = Some(values.into());
         self

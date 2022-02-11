@@ -35,11 +35,13 @@ impl<R: Rng + ?Sized> Generator<R> for IncrementIdGenerator {
             Some(s) => {
                 let _initial_id: SbrdInt = s
                     .get_initial()
+                    .to_parse_string()
                     .parse::<SbrdInt>()
                     .map_err(|e| CompileError::InvalidValue(e.to_string()))?;
 
                 let step_result = s.get_step().as_ref().map(|v| {
-                    v.parse::<SbrdInt>()
+                    v.to_parse_string()
+                        .parse::<SbrdInt>()
                         .map_err(|e| CompileError::InvalidValue(e.to_string()))
                 });
 

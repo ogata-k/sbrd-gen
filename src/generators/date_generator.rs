@@ -37,7 +37,7 @@ impl<R: Rng + ?Sized> Generator<R> for DateGenerator {
             None => default_range,
             Some(r) => r
                 .try_convert_with(|s| {
-                    SbrdDate::parse_from_str(&s, DATE_DEFAULT_FORMAT)
+                    SbrdDate::parse_from_str(&s.to_parse_string(), DATE_DEFAULT_FORMAT)
                         .map_err(|e| CompileError::InvalidValue(e.to_string()))
                 })
                 .map(|range| {

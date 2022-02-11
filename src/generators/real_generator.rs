@@ -33,7 +33,8 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
             None => default_range,
             Some(r) => r
                 .try_convert_with(|s| {
-                    s.parse::<SbrdReal>()
+                    s.to_parse_string()
+                        .parse::<SbrdReal>()
                         .map_err(|e| CompileError::InvalidValue(e.to_string()))
                 })
                 .map(|range| {

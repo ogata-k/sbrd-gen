@@ -32,7 +32,8 @@ impl<R: Rng + ?Sized> Generator<R> for IntGenerator {
         let _range = match range {
             None => default_range,
             Some(r) => r.try_convert_with(|s| {
-                s.parse::<SbrdInt>()
+                s.to_parse_string()
+                    .parse::<SbrdInt>()
                     .map_err(|e| CompileError::InvalidValue(e.to_string()))
             })?,
         };

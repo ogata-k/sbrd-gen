@@ -38,7 +38,7 @@ impl<R: Rng + ?Sized> Generator<R> for TimeGenerator {
             None => default_range,
             Some(r) => r
                 .try_convert_with(|s| {
-                    SbrdTime::parse_from_str(&s, TIME_DEFAULT_FORMAT)
+                    SbrdTime::parse_from_str(&s.to_parse_string(), TIME_DEFAULT_FORMAT)
                         .map_err(|e| CompileError::InvalidValue(e.to_string()))
                 })
                 .map(|range| {

@@ -36,9 +36,33 @@ pub(crate) fn replace_values(base_format: &str, value_map: &DataValueMap<String>
 pub enum DataValue {
     Int(SbrdInt),
     Real(SbrdReal),
-    Bool(bool),
+    Bool(SbrdBool),
     String(String),
     Null,
+}
+
+impl From<SbrdInt> for DataValue {
+    fn from(v: SbrdInt) -> Self {
+        Self::Int(v)
+    }
+}
+
+impl From<SbrdReal> for DataValue {
+    fn from(v: SbrdReal) -> Self {
+        Self::Real(v)
+    }
+}
+
+impl From<SbrdBool> for DataValue {
+    fn from(v: SbrdBool) -> Self {
+        Self::Bool(v)
+    }
+}
+
+impl From<String> for DataValue {
+    fn from(v: String) -> Self {
+        Self::String(v)
+    }
 }
 
 struct DataValueVisitor;
@@ -103,7 +127,7 @@ impl<'de> Visitor<'de> for DataValueVisitor {
     where
         D: Deserializer<'de>,
     {
-        deserializer.deserialize_string(Self)
+        deserializer.deserialize_any(Self)
     }
 }
 
@@ -132,6 +156,16 @@ impl Serialize for DataValue {
 }
 
 impl DataValue {
+    pub fn to_parse_string(&self) -> String {
+        match self {
+            DataValue::Int(v) => v.to_string(),
+            DataValue::Real(v) => v.to_string(),
+            DataValue::Bool(v) => v.to_string(),
+            DataValue::String(v) => v.to_string(),
+            DataValue::Null => "".to_string(),
+        }
+    }
+
     pub fn to_eval_value(&self) -> String {
         match self {
             DataValue::Int(v) => v.to_string(),

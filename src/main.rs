@@ -36,7 +36,8 @@ fn main() {
                 Option::<String>::None,
             )
             .nullable(),
-        ).into(),
+        )
+            .into(),
         (
             "0 <= {KeyA} && {KeyA} < 100",
             GeneratorBuilder::new_date(
@@ -46,7 +47,8 @@ fn main() {
                 )),
                 Option::<String>::None,
             ),
-        ).into(),
+        )
+            .into(),
         (
             "100 <= {KeyA} && {KeyA} < 200",
             GeneratorBuilder::new_time(
@@ -56,7 +58,8 @@ fn main() {
                 )),
                 Option::<String>::None,
             ),
-        ).into(),
+        )
+            .into(),
     ])
     .with_key("KeyD");
     let format_generator = GeneratorBuilder::new_format("{KeyC} {KeyD}").with_key("KeyE");

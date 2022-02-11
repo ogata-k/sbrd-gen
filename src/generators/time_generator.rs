@@ -11,12 +11,11 @@ use crate::{
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct TimeGenerator {
-    key: Option<String>,
-    condition: Option<String>,
     nullable: Nullable,
     format: String,
     range: ValueBound<SbrdTime>,
 }
+
 impl<R: Rng + ?Sized> Generator<R> for TimeGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
@@ -25,10 +24,8 @@ impl<R: Rng + ?Sized> Generator<R> for TimeGenerator {
         let GeneratorBuilder {
             generator_type,
             nullable,
-            key,
             range,
             format,
-            condition,
             ..
         } = builder;
 
@@ -56,24 +53,14 @@ impl<R: Rng + ?Sized> Generator<R> for TimeGenerator {
         }
 
         Ok(Self {
-            key,
-            condition,
             nullable,
             format: format.unwrap_or_else(|| TIME_DEFAULT_FORMAT.to_string()),
             range: _range,
         })
     }
 
-    fn get_key(&self) -> Option<&str> {
-        self.key.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_condition(&self) -> Option<&str> {
-        self.condition.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_nullable(&self) -> &Nullable {
-        &self.nullable
+    fn is_nullable(&self) -> bool {
+        self.nullable.is_nullable()
     }
 
     fn generate_without_null(
@@ -96,6 +83,7 @@ impl<R: Rng + ?Sized> Generator<R> for TimeGenerator {
         ));
         let mut time_value = lower_bound;
         time_value.add_assign(Duration::seconds(diff_seconds));
+
         Ok(DataValue::String(
             time_value.format(&self.format).to_string(),
         ))

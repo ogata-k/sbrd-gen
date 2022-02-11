@@ -8,8 +8,6 @@ use crate::{
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
 pub struct IntGenerator {
-    key: Option<String>,
-    condition: Option<String>,
     nullable: Nullable,
     range: ValueBound<SbrdInt>,
 }
@@ -22,9 +20,7 @@ impl<R: Rng + ?Sized> Generator<R> for IntGenerator {
         let GeneratorBuilder {
             generator_type,
             nullable,
-            key,
             range,
-            condition,
             ..
         } = builder;
 
@@ -47,23 +43,13 @@ impl<R: Rng + ?Sized> Generator<R> for IntGenerator {
         }
 
         Ok(Self {
-            key,
-            condition,
             nullable,
             range: _range,
         })
     }
 
-    fn get_key(&self) -> Option<&str> {
-        self.key.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_condition(&self) -> Option<&str> {
-        self.condition.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_nullable(&self) -> &Nullable {
-        &self.nullable
+    fn is_nullable(&self) -> bool {
+        self.nullable.is_nullable()
     }
 
     fn generate_without_null(

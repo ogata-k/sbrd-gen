@@ -8,18 +8,10 @@ pub trait Generator<R: Rng + ?Sized> {
     where
         Self: Sized;
 
-    fn get_key(&self) -> Option<&str>;
-
-    fn get_condition(&self) -> Option<&str>;
-
-    fn get_nullable(&self) -> &Nullable;
-
-    fn is_nullable(&self) -> bool {
-        self.get_nullable().is_nullable()
-    }
+    fn is_nullable(&self) -> bool;
 
     fn is_required(&self) -> bool {
-        self.get_nullable().is_required()
+        !self.is_nullable()
     }
 
     fn generate(

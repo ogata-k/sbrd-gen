@@ -5,46 +5,24 @@ use crate::generators::Generator;
 use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
-pub struct AlwaysNullGenerator {
-    key: Option<String>,
-    condition: Option<String>,
-    nullable: Nullable,
-}
+pub struct AlwaysNullGenerator {}
 
 impl<R: Rng + ?Sized> Generator<R> for AlwaysNullGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,
     {
-        let GeneratorBuilder {
-            generator_type,
-            nullable,
-            key,
-            condition,
-            ..
-        } = builder;
+        let GeneratorBuilder { generator_type, .. } = builder;
 
         if generator_type != GeneratorType::AlwaysNull {
             return Err(CompileError::InvalidType(generator_type));
         }
 
-        Ok(Self {
-            key,
-            condition,
-            nullable,
-        })
+        Ok(Self {})
     }
 
-    fn get_key(&self) -> Option<&str> {
-        self.key.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_condition(&self) -> Option<&str> {
-        self.condition.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_nullable(&self) -> &Nullable {
-        &self.nullable
+    fn is_nullable(&self) -> bool {
+        true
     }
 
     fn generate_without_null(

@@ -13,8 +13,6 @@ use crate::{
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct EvalGenerator<T: FromStr> {
-    key: Option<String>,
-    condition: Option<String>,
     nullable: Nullable,
     /// Supported operators: ! != "" '' () [] . , > < >= <= == + - * / % && || n..m.
     ///
@@ -22,6 +20,7 @@ pub struct EvalGenerator<T: FromStr> {
     script: String,
     _calculated_type: PhantomData<T>,
 }
+
 impl<R: Rng + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F> {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
@@ -30,8 +29,6 @@ impl<R: Rng + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F>
         let GeneratorBuilder {
             generator_type,
             nullable,
-            key,
-            condition,
             script,
             ..
         } = builder;
@@ -42,9 +39,7 @@ impl<R: Rng + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F>
 
         match script {
             None => Err(CompileError::NotExistValueOfKey("script".to_string())),
-            Some(mut _script) => Ok(Self {
-                key,
-                condition,
+            Some(_script) => Ok(Self {
                 nullable,
                 script: _script,
                 _calculated_type: PhantomData,
@@ -52,16 +47,8 @@ impl<R: Rng + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F>
         }
     }
 
-    fn get_key(&self) -> Option<&str> {
-        self.key.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_condition(&self) -> Option<&str> {
-        self.condition.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_nullable(&self) -> &Nullable {
-        &self.nullable
+    fn is_nullable(&self) -> bool {
+        self.nullable.is_nullable()
     }
 
     fn generate_without_null(
@@ -70,9 +57,9 @@ impl<R: Rng + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F>
         value_map: &DataValueMap<String>,
     ) -> Result<DataValue, GenerateError> {
         let mut _script = replace_values(&self.script, value_map);
-
         let eval_result = eval(&_script)
             .map_err(|e| GenerateError::EvalError(e, _script, self.script.clone()))?;
+
         F::eval_value_to_data_value(eval_result)
     }
 }

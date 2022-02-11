@@ -8,11 +8,10 @@ use crate::{
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct RealGenerator {
-    key: Option<String>,
-    condition: Option<String>,
     nullable: Nullable,
     range: ValueBound<SbrdReal>,
 }
+
 impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
@@ -21,9 +20,7 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
         let GeneratorBuilder {
             generator_type,
             nullable,
-            key,
             range,
-            condition,
             ..
         } = builder;
 
@@ -51,23 +48,13 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
         }
 
         Ok(Self {
-            key,
-            condition,
             nullable,
             range: _range,
         })
     }
 
-    fn get_key(&self) -> Option<&str> {
-        self.key.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_condition(&self) -> Option<&str> {
-        self.condition.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_nullable(&self) -> &Nullable {
-        &self.nullable
+    fn is_nullable(&self) -> bool {
+        self.nullable.is_nullable()
     }
 
     fn generate_without_null(
@@ -76,6 +63,7 @@ impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
         _value_map: &DataValueMap<String>,
     ) -> Result<DataValue, GenerateError> {
         let real = rng.gen_range(self.range);
+
         Ok(DataValue::Real(real))
     }
 }

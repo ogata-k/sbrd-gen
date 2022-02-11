@@ -9,8 +9,6 @@ const INITIAL_ID: SbrdInt = 1;
 const DEFAULT_STEP: SbrdInt = 1;
 #[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
 pub struct IncrementIdGenerator {
-    key: Option<String>,
-    condition: Option<String>,
     nullable: Nullable,
     current_id: Cell<SbrdInt>,
     step: SbrdInt,
@@ -24,9 +22,7 @@ impl<R: Rng + ?Sized> Generator<R> for IncrementIdGenerator {
         let GeneratorBuilder {
             generator_type,
             nullable,
-            key,
             increment,
-            condition,
             ..
         } = builder;
 
@@ -55,24 +51,14 @@ impl<R: Rng + ?Sized> Generator<R> for IncrementIdGenerator {
         };
 
         Ok(Self {
-            key,
-            condition,
             nullable,
             current_id: Cell::new(initial_id),
             step,
         })
     }
 
-    fn get_key(&self) -> Option<&str> {
-        self.key.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_condition(&self) -> Option<&str> {
-        self.condition.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_nullable(&self) -> &Nullable {
-        &self.nullable
+    fn is_nullable(&self) -> bool {
+        self.nullable.is_nullable()
     }
 
     fn generate_without_null(

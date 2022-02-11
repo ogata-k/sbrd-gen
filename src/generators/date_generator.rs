@@ -10,12 +10,11 @@ use crate::{
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct DateGenerator {
-    key: Option<String>,
-    condition: Option<String>,
     nullable: Nullable,
     format: String,
     range: ValueBound<SbrdDate>,
 }
+
 impl<R: Rng + ?Sized> Generator<R> for DateGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
@@ -24,10 +23,8 @@ impl<R: Rng + ?Sized> Generator<R> for DateGenerator {
         let GeneratorBuilder {
             generator_type,
             nullable,
-            key,
             range,
             format,
-            condition,
             ..
         } = builder;
 
@@ -55,24 +52,14 @@ impl<R: Rng + ?Sized> Generator<R> for DateGenerator {
         }
 
         Ok(Self {
-            key,
-            condition,
             nullable,
             format: format.unwrap_or_else(|| DATE_DEFAULT_FORMAT.to_string()),
             range: _range,
         })
     }
 
-    fn get_key(&self) -> Option<&str> {
-        self.key.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_condition(&self) -> Option<&str> {
-        self.condition.as_ref().map(|s| s.as_ref())
-    }
-
-    fn get_nullable(&self) -> &Nullable {
-        &self.nullable
+    fn is_nullable(&self) -> bool {
+        self.nullable.is_nullable()
     }
 
     fn generate_without_null(
@@ -88,6 +75,7 @@ impl<R: Rng + ?Sized> Generator<R> for DateGenerator {
                 num_days_value
             ))
         })?;
+
         Ok(DataValue::String(
             date_value.format(&self.format).to_string(),
         ))

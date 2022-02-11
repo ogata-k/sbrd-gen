@@ -36,7 +36,7 @@ fn main() {
                 Option::<String>::None,
             )
             .nullable(),
-        ),
+        ).into(),
         (
             "0 <= {KeyA} && {KeyA} < 100",
             GeneratorBuilder::new_date(
@@ -46,7 +46,7 @@ fn main() {
                 )),
                 Option::<String>::None,
             ),
-        ),
+        ).into(),
         (
             "100 <= {KeyA} && {KeyA} < 200",
             GeneratorBuilder::new_time(
@@ -56,7 +56,7 @@ fn main() {
                 )),
                 Option::<String>::None,
             ),
-        ),
+        ).into(),
     ])
     .with_key("KeyD");
     let format_generator = GeneratorBuilder::new_format("{KeyC} {KeyD}").with_key("KeyE");
@@ -85,20 +85,21 @@ fn main() {
 
     println!("\n---------------------------------------------------------------------------\n");
 
-    let builder =
+    let with_key_builder =
         GeneratorBuilder::new_increment_id(Some(ValueStep::new(100, Some(-2)))).with_key("KeyA");
-    let yaml_string = serde_yaml::to_string(&builder)
+    let yaml_string = serde_yaml::to_string(&with_key_builder)
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::SerializeError))
         .unwrap();
     println!("[builder]\n{}", &yaml_string);
 
-    let deserialized: GeneratorBuilder = serde_yaml::from_str(&yaml_string)
+    let deserialized: WithKeyBuilder = serde_yaml::from_str(&yaml_string)
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::ParseError))
         .unwrap();
     // println!("[builder]\n{:?}", deserialized);
 
-    assert_eq!(deserialized, builder);
+    assert_eq!(deserialized, with_key_builder);
 
+    let (key, builder) = with_key_builder.split();
     let generator = builder
         .build()
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::GenerateError))
@@ -135,7 +136,8 @@ fn main() {
     );
 
     let mut rng = thread_rng();
+    println!("[generate for \"{}\"]", key);
     for _ in 0..10 {
-        println!("[generate]\n{:?}", generator.generate(&mut rng, &value_map));
+        println!("{:?}", generator.generate(&mut rng, &value_map));
     }
 }

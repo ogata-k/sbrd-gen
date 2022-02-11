@@ -1,7 +1,7 @@
 use rand::Rng;
 
 use crate::generators::error::{CompileError, GenerateError};
-use crate::{DataValue, DataValueMap, GeneratorBuilder, Nullable};
+use crate::{DataValue, DataValueMap, GeneratorBuilder};
 
 pub trait Generator<R: Rng + ?Sized> {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>

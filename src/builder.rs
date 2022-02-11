@@ -15,6 +15,88 @@ use crate::value::DataValue;
 use crate::{Nullable, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdTime, ValueStep};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
+pub struct WithKeyBuilder {
+    key: String,
+    #[serde(flatten)]
+    builder: GeneratorBuilder,
+}
+
+impl WithKeyBuilder {
+    pub fn new<S>(key: S, builder: GeneratorBuilder) -> WithKeyBuilder
+    where
+        S: Into<String>,
+    {
+        Self {
+            key: key.into(),
+            builder,
+        }
+    }
+
+    pub fn split(self) -> (String, GeneratorBuilder) {
+        let Self { key, builder } = self;
+        (key, builder)
+    }
+}
+
+impl<S: Into<String>> From<(S, GeneratorBuilder)> for WithKeyBuilder {
+    fn from((key, builder): (S, GeneratorBuilder)) -> Self {
+        Self{
+            key: key.into(),
+            builder
+        }
+    }
+}
+
+impl Into<GeneratorBuilder> for WithKeyBuilder {
+    fn into(self) -> GeneratorBuilder {
+        self.builder
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
+pub struct WithConditionBuilder {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    condition: Option<String>,
+    #[serde(flatten)]
+    builder: GeneratorBuilder,
+}
+
+impl WithConditionBuilder {
+    pub fn new<S>(condition: Option<S>, builder: GeneratorBuilder) -> WithConditionBuilder
+    where
+        S: Into<String>,
+    {
+        Self {
+            condition: condition.map(|v|v.into()),
+            builder,
+        }
+    }
+
+    pub fn split(self) -> (Option<String>, GeneratorBuilder) {
+        let Self { condition, builder } = self;
+        (condition, builder)
+    }
+}
+
+impl From<GeneratorBuilder> for WithConditionBuilder {
+    fn from(builder: GeneratorBuilder) -> Self {
+        Self{
+            condition: None,
+            builder
+        }
+    }
+}
+
+impl<S: Into<String>> From<(S, GeneratorBuilder)> for WithConditionBuilder {
+    fn from((condition, builder): (S, GeneratorBuilder)) -> Self {
+        Self{
+            condition: Some(condition.into()),
+            builder
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct GeneratorBuilder {
     #[serde(rename = "type")]
     pub(crate) generator_type: GeneratorType,
@@ -24,15 +106,11 @@ pub struct GeneratorBuilder {
     )]
     pub(crate) nullable: Nullable,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) key: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) range: Option<ValueBound<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) increment: Option<ValueStep<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) condition: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) children: Option<Vec<GeneratorBuilder>>,
+    pub(crate) children: Option<Vec<WithConditionBuilder>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) chars: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,7 +134,6 @@ macro_rules! build_generator {
     }};
 }
 
-// create builder impl
 impl GeneratorBuilder {
     pub fn build<R: Rng + ?Sized>(self) -> Result<Box<dyn Generator<R>>, CompileError> {
         match self.generator_type {
@@ -89,8 +166,6 @@ impl GeneratorBuilder {
 
     fn new(generator_type: GeneratorType) -> Self {
         Self {
-            key: None,
-            condition: None,
             generator_type,
             nullable: Nullable::new_required(),
             range: None,
@@ -256,7 +331,7 @@ impl GeneratorBuilder {
     ) -> Self
     where
         S: Into<String>,
-        V: Into<Vec<GeneratorBuilder>>,
+        V: Into<Vec<WithConditionBuilder>>,
     {
         Self::new_duplicate_permutation(range, separator).children(builders)
     }
@@ -348,34 +423,39 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::DistRealNormal).parameters(parameters)
     }
 
-    pub fn new_when<S, V>(case_blocks: V) -> Self
+    pub fn new_when<V>(case_blocks: V) -> Self
     where
-        S: Into<String>,
-        V: Into<Vec<(S, GeneratorBuilder)>>,
+        V: Into<Vec<WithConditionBuilder>>,
     {
-        let _case_blocks: Vec<(S, GeneratorBuilder)> = case_blocks.into();
-        let builders: Vec<GeneratorBuilder> = _case_blocks
-            .into_iter()
-            .map(|(condition, block)| block.condition(condition))
-            .collect();
-
-        Self::new(GeneratorType::When).children(builders)
+        Self::new(GeneratorType::When).children(case_blocks)
     }
 
     //
     // build parameter functions following:
     //
 
-    pub fn nullable(mut self) -> Self {
-        self.nullable = Nullable::new_nullable();
-        self
-    }
-
-    pub fn with_key<S>(mut self, key: S) -> Self
+    pub fn with_key<S>(self, key: S) -> WithKeyBuilder
     where
         S: Into<String>,
     {
-        self.key = Some(key.into());
+        WithKeyBuilder {
+            key: key.into(),
+            builder: self,
+        }
+    }
+
+    fn with_condition<S>(self, condition: Option<S>) -> WithConditionBuilder
+    where
+        S: Into<String>,
+    {
+        WithConditionBuilder {
+            condition: condition.map(|v| v.into()),
+            builder: self,
+        }
+    }
+
+    pub fn nullable(mut self) -> Self {
+        self.nullable = Nullable::new_nullable();
         self
     }
 
@@ -395,17 +475,9 @@ impl GeneratorBuilder {
         self
     }
 
-    fn condition<S>(mut self, condition: S) -> Self
-    where
-        S: Into<String>,
-    {
-        self.condition = Some(condition.into());
-        self
-    }
-
     fn children<V>(mut self, children: V) -> Self
     where
-        V: Into<Vec<GeneratorBuilder>>,
+        V: Into<Vec<WithConditionBuilder>>,
     {
         self.children = Some(children.into());
         self

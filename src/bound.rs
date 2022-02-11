@@ -5,24 +5,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
 pub struct ValueBound<T> {
-    #[serde(skip_serializing_if = "Option::is_none", rename = "min")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     start: Option<T>,
     #[serde(
-        skip_serializing_if = "not_include_end",
-        rename = "include_max",
-        default = "default_not_include"
+        skip_serializing_if = "skip_serialize_include_end",
+        default = "default_include_end"
     )]
     include_end: bool,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "max")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     end: Option<T>,
 }
 
-fn not_include_end(b: &bool) -> bool {
-    b == &false
+fn skip_serialize_include_end(b: &bool) -> bool {
+    b == &default_include_end()
 }
 
-fn default_not_include() -> bool {
-    false
+fn default_include_end() -> bool {
+    true
 }
 
 impl<T> Default for ValueBound<T> {
@@ -43,7 +42,7 @@ impl<T> ValueBound<T> {
         };
 
         Self {
-            start: start,
+            start,
             end: _end,
             include_end: _include_end,
         }

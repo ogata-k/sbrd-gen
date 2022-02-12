@@ -9,6 +9,7 @@ pub type DataValueMap = BTreeMap<String, DataValue>;
 pub type SbrdInt = i32;
 pub type SbrdReal = f32;
 pub type SbrdBool = bool;
+pub type SbrdString = String;
 pub type SbrdDateTime = NaiveDateTime;
 pub type SbrdDate = NaiveDate;
 pub type SbrdTime = NaiveTime;
@@ -16,21 +17,6 @@ pub type SbrdTime = NaiveTime;
 pub const DATE_TIME_DEFAULT_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
 pub const DATE_DEFAULT_FORMAT: &str = "%Y-%m-%d";
 pub const TIME_DEFAULT_FORMAT: &str = "%H:%M:%S";
-
-pub(crate) fn replace_values(base_format: &str, value_map: &DataValueMap) -> String {
-    let mut result = String::new();
-    for (i, (key, value)) in value_map.iter().enumerate() {
-        let format = format!("{{{}}}", key);
-        let eval_value = value.to_eval_value();
-        if i == 0 {
-            result = base_format.replace(&format, &eval_value);
-        } else {
-            result = result.replace(&format, &eval_value);
-        }
-    }
-
-    result
-}
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub enum DataValue {
@@ -196,7 +182,7 @@ impl DataValue {
         }
     }
 
-    pub fn to_eval_value(&self) -> String {
+    pub fn to_format_value(&self) -> String {
         match self {
             DataValue::Int(v) => v.to_string(),
             DataValue::Real(v) => v.to_string(),

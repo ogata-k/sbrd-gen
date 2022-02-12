@@ -1,6 +1,5 @@
-use eval;
-
-use crate::{DataValue, GeneratorType, ValueBound};
+use crate::eval::EvalError;
+use crate::{DataValue, DataValueMap, GeneratorType, ValueBound};
 
 #[derive(Debug)]
 pub enum CompileError {
@@ -29,10 +28,8 @@ impl std::error::Error for CompileError {}
 
 #[derive(Debug)]
 pub enum GenerateError {
-    /// eval error, replaced script, unmodified script
-    FailEval(eval::Error, String, String),
-    /// type name, value, unmodified script
-    FailCastOfEvalScript(String, eval::Value, String),
+    /// eval error, unmodified script, context
+    FailEval(EvalError, String, DataValueMap),
     /// reason
     FailGenerate(String),
 }
@@ -40,16 +37,13 @@ pub enum GenerateError {
 impl std::fmt::Display for GenerateError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            GenerateError::FailEval(e, modified_script, unmodified_script) => write!(
-                f,
-                "Eval error: {} on evaluate \"{}\" from script \"{}\"",
-                e, modified_script, unmodified_script
-            ),
-            GenerateError::FailCastOfEvalScript(type_name, value, script) => write!(
-                f,
-                "Cast Value error: `{}` as '{}' on eval script \"{}\"",
-                value, type_name, script
-            ),
+            GenerateError::FailEval(e, script, context) => {
+                write!(
+                    f,
+                    "Fail Evaluate Script \"{}\" in context {:?} with error: {}",
+                    script, context, e
+                )
+            }
             GenerateError::FailGenerate(s) => {
                 write!(f, "Fail Generate valid data. Because {}", s)
             }

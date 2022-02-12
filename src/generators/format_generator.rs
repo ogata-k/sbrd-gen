@@ -1,8 +1,9 @@
 use rand::Rng;
 
+use crate::eval::Evaluator;
 use crate::generators::error::{CompileError, GenerateError};
 use crate::generators::Generator;
-use crate::{replace_values, DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
+use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct FormatGenerator {
@@ -44,8 +45,8 @@ impl<R: Rng + ?Sized> Generator<R> for FormatGenerator {
         _rng: &mut R,
         value_map: &DataValueMap,
     ) -> Result<DataValue, GenerateError> {
-        let format = replace_values(&self.format, value_map);
-
-        Ok(DataValue::String(format))
+        Ok(DataValue::String(
+            Evaluator::new(&self.format, value_map).format_script(),
+        ))
     }
 }

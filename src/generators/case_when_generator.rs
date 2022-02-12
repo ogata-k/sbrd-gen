@@ -1,9 +1,9 @@
-use eval::eval;
 use rand::Rng;
 
+use crate::eval::Evaluator;
 use crate::generators::error::{CompileError, GenerateError};
 use crate::generators::Generator;
-use crate::{replace_values, DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
+use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 
 pub struct CaseWhenGenerator<R: 'static + Rng + ?Sized> {
     nullable: Nullable,
@@ -62,16 +62,9 @@ impl<R: Rng + ?Sized> Generator<R> for CaseWhenGenerator<R> {
             return match condition {
                 None => generator.generate(rng, value_map),
                 Some(_condition) => {
-                    let replaced_condition = replace_values(_condition, value_map);
-                    let value = eval(&replaced_condition).map_err(|e| {
-                        GenerateError::FailEval(e, replaced_condition.clone(), _condition.clone())
-                    })?;
-                    let is_satisfy = value.as_bool().ok_or_else(|| {
-                        GenerateError::FailCastOfEvalScript(
-                            "bool".to_string(),
-                            value,
-                            _condition.clone(),
-                        )
+                    let evaluator = Evaluator::new(_condition, value_map);
+                    let is_satisfy = evaluator.eval_bool().map_err(|e| {
+                        GenerateError::FailEval(e, _condition.clone(), value_map.clone())
                     })?;
                     if !is_satisfy {
                         continue;

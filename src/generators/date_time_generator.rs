@@ -45,9 +45,7 @@ impl<R: Rng + ?Sized> Generator<R> for DateTimeGenerator {
                 })?,
         };
         if _range.is_empty() {
-            return Err(CompileError::RangeEmpty(
-                _range.convert_with(|b| b.to_string()),
-            ));
+            return Err(CompileError::RangeEmpty(_range.convert_into()));
         }
 
         Ok(Self {
@@ -64,7 +62,7 @@ impl<R: Rng + ?Sized> Generator<R> for DateTimeGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _value_map: &DataValueMap<String>,
+        _value_map: &DataValueMap,
     ) -> Result<DataValue, GenerateError> {
         let timestamp_range = self.range.convert_with(|date_time| date_time.timestamp());
         let timestamp_value = rng.gen_range(timestamp_range);

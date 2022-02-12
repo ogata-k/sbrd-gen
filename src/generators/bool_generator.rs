@@ -34,7 +34,7 @@ impl<R: Rng + ?Sized> Generator<R> for BoolGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _value_map: &DataValueMap<String>,
+        _value_map: &DataValueMap,
     ) -> Result<DataValue, GenerateError> {
         Ok(DataValue::Bool(rng.gen_bool(0.5)))
     }

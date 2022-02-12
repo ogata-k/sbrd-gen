@@ -5,7 +5,7 @@ use std::fmt;
 use serde::de::{Error, Unexpected, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-pub type DataValueMap<K> = BTreeMap<K, DataValue>;
+pub type DataValueMap = BTreeMap<String, DataValue>;
 pub type SbrdInt = i32;
 pub type SbrdReal = f32;
 pub type SbrdBool = bool;
@@ -17,7 +17,7 @@ pub const DATE_TIME_DEFAULT_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
 pub const DATE_DEFAULT_FORMAT: &str = "%Y-%m-%d";
 pub const TIME_DEFAULT_FORMAT: &str = "%H:%M:%S";
 
-pub(crate) fn replace_values(base_format: &str, value_map: &DataValueMap<String>) -> String {
+pub(crate) fn replace_values(base_format: &str, value_map: &DataValueMap) -> String {
     let mut result = String::new();
     for (i, (key, value)) in value_map.iter().enumerate() {
         let format = format!("{{{}}}", key);
@@ -62,6 +62,24 @@ impl From<SbrdBool> for DataValue {
 impl From<String> for DataValue {
     fn from(v: String) -> Self {
         Self::String(v)
+    }
+}
+
+impl From<SbrdDateTime> for DataValue {
+    fn from(v: SbrdDateTime) -> Self {
+        Self::String(v.format(DATE_TIME_DEFAULT_FORMAT).to_string())
+    }
+}
+
+impl From<SbrdDate> for DataValue {
+    fn from(v: SbrdDate) -> Self {
+        Self::String(v.format(DATE_DEFAULT_FORMAT).to_string())
+    }
+}
+
+impl From<SbrdTime> for DataValue {
+    fn from(v: SbrdTime) -> Self {
+        Self::String(v.format(TIME_DEFAULT_FORMAT).to_string())
     }
 }
 
@@ -151,6 +169,18 @@ impl Serialize for DataValue {
             DataValue::Bool(v) => serializer.serialize_bool(*v),
             DataValue::String(v) => serializer.serialize_str(v),
             DataValue::Null => serializer.serialize_unit(),
+        }
+    }
+}
+
+impl std::fmt::Display for DataValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DataValue::Int(v) => write!(f, "{}", v),
+            DataValue::Real(v) => write!(f, "{}", v),
+            DataValue::Bool(v) => write!(f, "{}", v),
+            DataValue::String(v) => write!(f, "{}", v),
+            DataValue::Null => write!(f, "null"),
         }
     }
 }

@@ -38,7 +38,7 @@ impl<R: Rng + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F>
         }
 
         match script {
-            None => Err(CompileError::NotExistValueOfKey("script".to_string())),
+            None => Err(CompileError::NotExistValueOf("script".to_string())),
             Some(_script) => Ok(Self {
                 nullable,
                 script: _script,
@@ -54,11 +54,11 @@ impl<R: Rng + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F>
     fn generate_without_null(
         &self,
         _rng: &mut R,
-        value_map: &DataValueMap<String>,
+        value_map: &DataValueMap,
     ) -> Result<DataValue, GenerateError> {
         let mut _script = replace_values(&self.script, value_map);
-        let eval_result = eval(&_script)
-            .map_err(|e| GenerateError::EvalError(e, _script, self.script.clone()))?;
+        let eval_result =
+            eval(&_script).map_err(|e| GenerateError::FailEval(e, _script, self.script.clone()))?;
 
         F::eval_value_to_data_value(eval_result)
     }

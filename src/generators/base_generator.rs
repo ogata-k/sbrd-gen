@@ -14,11 +14,7 @@ pub trait Generator<R: Rng + ?Sized> {
         !self.is_nullable()
     }
 
-    fn generate(
-        &self,
-        rng: &mut R,
-        value_map: &DataValueMap<String>,
-    ) -> Result<DataValue, GenerateError> {
+    fn generate(&self, rng: &mut R, value_map: &DataValueMap) -> Result<DataValue, GenerateError> {
         if self.is_required() {
             self.generate_without_null(rng, value_map)
         } else {
@@ -33,6 +29,6 @@ pub trait Generator<R: Rng + ?Sized> {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap<String>,
+        value_map: &DataValueMap,
     ) -> Result<DataValue, GenerateError>;
 }

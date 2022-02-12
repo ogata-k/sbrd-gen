@@ -47,9 +47,7 @@ impl<R: Rng + ?Sized> Generator<R> for TimeGenerator {
                 })?,
         };
         if _range.is_empty() {
-            return Err(CompileError::RangeEmpty(
-                _range.convert_with(|b| b.to_string()),
-            ));
+            return Err(CompileError::RangeEmpty(_range.convert_into()));
         }
 
         Ok(Self {
@@ -66,7 +64,7 @@ impl<R: Rng + ?Sized> Generator<R> for TimeGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _value_map: &DataValueMap<String>,
+        _value_map: &DataValueMap,
     ) -> Result<DataValue, GenerateError> {
         let upper_bound = self
             .range

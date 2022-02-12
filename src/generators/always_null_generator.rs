@@ -28,7 +28,7 @@ impl<R: Rng + ?Sized> Generator<R> for AlwaysNullGenerator {
     fn generate_without_null(
         &self,
         _rng: &mut R,
-        _value_map: &DataValueMap<String>,
+        _value_map: &DataValueMap,
     ) -> Result<DataValue, GenerateError> {
         Ok(DataValue::Null)
     }

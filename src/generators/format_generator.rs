@@ -27,7 +27,7 @@ impl<R: Rng + ?Sized> Generator<R> for FormatGenerator {
         }
 
         match format {
-            None => Err(CompileError::NotExistValueOfKey("format".to_string())),
+            None => Err(CompileError::NotExistValueOf("format".to_string())),
             Some(_format) => Ok(Self {
                 nullable,
                 format: _format,
@@ -42,7 +42,7 @@ impl<R: Rng + ?Sized> Generator<R> for FormatGenerator {
     fn generate_without_null(
         &self,
         _rng: &mut R,
-        value_map: &DataValueMap<String>,
+        value_map: &DataValueMap,
     ) -> Result<DataValue, GenerateError> {
         let format = replace_values(&self.format, value_map);
 

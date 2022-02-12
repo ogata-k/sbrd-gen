@@ -8,8 +8,9 @@ use crate::bound::ValueBound;
 use crate::generator_type::GeneratorType;
 use crate::generators::error::CompileError;
 use crate::generators::{
-    AlwaysNullGenerator, BoolGenerator, DateGenerator, DateTimeGenerator, EvalGenerator,
-    FormatGenerator, Generator, IncrementIdGenerator, IntGenerator, RealGenerator, TimeGenerator,
+    AlwaysNullGenerator, BoolGenerator, CaseWhenGenerator, DateGenerator, DateTimeGenerator,
+    EvalGenerator, FormatGenerator, Generator, IncrementIdGenerator, IntGenerator, RealGenerator,
+    TimeGenerator,
 };
 use crate::value::DataValue;
 use crate::{Nullable, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdTime, ValueStep};
@@ -47,29 +48,17 @@ impl<S: Into<String>> From<(S, GeneratorBuilder)> for WithKeyBuilder {
     }
 }
 
-impl Into<GeneratorBuilder> for WithKeyBuilder {
-    fn into(self) -> GeneratorBuilder {
-        self.builder
-    }
-}
-
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct WithConditionBuilder {
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "case", skip_serializing_if = "Option::is_none")]
     condition: Option<String>,
     #[serde(flatten)]
     builder: GeneratorBuilder,
 }
 
 impl WithConditionBuilder {
-    pub fn new<S>(condition: Option<S>, builder: GeneratorBuilder) -> WithConditionBuilder
-    where
-        S: Into<String>,
-    {
-        Self {
-            condition: condition.map(|v| v.into()),
-            builder,
-        }
+    pub fn new(condition: Option<String>, builder: GeneratorBuilder) -> WithConditionBuilder {
+        Self { condition, builder }
     }
 
     pub fn split(self) -> (Option<String>, GeneratorBuilder) {
@@ -135,7 +124,7 @@ macro_rules! build_generator {
 }
 
 impl GeneratorBuilder {
-    pub fn build<R: Rng + ?Sized>(self) -> Result<Box<dyn Generator<R>>, CompileError> {
+    pub fn build<R: 'static + Rng + ?Sized>(self) -> Result<Box<dyn Generator<R>>, CompileError> {
         match self.generator_type {
             GeneratorType::Int => build_generator!(self, R, IntGenerator),
             GeneratorType::Real => build_generator!(self, R, RealGenerator),
@@ -150,13 +139,13 @@ impl GeneratorBuilder {
             GeneratorType::EvalBool => build_generator!(self, R, EvalGenerator<SbrdBool>),
             GeneratorType::Format => build_generator!(self, R, FormatGenerator),
             GeneratorType::DuplicatePermutation => unimplemented!(),
+            GeneratorType::CaseWhen => build_generator!(self, R, CaseWhenGenerator<R>),
             GeneratorType::SelectInt => unimplemented!(),
             GeneratorType::SelectReal => unimplemented!(),
             GeneratorType::SelectString => unimplemented!(),
             GeneratorType::DistIntUniform => unimplemented!(),
             GeneratorType::DistRealUniform => unimplemented!(),
             GeneratorType::DistRealNormal => unimplemented!(),
-            GeneratorType::When => unimplemented!(),
         }
     }
 
@@ -203,11 +192,7 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::Bool)
     }
 
-    pub fn new_date_time<DT, S>(range: Option<ValueBound<DT>>, format: Option<S>) -> Self
-    where
-        DT: Into<SbrdDateTime>,
-        S: Into<String>,
-    {
+    pub fn new_date_time(range: Option<ValueBound<SbrdDateTime>>, format: Option<String>) -> Self {
         let mut this = Self::new(GeneratorType::DateTime);
         if let Some(range) = range {
             this = this.range(
@@ -222,11 +207,7 @@ impl GeneratorBuilder {
         this
     }
 
-    pub fn new_date<D, S>(range: Option<ValueBound<D>>, format: Option<S>) -> Self
-    where
-        D: Into<SbrdDate>,
-        S: Into<String>,
-    {
+    pub fn new_date(range: Option<ValueBound<SbrdDate>>, format: Option<String>) -> Self {
         let mut this = Self::new(GeneratorType::Date);
         if let Some(range) = range {
             this = this
@@ -240,11 +221,7 @@ impl GeneratorBuilder {
         this
     }
 
-    pub fn new_time<T, S>(range: Option<ValueBound<T>>, format: Option<S>) -> Self
-    where
-        T: Into<SbrdTime>,
-        S: Into<String>,
-    {
+    pub fn new_time(range: Option<ValueBound<SbrdTime>>, format: Option<String>) -> Self {
         let mut this = Self::new(GeneratorType::Time);
         if let Some(range) = range {
             this = this
@@ -266,7 +243,7 @@ impl GeneratorBuilder {
         let mut this = Self::new(GeneratorType::IncrementId);
 
         if let Some(_increment) = increment {
-            this = this.increment(_increment.convert_with(|v| DataValue::from(v)))
+            this = this.increment(_increment.convert_with(DataValue::from))
         }
 
         this
@@ -336,6 +313,13 @@ impl GeneratorBuilder {
         Self::new_duplicate_permutation(range, separator).children(builders)
     }
 
+    pub fn new_case_when<V>(case_when: V) -> Self
+    where
+        V: Into<Vec<WithConditionBuilder>>,
+    {
+        Self::new(GeneratorType::CaseWhen).children(case_when)
+    }
+
     fn new_select_int() -> Self {
         Self::new(GeneratorType::SelectInt)
     }
@@ -348,7 +332,7 @@ impl GeneratorBuilder {
             values
                 .into()
                 .into_iter()
-                .map(|v| DataValue::from(v))
+                .map(DataValue::from)
                 .collect::<Vec<DataValue>>(),
         )
     }
@@ -372,7 +356,7 @@ impl GeneratorBuilder {
             values
                 .into()
                 .into_iter()
-                .map(|v| DataValue::from(v))
+                .map(DataValue::from)
                 .collect::<Vec<DataValue>>(),
         )
     }
@@ -396,7 +380,7 @@ impl GeneratorBuilder {
             values
                 .into()
                 .into_iter()
-                .map(|v| DataValue::from(v))
+                .map(DataValue::from)
                 .collect::<Vec<DataValue>>(),
         )
     }
@@ -429,36 +413,9 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::DistRealNormal).parameters(parameters)
     }
 
-    pub fn new_when<V>(case_blocks: V) -> Self
-    where
-        V: Into<Vec<WithConditionBuilder>>,
-    {
-        Self::new(GeneratorType::When).children(case_blocks)
-    }
-
     //
     // build parameter functions following:
     //
-
-    pub fn with_key<S>(self, key: S) -> WithKeyBuilder
-    where
-        S: Into<String>,
-    {
-        WithKeyBuilder {
-            key: key.into(),
-            builder: self,
-        }
-    }
-
-    fn with_condition<S>(self, condition: Option<S>) -> WithConditionBuilder
-    where
-        S: Into<String>,
-    {
-        WithConditionBuilder {
-            condition: condition.map(|v| v.into()),
-            builder: self,
-        }
-    }
 
     pub fn nullable(mut self) -> Self {
         self.nullable = Nullable::new_nullable();
@@ -543,5 +500,24 @@ impl GeneratorBuilder {
     {
         self.parameters = Some(parameters.into());
         self
+    }
+}
+
+impl GeneratorBuilder {
+    pub fn with_key<S>(self, key: S) -> WithKeyBuilder
+    where
+        S: Into<String>,
+    {
+        WithKeyBuilder {
+            key: key.into(),
+            builder: self,
+        }
+    }
+
+    pub fn with_condition(self, condition: Option<String>) -> WithConditionBuilder {
+        WithConditionBuilder {
+            condition,
+            builder: self,
+        }
     }
 }

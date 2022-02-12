@@ -1,14 +1,15 @@
 use eval;
 
-use crate::{GeneratorType, ValueBound};
+use crate::{DataValue, GeneratorType, ValueBound};
 
 #[derive(Debug)]
 pub enum CompileError {
     InvalidType(GeneratorType),
     InvalidValue(String),
-    NotExistValueOfKey(String),
-    // 文字列に変換して範囲を持つようにする
-    RangeEmpty(ValueBound<String>),
+    NotExistValueOf(String),
+    RangeEmpty(ValueBound<DataValue>),
+    EmptyChildren,
+    NotExistDefaultCase,
 }
 
 impl std::fmt::Display for CompileError {
@@ -16,8 +17,10 @@ impl std::fmt::Display for CompileError {
         match self {
             CompileError::InvalidType(t) => write!(f, "Invalid Type: {}", t),
             CompileError::InvalidValue(s) => write!(f, "Invalid Value: {}", s),
-            CompileError::NotExistValueOfKey(s) => write!(f, "Not Exist Value on the Key: {}", s),
+            CompileError::NotExistValueOf(s) => write!(f, "Not Exist Value for {}", s),
             CompileError::RangeEmpty(range) => write!(f, "Empty Range: {}", range),
+            CompileError::EmptyChildren => write!(f, "Not Exist selectable children"),
+            CompileError::NotExistDefaultCase => write!(f, "Not Exist default case condition"),
         }
     }
 }
@@ -26,20 +29,29 @@ impl std::error::Error for CompileError {}
 
 #[derive(Debug)]
 pub enum GenerateError {
-    EvalError(eval::Error, String, String),
+    /// eval error, replaced script, unmodified script
+    FailEval(eval::Error, String, String),
+    /// type name, value, unmodified script
+    FailCastOfEvalScript(String, eval::Value, String),
+    /// reason
     FailGenerate(String),
 }
 
 impl std::fmt::Display for GenerateError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            GenerateError::EvalError(e, modified_script, unmodified_script) => write!(
+            GenerateError::FailEval(e, modified_script, unmodified_script) => write!(
                 f,
-                "Eval error: {} on evaluate \"{}\" from script\"{}\"",
+                "Eval error: {} on evaluate \"{}\" from script \"{}\"",
                 e, modified_script, unmodified_script
             ),
+            GenerateError::FailCastOfEvalScript(type_name, value, script) => write!(
+                f,
+                "Cast Value error: `{}` as '{}' on eval script \"{}\"",
+                value, type_name, script
+            ),
             GenerateError::FailGenerate(s) => {
-                write!(f, "Fail Generate valid data. But generate {}", s)
+                write!(f, "Fail Generate valid data. Because {}", s)
             }
         }
     }

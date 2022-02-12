@@ -25,7 +25,7 @@ fn main() {
     .nullable()
     .with_key("KeyC");
     // other case get error or null(when nullable)
-    let when_generator = GeneratorBuilder::new_when([
+    let case_when_generator = GeneratorBuilder::new_case_when([
         (
             "{KeyA} < 0",
             GeneratorBuilder::new_date_time(
@@ -33,7 +33,7 @@ fn main() {
                     Some(SbrdDate::from_ymd(2021, 12, 25).and_hms(0, 0, 0)),
                     Some((false, SbrdDate::from_ymd(2021, 12, 26).and_hms(0, 0, 0))),
                 )),
-                Option::<String>::None,
+                None,
             )
             .nullable(),
         )
@@ -45,7 +45,7 @@ fn main() {
                     Some(SbrdDate::from_ymd(2021, 12, 25)),
                     None,
                 )),
-                Option::<String>::None,
+                None,
             ),
         )
             .into(),
@@ -56,7 +56,7 @@ fn main() {
                     None,
                     Some((true, SbrdTime::from_hms(23, 59, 59))),
                 )),
-                Option::<String>::None,
+                None,
             ),
         )
             .into(),
@@ -70,7 +70,7 @@ fn main() {
             int_generator,
             select_sting_generator,
             duplicate_permutation_generator,
-            when_generator,
+            case_when_generator,
             format_generator,
         ],
     );
@@ -88,8 +88,44 @@ fn main() {
 
     println!("\n---------------------------------------------------------------------------\n");
 
-    let with_key_builder =
-        GeneratorBuilder::new_increment_id(Some(ValueStep::new(100, Some(-2)))).with_key("KeyA");
+    let with_key_builder = GeneratorBuilder::new_case_when([
+        (
+            "50 <= {dummy_int}",
+            GeneratorBuilder::new_date_time(
+                Some(ValueBound::new(
+                    Some(SbrdDate::from_ymd(2021, 12, 25).and_hms(0, 0, 0)),
+                    Some((false, SbrdDate::from_ymd(2021, 12, 26).and_hms(0, 0, 0))),
+                )),
+                None,
+            )
+            .nullable(),
+        )
+            .into(),
+        (
+            "10 <= {dummy_int} && {dummy_int} < 50",
+            GeneratorBuilder::new_date(
+                Some(ValueBound::new(
+                    Some(SbrdDate::from_ymd(2021, 12, 25)),
+                    None,
+                )),
+                None,
+            ),
+        )
+            .into(),
+        (
+            "0 <= {dummy_int} && {dummy_int} < 10",
+            GeneratorBuilder::new_time(
+                Some(ValueBound::new(
+                    None,
+                    Some((true, SbrdTime::from_hms(23, 59, 59))),
+                )),
+                None,
+            ),
+        )
+            .into(),
+        GeneratorBuilder::new_always_null().into(),
+    ])
+    .with_key("KeyA");
     let yaml_string = serde_yaml::to_string(&with_key_builder)
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::SerializeError))
         .unwrap();
@@ -108,39 +144,59 @@ fn main() {
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::GenerateError))
         .unwrap();
 
-    let mut value_map = DataValueMap::<String>::new();
-    value_map.insert("dummy_int".to_string(), DataValue::Int(32));
-    value_map.insert("dummy_real".to_string(), DataValue::Real(3.15));
-    value_map.insert("dummy_bool".to_string(), DataValue::Bool(false));
-    value_map.insert(
-        "dummy_date_time".to_string(),
-        DataValue::String(
-            SbrdDate::from_ymd(2021, 12, 25)
-                .and_hms(0, 0, 0)
-                .format(DATE_TIME_DEFAULT_FORMAT)
-                .to_string(),
-        ),
-    );
-    value_map.insert(
-        "dummy_date".to_string(),
-        DataValue::String(
-            SbrdDate::from_ymd(2021, 12, 25)
-                .format(DATE_DEFAULT_FORMAT)
-                .to_string(),
-        ),
-    );
-    value_map.insert(
-        "dummy_time".to_string(),
-        DataValue::String(
-            SbrdTime::from_hms(0, 0, 0)
-                .format(TIME_DEFAULT_FORMAT)
-                .to_string(),
-        ),
-    );
-
     let mut rng = thread_rng();
     println!("[generate for \"{}\"]", key);
     for _ in 0..10 {
+        let mut value_map = DataValueMap::new();
+        value_map.insert(
+            "dummy_int".to_string(),
+            GeneratorBuilder::new_int(None)
+                .build()
+                .unwrap()
+                .generate(&mut rng, &value_map)
+                .unwrap(),
+        );
+        value_map.insert(
+            "dummy_real".to_string(),
+            GeneratorBuilder::new_real(None)
+                .build()
+                .unwrap()
+                .generate(&mut rng, &value_map)
+                .unwrap(),
+        );
+        value_map.insert(
+            "dummy_bool".to_string(),
+            GeneratorBuilder::new_bool()
+                .build()
+                .unwrap()
+                .generate(&mut rng, &value_map)
+                .unwrap(),
+        );
+        value_map.insert(
+            "dummy_date_time".to_string(),
+            GeneratorBuilder::new_date_time(None, Option::<String>::None)
+                .build()
+                .unwrap()
+                .generate(&mut rng, &value_map)
+                .unwrap(),
+        );
+        value_map.insert(
+            "dummy_date".to_string(),
+            GeneratorBuilder::new_date(None, Option::<String>::None)
+                .build()
+                .unwrap()
+                .generate(&mut rng, &value_map)
+                .unwrap(),
+        );
+        value_map.insert(
+            "dummy_time".to_string(),
+            GeneratorBuilder::new_time(None, Option::<String>::None)
+                .build()
+                .unwrap()
+                .generate(&mut rng, &value_map)
+                .unwrap(),
+        );
+
         println!("{:?}", generator.generate(&mut rng, &value_map));
     }
 }

@@ -22,6 +22,7 @@ pub enum GeneratorType {
     // join (use bound parameter as count)
     DuplicatePermutation,
     // random select
+    CaseWhen,
     SelectInt,
     SelectReal,
     SelectString,
@@ -29,8 +30,6 @@ pub enum GeneratorType {
     DistIntUniform,
     DistRealUniform,
     DistRealNormal,
-    // case-when condition. default value is null.
-    When,
 }
 
 impl std::fmt::Display for GeneratorType {

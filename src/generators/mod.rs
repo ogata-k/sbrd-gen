@@ -1,6 +1,7 @@
 pub use always_null_generator::*;
 pub use base_generator::*;
 pub use bool_generator::*;
+pub use case_when_generator::*;
 pub use date_generator::*;
 pub use date_time_generator::*;
 pub use eval_generator::*;
@@ -13,6 +14,7 @@ pub use time_generator::*;
 mod always_null_generator;
 mod base_generator;
 mod bool_generator;
+mod case_when_generator;
 mod date_generator;
 mod date_time_generator;
 pub mod error;

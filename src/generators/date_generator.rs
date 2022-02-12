@@ -46,9 +46,7 @@ impl<R: Rng + ?Sized> Generator<R> for DateGenerator {
                 })?,
         };
         if _range.is_empty() {
-            return Err(CompileError::RangeEmpty(
-                _range.convert_with(|b| b.to_string()),
-            ));
+            return Err(CompileError::RangeEmpty(_range.convert_into()));
         }
 
         Ok(Self {
@@ -65,7 +63,7 @@ impl<R: Rng + ?Sized> Generator<R> for DateGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _value_map: &DataValueMap<String>,
+        _value_map: &DataValueMap,
     ) -> Result<DataValue, GenerateError> {
         let num_days_range = self.range.convert_with(|date| date.num_days_from_ce());
         let num_days_value = rng.gen_range(num_days_range);

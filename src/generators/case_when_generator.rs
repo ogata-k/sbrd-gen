@@ -3,7 +3,9 @@ use rand::Rng;
 use crate::eval::Evaluator;
 use crate::generators::error::{CompileError, GenerateError};
 use crate::generators::Generator;
-use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
+use crate::{
+    ChildGeneratorBuilder, DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable,
+};
 
 pub struct CaseWhenGenerator<R: 'static + Rng + ?Sized> {
     nullable: Nullable,
@@ -31,8 +33,10 @@ impl<R: Rng + ?Sized> Generator<R> for CaseWhenGenerator<R> {
             Some(children) => {
                 let mut _children: Vec<(Option<String>, Box<dyn Generator<R>>)> = Vec::new();
                 let mut has_default_case = false;
-                for with_condition_builder in children.into_iter() {
-                    let (condition, builder) = with_condition_builder.split();
+                for child_builder in children.into_iter() {
+                    let ChildGeneratorBuilder {
+                        condition, builder, ..
+                    } = child_builder;
                     has_default_case = has_default_case || condition.is_none();
                     _children.push((condition, builder.build()?));
                 }

@@ -19,7 +19,8 @@ pub enum GeneratorType {
     EvalBool,
     // join
     Format,
-    // join (use bound parameter as count)
+    // randomize child generator
+    Randomize,
     DuplicatePermutation,
     // random select
     CaseWhen,

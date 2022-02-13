@@ -1,15 +1,15 @@
-use crate::WithKeyBuilder;
+use crate::ParentGeneratorBuilder;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct Scheme {
     keys: Vec<String>,
     #[serde(rename = "generators")]
-    builders: Vec<WithKeyBuilder>,
+    builders: Vec<ParentGeneratorBuilder>,
 }
 
 impl Scheme {
-    pub fn new(keys: Vec<String>, builders: Vec<WithKeyBuilder>) -> Scheme {
+    pub fn new(keys: Vec<String>, builders: Vec<ParentGeneratorBuilder>) -> Scheme {
         Scheme { keys, builders }
     }
 }

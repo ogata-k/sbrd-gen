@@ -15,3 +15,4 @@ serde_yaml = "0.8.23"
 rand = { version = "0.8.4", features = ["alloc"] }
 chrono = "0.4.19"
 evalexpr = "7.0.0"
+either = "1.6.1"

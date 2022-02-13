@@ -7,13 +7,13 @@ use crate::generator_type::GeneratorType;
 use crate::generators::error::CompileError;
 use crate::generators::{
     AlwaysNullGenerator, BoolGenerator, CaseWhenGenerator, DateGenerator, DateTimeGenerator,
-    EvalGenerator, FormatGenerator, Generator, IncrementIdGenerator, IntGenerator,
-    RandomizeGenerator, Randomizer, RealGenerator, TimeGenerator,
+    DuplicatePermutationGenerator, EvalGenerator, FormatGenerator, Generator, IncrementIdGenerator,
+    IntGenerator, RandomizeGenerator, Randomizer, RealGenerator, TimeGenerator,
 };
 use crate::value::DataValue;
 use crate::{
-    DataValueMap, Nullable, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdTime,
-    ValueStep,
+    DataValueMap, Nullable, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdString,
+    SbrdTime, ValueStep,
 };
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
@@ -94,7 +94,7 @@ pub struct GeneratorBuilder {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) values: Option<Vec<DataValue>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) file: Option<PathBuf>,
+    pub(crate) filepath: Option<PathBuf>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) separator: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -133,14 +133,16 @@ impl GeneratorBuilder {
             GeneratorType::EvalBool => build_generator!(self, R, EvalGenerator<SbrdBool>),
             GeneratorType::Format => build_generator!(self, R, FormatGenerator),
             GeneratorType::Randomize => build_generator!(self, R, RandomizeGenerator<R>),
-            GeneratorType::DuplicatePermutation => unimplemented!(),
+            GeneratorType::DuplicatePermutation => {
+                build_generator!(self, R, DuplicatePermutationGenerator<R>)
+            }
             GeneratorType::CaseWhen => build_generator!(self, R, CaseWhenGenerator<R>),
             GeneratorType::SelectInt => unimplemented!(),
             GeneratorType::SelectReal => unimplemented!(),
             GeneratorType::SelectString => unimplemented!(),
             GeneratorType::DistIntUniform => unimplemented!(),
             GeneratorType::DistRealUniform => unimplemented!(),
-            GeneratorType::DistRealNormal => unimplemented!(),
+            GeneratorType::DistNormal => unimplemented!(),
         }
     }
 
@@ -166,7 +168,7 @@ impl GeneratorBuilder {
             nullable: Nullable::new_required(),
             range: None,
             increment: None,
-            file: None,
+            filepath: None,
             separator: None,
             values: None,
             format: None,
@@ -289,8 +291,32 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::Format).format(format)
     }
 
-    pub fn new_randomize(children: Vec<ChildGeneratorBuilder>) -> Self {
-        Self::new(GeneratorType::Randomize).children(children)
+    fn new_randomize() -> Self {
+        Self::new(GeneratorType::Randomize)
+    }
+
+    pub fn new_randomize_with_children(children: Vec<ChildGeneratorBuilder>) -> Self {
+        Self::new_randomize().children(children)
+    }
+
+    pub fn new_randomize_with_select_list(
+        chars: Option<String>,
+        values: Option<Vec<String>>,
+    ) -> Self {
+        let mut this = Self::new_randomize();
+        if chars.is_none() && values.is_none() {
+            // default setting
+            this = this.values(Vec::new());
+        } else {
+            if let Some(chars) = chars {
+                this = this.chars(chars);
+            }
+            if let Some(values) = values {
+                this = this.values(values.into_iter().map(|v| v.into()).collect());
+            }
+        }
+
+        this
     }
 
     fn new_duplicate_permutation<S>(range: Option<ValueBound<SbrdInt>>, separator: S) -> Self
@@ -305,91 +331,89 @@ impl GeneratorBuilder {
         this
     }
 
-    pub fn new_duplicate_permutation_with_chars<S1, S2>(
-        range: Option<ValueBound<SbrdInt>>,
-        separator: S1,
-        chars: S2,
-    ) -> Self
-    where
-        S1: Into<String>,
-        S2: Into<String>,
-    {
-        Self::new_duplicate_permutation(range, separator).chars(chars)
-    }
-
     pub fn new_duplicate_permutation_with_children<S>(
         range: Option<ValueBound<SbrdInt>>,
         separator: S,
-        builders: Vec<ChildGeneratorBuilder>,
+        children: Vec<ChildGeneratorBuilder>,
     ) -> Self
     where
         S: Into<String>,
     {
-        Self::new_duplicate_permutation(range, separator).children(builders)
+        Self::new_duplicate_permutation(range, separator).children(children)
     }
 
-    pub fn new_case_when(case_when: Vec<ChildGeneratorBuilder>) -> Self {
-        Self::new(GeneratorType::CaseWhen).children(case_when)
+    pub fn new_duplicate_permutation_with_select_list<S>(
+        range: Option<ValueBound<SbrdInt>>,
+        separator: S,
+        chars: Option<String>,
+        values: Option<Vec<String>>,
+    ) -> Self
+    where
+        S: Into<String>,
+    {
+        let mut this = Self::new_duplicate_permutation(range, separator);
+        if chars.is_none() && values.is_none() {
+            // default setting
+            this = this.values(Vec::new());
+        } else {
+            if let Some(chars) = chars {
+                this = this.chars(chars);
+            }
+            if let Some(values) = values {
+                this = this.values(values.into_iter().map(|v| v.into()).collect());
+            }
+        }
+
+        this
     }
 
-    fn new_select_int() -> Self {
-        Self::new(GeneratorType::SelectInt)
+    pub fn new_case_when(children: Vec<ChildGeneratorBuilder>) -> Self {
+        Self::new(GeneratorType::CaseWhen).children(children)
     }
 
-    pub fn new_select_int_with_values(values: Vec<SbrdInt>) -> Self {
-        Self::new_select_int().values(
+    pub fn new_select_int(values: Vec<SbrdInt>, filepath: Option<PathBuf>) -> Self {
+        let mut this = Self::new(GeneratorType::SelectInt);
+        if let Some(path) = filepath {
+            this = this.filepath(path);
+        }
+        this = this.values(
             values
                 .into_iter()
                 .map(DataValue::from)
                 .collect::<Vec<DataValue>>(),
-        )
+        );
+
+        this
     }
 
-    pub fn new_select_int_with_file<P>(path: P) -> Self
-    where
-        P: Into<PathBuf>,
-    {
-        Self::new_select_int().file(path)
-    }
-
-    fn new_select_real() -> Self {
-        Self::new(GeneratorType::SelectReal)
-    }
-
-    pub fn new_select_real_with_values(values: Vec<SbrdReal>) -> Self {
-        Self::new_select_real().values(
+    pub fn new_select_real(values: Vec<SbrdReal>, filepath: Option<PathBuf>) -> Self {
+        let mut this = Self::new(GeneratorType::SelectReal);
+        if let Some(path) = filepath {
+            this = this.filepath(path);
+        }
+        this = this.values(
             values
                 .into_iter()
                 .map(DataValue::from)
                 .collect::<Vec<DataValue>>(),
-        )
+        );
+
+        this
     }
 
-    pub fn new_select_real_with_file<P>(path: P) -> Self
-    where
-        P: Into<PathBuf>,
-    {
-        Self::new_select_real().file(path)
-    }
-
-    fn new_select_string() -> Self {
-        Self::new(GeneratorType::SelectString)
-    }
-
-    pub fn new_select_string_with_values(values: Vec<String>) -> Self {
-        Self::new_select_string().values(
+    pub fn new_select_string(values: Vec<SbrdString>, filepath: Option<PathBuf>) -> Self {
+        let mut this = Self::new(GeneratorType::SelectString);
+        if let Some(path) = filepath {
+            this = this.filepath(path);
+        }
+        this = this.values(
             values
                 .into_iter()
                 .map(DataValue::from)
                 .collect::<Vec<DataValue>>(),
-        )
-    }
+        );
 
-    pub fn new_select_string_with_file<P>(path: P) -> Self
-    where
-        P: Into<PathBuf>,
-    {
-        Self::new_select_string().file(path)
+        this
     }
 
     pub fn new_dist_int_uniform(parameters: DataValueMap) -> Self {
@@ -400,8 +424,8 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::DistRealUniform).parameters(parameters)
     }
 
-    pub fn new_real_normal(parameters: DataValueMap) -> Self {
-        Self::new(GeneratorType::DistRealNormal).parameters(parameters)
+    pub fn new_dist_normal(parameters: DataValueMap) -> Self {
+        Self::new(GeneratorType::DistNormal).parameters(parameters)
     }
 }
 
@@ -442,11 +466,11 @@ impl GeneratorBuilder {
         self
     }
 
-    fn file<P>(mut self, path: P) -> Self
+    fn filepath<P>(mut self, filepath: P) -> Self
     where
         P: Into<PathBuf>,
     {
-        self.file = Some(path.into());
+        self.filepath = Some(filepath.into());
         self
     }
 

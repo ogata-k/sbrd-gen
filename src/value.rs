@@ -172,6 +172,16 @@ impl std::fmt::Display for DataValue {
 }
 
 impl DataValue {
+    pub fn to_permutation_string(&self) -> String {
+        match self {
+            DataValue::Int(v) => v.to_string(),
+            DataValue::Real(v) => v.to_string(),
+            DataValue::Bool(v) => v.to_string(),
+            DataValue::String(v) => v.to_string(),
+            DataValue::Null => "".to_string(),
+        }
+    }
+
     pub fn to_parse_string(&self) -> String {
         match self {
             DataValue::Int(v) => v.to_string(),

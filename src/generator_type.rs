@@ -30,7 +30,7 @@ pub enum GeneratorType {
     // distribution
     DistIntUniform,
     DistRealUniform,
-    DistRealNormal,
+    DistNormal,
 }
 
 impl std::fmt::Display for GeneratorType {

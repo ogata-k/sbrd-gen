@@ -1,14 +1,16 @@
 use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::{Generator, Randomizer};
-use crate::{
-    ChildGeneratorBuilder, DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable,
-    Weight,
-};
-use rand::prelude::SliceRandom;
+use crate::generators::{Generator, RandomSelectableGenerator, Randomizer, WeightedSelectable};
+use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 
 pub struct RandomizeGenerator<R: 'static + Randomizer + ?Sized> {
     nullable: Nullable,
-    children: Vec<(Weight, Box<dyn Generator<R>>)>,
+    selectable_values: Vec<WeightedSelectable<R>>,
+}
+
+impl<R: Randomizer + ?Sized> RandomSelectableGenerator<R> for RandomizeGenerator<R> {
+    fn get_selectable(&self) -> &[WeightedSelectable<R>] {
+        &self.selectable_values
+    }
 }
 
 impl<R: Randomizer + ?Sized> Generator<R> for RandomizeGenerator<R> {
@@ -20,6 +22,9 @@ impl<R: Randomizer + ?Sized> Generator<R> for RandomizeGenerator<R> {
             generator_type,
             nullable,
             children,
+            chars,
+            values,
+            filepath,
             ..
         } = builder;
 
@@ -27,31 +32,12 @@ impl<R: Randomizer + ?Sized> Generator<R> for RandomizeGenerator<R> {
             return Err(CompileError::InvalidType(generator_type));
         }
 
-        match children {
-            None => Err(CompileError::EmptyChildren),
-            Some(children) => {
-                let mut _children: Vec<(Weight, Box<dyn Generator<R>>)> = Vec::new();
-                for child_builder in children.into_iter() {
-                    let ChildGeneratorBuilder {
-                        weight, builder, ..
-                    } = child_builder;
-                    _children.push((weight.unwrap_or(1), builder.build()?));
-                }
+        let selectable_values = Self::build_selectable(children, chars, values, filepath)?;
 
-                if _children.is_empty() {
-                    return Err(CompileError::EmptyChildren);
-                }
-
-                if _children.iter().fold(0, |acc, item| acc + item.0) == 0 {
-                    return Err(CompileError::AllWeightsZero);
-                }
-
-                Ok(Self {
-                    nullable,
-                    children: _children,
-                })
-            }
-        }
+        Ok(Self {
+            nullable,
+            selectable_values,
+        })
     }
 
     fn is_nullable(&self) -> bool {
@@ -63,9 +49,6 @@ impl<R: Randomizer + ?Sized> Generator<R> for RandomizeGenerator<R> {
         rng: &mut R,
         value_map: &DataValueMap,
     ) -> Result<DataValue, GenerateError> {
-        self.children
-            .choose_weighted(rng, |item| item.0)
-            .map_err(|err| GenerateError::FailGenerate(err.to_string()))
-            .and_then(|item| item.1.generate(rng, value_map))
+        self.choose(rng, value_map)
     }
 }

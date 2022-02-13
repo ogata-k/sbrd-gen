@@ -8,8 +8,10 @@ pub enum CompileError {
     NotExistValueOf(String),
     RangeEmpty(ValueBound<DataValue>),
     EmptyChildren,
+    EmptyRandomize,
     NotExistDefaultCase,
     AllWeightsZero,
+    FileError(std::io::Error),
 }
 
 impl std::fmt::Display for CompileError {
@@ -20,8 +22,12 @@ impl std::fmt::Display for CompileError {
             CompileError::NotExistValueOf(s) => write!(f, "Not Exist Value for {}", s),
             CompileError::RangeEmpty(range) => write!(f, "Empty Range: {}", range),
             CompileError::EmptyChildren => write!(f, "Not Exist selectable children"),
+            CompileError::EmptyRandomize => {
+                write!(f, "Not Exist selectable children xor (chars, values, file)")
+            }
             CompileError::NotExistDefaultCase => write!(f, "Not Exist default case condition"),
             CompileError::AllWeightsZero => write!(f, "All weights are zero"),
+            CompileError::FileError(fe) => write!(f, "File Error: {}", fe),
         }
     }
 }

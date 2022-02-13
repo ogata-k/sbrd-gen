@@ -27,7 +27,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for CaseWhenGenerator<R> {
         }
 
         match children {
-            None => Err(CompileError::EmptyChildren),
+            None => Err(CompileError::InvalidValue("children".to_string())),
             Some(children) => {
                 let mut _children: Vec<(Option<String>, Box<dyn Generator<R>>)> = Vec::new();
                 let mut has_default_case = false;

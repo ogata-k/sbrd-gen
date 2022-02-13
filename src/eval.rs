@@ -1,5 +1,5 @@
-use crate::{DataValue, DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
-use evalexpr::{eval, eval_boolean, eval_float, eval_int, EvalexprError, Value};
+use crate::{DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
+use evalexpr::{eval_boolean, eval_float, eval_int, EvalexprError};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Evaluator<'a> {
@@ -25,20 +25,6 @@ impl<'a> Evaluator<'a> {
         }
 
         replaced_script
-    }
-
-    pub fn eval_data_value(&self) -> EvalResult<DataValue> {
-        match eval(&self.format_script()) {
-            Ok(eval_value) => match eval_value {
-                Value::String(v) => Ok(DataValue::String(v)),
-                Value::Float(v) => Ok(DataValue::Real(v as SbrdReal)),
-                Value::Int(v) => Ok(DataValue::Int(v as SbrdInt)),
-                Value::Boolean(v) => Ok(DataValue::Bool(v)),
-                Value::Tuple(_) => Err(EvalexprError::expected_number_or_string(eval_value)),
-                Value::Empty => Ok(DataValue::Null),
-            },
-            Err(e) => Err(e),
-        }
     }
 
     pub fn eval_int(&self) -> EvalResult<SbrdInt> {

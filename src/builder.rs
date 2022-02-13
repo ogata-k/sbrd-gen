@@ -13,7 +13,10 @@ use crate::generators::{
     TimeGenerator,
 };
 use crate::value::DataValue;
-use crate::{Nullable, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdTime, ValueStep};
+use crate::{
+    DataValueMap, Nullable, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdTime,
+    ValueStep,
+};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct WithKeyBuilder {
@@ -173,7 +176,7 @@ impl GeneratorBuilder {
     pub fn new_int(range: Option<ValueBound<SbrdInt>>) -> Self {
         let mut this = Self::new(GeneratorType::Int);
         if let Some(range) = range {
-            this = this.range(range.convert_with(|v| format!("{}", v)));
+            this = this.range(range.convert_with(|v| format!("{}", v).into()));
         }
 
         this
@@ -182,7 +185,7 @@ impl GeneratorBuilder {
     pub fn new_real(range: Option<ValueBound<SbrdReal>>) -> Self {
         let mut this = Self::new(GeneratorType::Real);
         if let Some(range) = range {
-            this = this.range(range.convert_with(|v| format!("{}", v)));
+            this = this.range(range.convert_with(|v| format!("{}", v).into()));
         }
 
         this
@@ -195,9 +198,12 @@ impl GeneratorBuilder {
     pub fn new_date_time(range: Option<ValueBound<SbrdDateTime>>, format: Option<String>) -> Self {
         let mut this = Self::new(GeneratorType::DateTime);
         if let Some(range) = range {
-            this = this.range(
-                range.convert_with(|v| Into::<SbrdDateTime>::into(v).format("%F %T").to_string()),
-            );
+            this = this.range(range.convert_with(|v| {
+                Into::<SbrdDateTime>::into(v)
+                    .format("%F %T")
+                    .to_string()
+                    .into()
+            }));
         }
 
         if let Some(_format) = format {
@@ -210,8 +216,9 @@ impl GeneratorBuilder {
     pub fn new_date(range: Option<ValueBound<SbrdDate>>, format: Option<String>) -> Self {
         let mut this = Self::new(GeneratorType::Date);
         if let Some(range) = range {
-            this = this
-                .range(range.convert_with(|v| Into::<SbrdDate>::into(v).format("%F").to_string()));
+            this = this.range(
+                range.convert_with(|v| Into::<SbrdDate>::into(v).format("%F").to_string().into()),
+            );
         }
 
         if let Some(_format) = format {
@@ -224,8 +231,9 @@ impl GeneratorBuilder {
     pub fn new_time(range: Option<ValueBound<SbrdTime>>, format: Option<String>) -> Self {
         let mut this = Self::new(GeneratorType::Time);
         if let Some(range) = range {
-            this = this
-                .range(range.convert_with(|v| Into::<SbrdTime>::into(v).format("%T").to_string()));
+            this = this.range(
+                range.convert_with(|v| Into::<SbrdTime>::into(v).format("%T").to_string().into()),
+            );
         }
 
         if let Some(_format) = format {
@@ -283,7 +291,7 @@ impl GeneratorBuilder {
     {
         let mut this = Self::new(GeneratorType::DuplicatePermutation).separator(separator);
         if let Some(range) = range {
-            this = this.range(range.convert_with(|v| format!("{}", v)));
+            this = this.range(range.convert_with(|v| format!("{}", v).into()));
         }
 
         this
@@ -301,22 +309,18 @@ impl GeneratorBuilder {
         Self::new_duplicate_permutation(range, separator).chars(chars)
     }
 
-    pub fn new_duplicate_permutation_with_children<S, V>(
+    pub fn new_duplicate_permutation_with_children<S>(
         range: Option<ValueBound<SbrdInt>>,
         separator: S,
-        builders: V,
+        builders: Vec<WithConditionBuilder>,
     ) -> Self
     where
         S: Into<String>,
-        V: Into<Vec<WithConditionBuilder>>,
     {
         Self::new_duplicate_permutation(range, separator).children(builders)
     }
 
-    pub fn new_case_when<V>(case_when: V) -> Self
-    where
-        V: Into<Vec<WithConditionBuilder>>,
-    {
+    pub fn new_case_when(case_when: Vec<WithConditionBuilder>) -> Self {
         Self::new(GeneratorType::CaseWhen).children(case_when)
     }
 
@@ -324,13 +328,9 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::SelectInt)
     }
 
-    pub fn new_select_int_with_values<V>(values: V) -> Self
-    where
-        V: Into<Vec<SbrdInt>>,
-    {
+    pub fn new_select_int_with_values(values: Vec<SbrdInt>) -> Self {
         Self::new_select_int().values(
             values
-                .into()
                 .into_iter()
                 .map(DataValue::from)
                 .collect::<Vec<DataValue>>(),
@@ -348,13 +348,9 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::SelectReal)
     }
 
-    pub fn new_select_real_with_values<V>(values: V) -> Self
-    where
-        V: Into<Vec<SbrdReal>>,
-    {
+    pub fn new_select_real_with_values(values: Vec<SbrdReal>) -> Self {
         Self::new_select_real().values(
             values
-                .into()
                 .into_iter()
                 .map(DataValue::from)
                 .collect::<Vec<DataValue>>(),
@@ -372,13 +368,9 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::SelectString)
     }
 
-    pub fn new_select_string_with_values<V>(values: V) -> Self
-    where
-        V: Into<Vec<String>>,
-    {
+    pub fn new_select_string_with_values(values: Vec<String>) -> Self {
         Self::new_select_string().values(
             values
-                .into()
                 .into_iter()
                 .map(DataValue::from)
                 .collect::<Vec<DataValue>>(),
@@ -392,24 +384,15 @@ impl GeneratorBuilder {
         Self::new_select_string().file(path)
     }
 
-    pub fn new_dist_int_uniform<M>(parameters: M) -> Self
-    where
-        M: Into<BTreeMap<String, DataValue>>,
-    {
+    pub fn new_dist_int_uniform(parameters: DataValueMap) -> Self {
         Self::new(GeneratorType::DistIntUniform).parameters(parameters)
     }
 
-    pub fn new_dist_real_uniform<M>(parameters: M) -> Self
-    where
-        M: Into<BTreeMap<String, DataValue>>,
-    {
+    pub fn new_dist_real_uniform(parameters: DataValueMap) -> Self {
         Self::new(GeneratorType::DistRealUniform).parameters(parameters)
     }
 
-    pub fn new_real_normal<M>(parameters: M) -> Self
-    where
-        M: Into<BTreeMap<String, DataValue>>,
-    {
+    pub fn new_real_normal(parameters: DataValueMap) -> Self {
         Self::new(GeneratorType::DistRealNormal).parameters(parameters)
     }
 
@@ -422,27 +405,18 @@ impl GeneratorBuilder {
         self
     }
 
-    fn range<S>(mut self, range: ValueBound<S>) -> Self
-    where
-        S: Into<DataValue>,
-    {
-        self.range = Some(range.convert_into());
+    fn range(mut self, range: ValueBound<DataValue>) -> Self {
+        self.range = Some(range);
         self
     }
 
-    fn increment<S>(mut self, increment: ValueStep<S>) -> Self
-    where
-        S: Into<DataValue>,
-    {
-        self.increment = Some(increment.convert_into());
+    fn increment(mut self, increment: ValueStep<DataValue>) -> Self {
+        self.increment = Some(increment);
         self
     }
 
-    fn children<V>(mut self, children: V) -> Self
-    where
-        V: Into<Vec<WithConditionBuilder>>,
-    {
-        self.children = Some(children.into());
+    fn children(mut self, children: Vec<WithConditionBuilder>) -> Self {
+        self.children = Some(children);
         self
     }
 
@@ -454,11 +428,8 @@ impl GeneratorBuilder {
         self
     }
 
-    fn values<V>(mut self, values: V) -> Self
-    where
-        V: Into<Vec<DataValue>>,
-    {
-        self.values = Some(values.into());
+    fn values(mut self, values: Vec<DataValue>) -> Self {
+        self.values = Some(values);
         self
     }
 
@@ -494,11 +465,8 @@ impl GeneratorBuilder {
         self
     }
 
-    fn parameters<M>(mut self, parameters: M) -> Self
-    where
-        M: Into<BTreeMap<String, DataValue>>,
-    {
-        self.parameters = Some(parameters.into());
+    fn parameters(mut self, parameters: DataValueMap) -> Self {
+        self.parameters = Some(parameters);
         self
     }
 }

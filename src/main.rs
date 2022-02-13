@@ -4,7 +4,7 @@ use sbrd_gen::error::{ErrorKind, SbrdGenError};
 use sbrd_gen::*;
 
 fn main() {
-    let with_key_builder = GeneratorBuilder::new_case_when([
+    let with_key_builder = GeneratorBuilder::new_case_when(vec![
         (
             "250 <= {dummy_int}",
             GeneratorBuilder::new_date_time(

@@ -1,7 +1,5 @@
-use rand::Rng;
-
 use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::Generator;
+use crate::generators::{Generator, Randomizer};
 use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
@@ -9,7 +7,7 @@ pub struct BoolGenerator {
     nullable: Nullable,
 }
 
-impl<R: Rng + ?Sized> Generator<R> for BoolGenerator {
+impl<R: Randomizer + ?Sized> Generator<R> for BoolGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,

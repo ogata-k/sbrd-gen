@@ -12,6 +12,6 @@ serde_with = "1.11.0"
 yaml-rust = "0.4"
 serde_yaml = "0.8.23"
 
-rand = "0.8.4"
+rand = { version = "0.8.4", features = ["alloc"] }
 chrono = "0.4.19"
 evalexpr = "7.0.0"

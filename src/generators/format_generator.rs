@@ -1,8 +1,6 @@
-use rand::Rng;
-
 use crate::eval::Evaluator;
 use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::Generator;
+use crate::generators::{Generator, Randomizer};
 use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
@@ -11,7 +9,7 @@ pub struct FormatGenerator {
     format: String,
 }
 
-impl<R: Rng + ?Sized> Generator<R> for FormatGenerator {
+impl<R: Randomizer + ?Sized> Generator<R> for FormatGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,

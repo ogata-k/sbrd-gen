@@ -1,14 +1,11 @@
-use std::marker::PhantomData;
-use std::str::FromStr;
-
-use rand::Rng;
-
 use crate::eval::Evaluator;
 use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::Generator;
+use crate::generators::{Generator, Randomizer};
 use crate::{
     DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdBool, SbrdInt, SbrdReal,
 };
+use std::marker::PhantomData;
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct EvalGenerator<T: FromStr> {
@@ -20,7 +17,7 @@ pub struct EvalGenerator<T: FromStr> {
     _calculated_type: PhantomData<T>,
 }
 
-impl<R: Rng + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F> {
+impl<R: Randomizer + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F> {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,

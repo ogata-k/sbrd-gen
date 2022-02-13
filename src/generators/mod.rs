@@ -8,6 +8,7 @@ pub use eval_generator::*;
 pub use format_generator::*;
 pub use increment_id_generator::*;
 pub use int_generator::*;
+pub use randomize_generator::*;
 pub use real_generator::*;
 pub use time_generator::*;
 
@@ -22,5 +23,6 @@ mod eval_generator;
 mod format_generator;
 mod increment_id_generator;
 mod int_generator;
+mod randomize_generator;
 mod real_generator;
 mod time_generator;

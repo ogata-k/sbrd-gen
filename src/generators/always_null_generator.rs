@@ -1,13 +1,11 @@
-use rand::Rng;
-
 use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::Generator;
+use crate::generators::{Generator, Randomizer};
 use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
 pub struct AlwaysNullGenerator {}
 
-impl<R: Rng + ?Sized> Generator<R> for AlwaysNullGenerator {
+impl<R: Randomizer + ?Sized> Generator<R> for AlwaysNullGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,

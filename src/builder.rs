@@ -1,16 +1,14 @@
+use serde::{Deserialize, Serialize};
 use std::collections::btree_map::BTreeMap;
 use std::path::PathBuf;
-
-use rand::Rng;
-use serde::{Deserialize, Serialize};
 
 use crate::bound::ValueBound;
 use crate::generator_type::GeneratorType;
 use crate::generators::error::CompileError;
 use crate::generators::{
     AlwaysNullGenerator, BoolGenerator, CaseWhenGenerator, DateGenerator, DateTimeGenerator,
-    EvalGenerator, FormatGenerator, Generator, IncrementIdGenerator, IntGenerator, RealGenerator,
-    TimeGenerator,
+    EvalGenerator, FormatGenerator, Generator, IncrementIdGenerator, IntGenerator,
+    RandomizeGenerator, Randomizer, RealGenerator, TimeGenerator,
 };
 use crate::value::DataValue;
 use crate::{
@@ -42,12 +40,13 @@ impl ParentGeneratorBuilder {
     }
 }
 
+pub type Weight = u8;
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct ChildGeneratorBuilder {
     #[serde(rename = "case", skip_serializing_if = "Option::is_none")]
     pub(crate) condition: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) weight: Option<u8>,
+    pub(crate) weight: Option<Weight>,
     #[serde(flatten)]
     pub(crate) builder: GeneratorBuilder,
 }
@@ -69,7 +68,7 @@ impl ChildGeneratorBuilder {
         self
     }
 
-    pub fn weight(mut self, weight: u8) -> Self {
+    pub fn weight(mut self, weight: Weight) -> Self {
         self.weight = Some(weight);
         self
     }
@@ -117,7 +116,9 @@ macro_rules! build_generator {
 // building
 //
 impl GeneratorBuilder {
-    pub fn build<R: 'static + Rng + ?Sized>(self) -> Result<Box<dyn Generator<R>>, CompileError> {
+    pub fn build<R: 'static + Randomizer + ?Sized>(
+        self,
+    ) -> Result<Box<dyn Generator<R>>, CompileError> {
         match self.generator_type {
             GeneratorType::Int => build_generator!(self, R, IntGenerator),
             GeneratorType::Real => build_generator!(self, R, RealGenerator),
@@ -131,7 +132,7 @@ impl GeneratorBuilder {
             GeneratorType::EvalReal => build_generator!(self, R, EvalGenerator<SbrdReal>),
             GeneratorType::EvalBool => build_generator!(self, R, EvalGenerator<SbrdBool>),
             GeneratorType::Format => build_generator!(self, R, FormatGenerator),
-            GeneratorType::Randomize => unimplemented!(),
+            GeneratorType::Randomize => build_generator!(self, R, RandomizeGenerator<R>),
             GeneratorType::DuplicatePermutation => unimplemented!(),
             GeneratorType::CaseWhen => build_generator!(self, R, CaseWhenGenerator<R>),
             GeneratorType::SelectInt => unimplemented!(),

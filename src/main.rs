@@ -4,7 +4,7 @@ use sbrd_gen::error::{ErrorKind, SbrdGenError};
 use sbrd_gen::*;
 
 fn main() {
-    let parent_builder = GeneratorBuilder::new_case_when(vec![
+    let parent_builder = GeneratorBuilder::new_randomize(vec![
         GeneratorBuilder::new_date_time(
             Some(ValueBound::new(
                 Some(SbrdDate::from_ymd(2021, 12, 25).and_hms(0, 0, 0)),
@@ -13,7 +13,7 @@ fn main() {
             None,
         )
         .into_child()
-        .condition("250 <= {dummy_int}"),
+        .weight(2),
         GeneratorBuilder::new_date(
             Some(ValueBound::new(
                 Some(SbrdDate::from_ymd(2021, 12, 25)),
@@ -22,7 +22,8 @@ fn main() {
             None,
         )
         .into_child()
-        .condition("-150 <= {dummy_int} && {dummy_int} < 250"),
+        // is same to specify weight
+        .weight(1),
         GeneratorBuilder::new_time(
             Some(ValueBound::new(
                 None,
@@ -31,8 +32,11 @@ fn main() {
             None,
         )
         .into_child()
-        .condition("-400 <= {dummy_int} && {dummy_int} < -150"),
-        GeneratorBuilder::new_real(Some((0.0..=1.0).into())).into_child(),
+        // no choice
+        .weight(0),
+        GeneratorBuilder::new_real(Some((0.0..=1.0).into()))
+            .into_child()
+            .weight(3),
     ])
     .into_parent("KeyA");
     let yaml_string = serde_yaml::to_string(&parent_builder)

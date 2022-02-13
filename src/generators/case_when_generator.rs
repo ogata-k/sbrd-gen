@@ -1,18 +1,16 @@
-use rand::Rng;
-
 use crate::eval::Evaluator;
 use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::Generator;
+use crate::generators::{Generator, Randomizer};
 use crate::{
     ChildGeneratorBuilder, DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable,
 };
 
-pub struct CaseWhenGenerator<R: 'static + Rng + ?Sized> {
+pub struct CaseWhenGenerator<R: 'static + Randomizer + ?Sized> {
     nullable: Nullable,
     children: Vec<(Option<String>, Box<dyn Generator<R>>)>,
 }
 
-impl<R: Rng + ?Sized> Generator<R> for CaseWhenGenerator<R> {
+impl<R: Randomizer + ?Sized> Generator<R> for CaseWhenGenerator<R> {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,
@@ -39,6 +37,10 @@ impl<R: Rng + ?Sized> Generator<R> for CaseWhenGenerator<R> {
                     } = child_builder;
                     has_default_case = has_default_case || condition.is_none();
                     _children.push((condition, builder.build()?));
+                }
+
+                if _children.is_empty() {
+                    return Err(CompileError::EmptyChildren);
                 }
 
                 if !has_default_case {

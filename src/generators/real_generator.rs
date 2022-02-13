@@ -1,7 +1,5 @@
-use rand::Rng;
-
 use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::Generator;
+use crate::generators::{Generator, Randomizer};
 use crate::{
     DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdReal, ValueBound,
 };
@@ -12,7 +10,7 @@ pub struct RealGenerator {
     range: ValueBound<SbrdReal>,
 }
 
-impl<R: Rng + ?Sized> Generator<R> for RealGenerator {
+impl<R: Randomizer + ?Sized> Generator<R> for RealGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,

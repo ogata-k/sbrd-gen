@@ -1,13 +1,11 @@
-use chrono::Duration;
-use rand::Rng;
-use std::ops::AddAssign;
-
 use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::Generator;
+use crate::generators::{Generator, Randomizer};
 use crate::{
     DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdTime, ValueBound,
     TIME_DEFAULT_FORMAT,
 };
+use chrono::Duration;
+use std::ops::AddAssign;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct TimeGenerator {
@@ -16,7 +14,7 @@ pub struct TimeGenerator {
     range: ValueBound<SbrdTime>,
 }
 
-impl<R: Rng + ?Sized> Generator<R> for TimeGenerator {
+impl<R: Randomizer + ?Sized> Generator<R> for TimeGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,

@@ -3,7 +3,10 @@ use rand::Rng;
 use crate::generators::error::{CompileError, GenerateError};
 use crate::{DataValue, DataValueMap, GeneratorBuilder};
 
-pub trait Generator<R: Rng + ?Sized> {
+pub trait Randomizer: Rng {}
+impl<R: Rng> Randomizer for R {}
+
+pub trait Generator<R: Randomizer + ?Sized> {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized;

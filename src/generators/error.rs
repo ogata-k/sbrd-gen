@@ -9,6 +9,7 @@ pub enum CompileError {
     RangeEmpty(ValueBound<DataValue>),
     EmptyChildren,
     NotExistDefaultCase,
+    AllWeightsZero,
 }
 
 impl std::fmt::Display for CompileError {
@@ -20,6 +21,7 @@ impl std::fmt::Display for CompileError {
             CompileError::RangeEmpty(range) => write!(f, "Empty Range: {}", range),
             CompileError::EmptyChildren => write!(f, "Not Exist selectable children"),
             CompileError::NotExistDefaultCase => write!(f, "Not Exist default case condition"),
+            CompileError::AllWeightsZero => write!(f, "All weights are zero"),
         }
     }
 }

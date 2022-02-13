@@ -1,12 +1,10 @@
-use chrono::Datelike;
-use rand::Rng;
-
 use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::Generator;
+use crate::generators::{Generator, Randomizer};
 use crate::{
     DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdDate, ValueBound,
     DATE_DEFAULT_FORMAT,
 };
+use chrono::Datelike;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct DateGenerator {
@@ -15,7 +13,7 @@ pub struct DateGenerator {
     range: ValueBound<SbrdDate>,
 }
 
-impl<R: Rng + ?Sized> Generator<R> for DateGenerator {
+impl<R: Randomizer + ?Sized> Generator<R> for DateGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
     where
         Self: Sized,

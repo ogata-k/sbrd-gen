@@ -180,7 +180,7 @@ impl GeneratorBuilder {
     pub fn new_int(range: Option<ValueBound<SbrdInt>>) -> Self {
         let mut this = Self::new(GeneratorType::Int);
         if let Some(range) = range {
-            this = this.range(range.convert_with(|v| format!("{}", v).into()));
+            this = this.range(range.convert_into());
         }
 
         this
@@ -189,7 +189,7 @@ impl GeneratorBuilder {
     pub fn new_real(range: Option<ValueBound<SbrdReal>>) -> Self {
         let mut this = Self::new(GeneratorType::Real);
         if let Some(range) = range {
-            this = this.range(range.convert_with(|v| format!("{}", v).into()));
+            this = this.range(range.convert_into());
         }
 
         this
@@ -299,7 +299,7 @@ impl GeneratorBuilder {
     {
         let mut this = Self::new(GeneratorType::DuplicatePermutation).separator(separator);
         if let Some(range) = range {
-            this = this.range(range.convert_with(|v| format!("{}", v).into()));
+            this = this.range(range.convert_into());
         }
 
         this

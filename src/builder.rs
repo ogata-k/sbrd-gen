@@ -8,7 +8,7 @@ use crate::generators::error::CompileError;
 use crate::generators::{
     AlwaysNullGenerator, BoolGenerator, CaseWhenGenerator, DateGenerator, DateTimeGenerator,
     DuplicatePermutationGenerator, EvalGenerator, FormatGenerator, Generator, IncrementIdGenerator,
-    IntGenerator, RandomizeGenerator, Randomizer, RealGenerator, TimeGenerator,
+    IntGenerator, RandomizeGenerator, Randomizer, RealGenerator, SelectGenerator, TimeGenerator,
 };
 use crate::value::DataValue;
 use crate::{
@@ -137,9 +137,9 @@ impl GeneratorBuilder {
                 build_generator!(self, R, DuplicatePermutationGenerator<R>)
             }
             GeneratorType::CaseWhen => build_generator!(self, R, CaseWhenGenerator<R>),
-            GeneratorType::SelectInt => unimplemented!(),
-            GeneratorType::SelectReal => unimplemented!(),
-            GeneratorType::SelectString => unimplemented!(),
+            GeneratorType::SelectInt => build_generator!(self, R, SelectGenerator<SbrdInt>),
+            GeneratorType::SelectReal => build_generator!(self, R, SelectGenerator<SbrdReal>),
+            GeneratorType::SelectString => build_generator!(self, R, SelectGenerator<SbrdString>),
             GeneratorType::DistIntUniform => unimplemented!(),
             GeneratorType::DistRealUniform => unimplemented!(),
             GeneratorType::DistNormal => unimplemented!(),
@@ -302,9 +302,10 @@ impl GeneratorBuilder {
     pub fn new_randomize_with_select_list(
         chars: Option<String>,
         values: Option<Vec<String>>,
+        filepath: Option<PathBuf>,
     ) -> Self {
         let mut this = Self::new_randomize();
-        if chars.is_none() && values.is_none() {
+        if chars.is_none() && values.is_none() && filepath.is_none() {
             // default setting
             this = this.values(Vec::new());
         } else {
@@ -313,6 +314,9 @@ impl GeneratorBuilder {
             }
             if let Some(values) = values {
                 this = this.values(values.into_iter().map(|v| v.into()).collect());
+            }
+            if let Some(filepath) = filepath {
+                this = this.filepath(filepath);
             }
         }
 
@@ -347,12 +351,13 @@ impl GeneratorBuilder {
         separator: S,
         chars: Option<String>,
         values: Option<Vec<String>>,
+        filepath: Option<PathBuf>,
     ) -> Self
     where
         S: Into<String>,
     {
         let mut this = Self::new_duplicate_permutation(range, separator);
-        if chars.is_none() && values.is_none() {
+        if chars.is_none() && values.is_none() && filepath.is_none() {
             // default setting
             this = this.values(Vec::new());
         } else {
@@ -361,6 +366,9 @@ impl GeneratorBuilder {
             }
             if let Some(values) = values {
                 this = this.values(values.into_iter().map(|v| v.into()).collect());
+            }
+            if let Some(filepath) = filepath {
+                this = this.filepath(filepath);
             }
         }
 
@@ -371,47 +379,74 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::CaseWhen).children(children)
     }
 
-    pub fn new_select_int(values: Vec<SbrdInt>, filepath: Option<PathBuf>) -> Self {
+    pub fn new_select_int(
+        chars: Option<String>,
+        values: Option<Vec<SbrdInt>>,
+        filepath: Option<PathBuf>,
+    ) -> Self {
         let mut this = Self::new(GeneratorType::SelectInt);
-        if let Some(path) = filepath {
-            this = this.filepath(path);
+        if chars.is_none() && values.is_none() && filepath.is_none() {
+            // default setting
+            this = this.values(Vec::new());
+        } else {
+            if let Some(chars) = chars {
+                this = this.chars(chars);
+            }
+            if let Some(values) = values {
+                this = this.values(values.into_iter().map(|v| v.into()).collect());
+            }
+            if let Some(filepath) = filepath {
+                this = this.filepath(filepath);
+            }
         }
-        this = this.values(
-            values
-                .into_iter()
-                .map(DataValue::from)
-                .collect::<Vec<DataValue>>(),
-        );
 
         this
     }
 
-    pub fn new_select_real(values: Vec<SbrdReal>, filepath: Option<PathBuf>) -> Self {
+    pub fn new_select_real(
+        chars: Option<String>,
+        values: Option<Vec<SbrdReal>>,
+        filepath: Option<PathBuf>,
+    ) -> Self {
         let mut this = Self::new(GeneratorType::SelectReal);
-        if let Some(path) = filepath {
-            this = this.filepath(path);
+        if chars.is_none() && values.is_none() && filepath.is_none() {
+            // default setting
+            this = this.values(Vec::new());
+        } else {
+            if let Some(chars) = chars {
+                this = this.chars(chars);
+            }
+            if let Some(values) = values {
+                this = this.values(values.into_iter().map(|v| v.into()).collect());
+            }
+            if let Some(filepath) = filepath {
+                this = this.filepath(filepath);
+            }
         }
-        this = this.values(
-            values
-                .into_iter()
-                .map(DataValue::from)
-                .collect::<Vec<DataValue>>(),
-        );
 
         this
     }
 
-    pub fn new_select_string(values: Vec<SbrdString>, filepath: Option<PathBuf>) -> Self {
+    pub fn new_select_string(
+        chars: Option<String>,
+        values: Option<Vec<SbrdString>>,
+        filepath: Option<PathBuf>,
+    ) -> Self {
         let mut this = Self::new(GeneratorType::SelectString);
-        if let Some(path) = filepath {
-            this = this.filepath(path);
+        if chars.is_none() && values.is_none() && filepath.is_none() {
+            // default setting
+            this = this.values(Vec::new());
+        } else {
+            if let Some(chars) = chars {
+                this = this.chars(chars);
+            }
+            if let Some(values) = values {
+                this = this.values(values.into_iter().map(|v| v.into()).collect());
+            }
+            if let Some(filepath) = filepath {
+                this = this.filepath(filepath);
+            }
         }
-        this = this.values(
-            values
-                .into_iter()
-                .map(DataValue::from)
-                .collect::<Vec<DataValue>>(),
-        );
 
         this
     }

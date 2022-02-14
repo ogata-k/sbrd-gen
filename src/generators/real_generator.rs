@@ -31,9 +31,13 @@ impl<R: Randomizer + ?Sized> Generator<R> for RealGenerator {
             None => default_range,
             Some(r) => r
                 .try_convert_with(|s| {
-                    s.to_parse_string()
-                        .parse::<SbrdReal>()
-                        .map_err(|e| CompileError::InvalidValue(e.to_string()))
+                    s.to_parse_string().parse::<SbrdReal>().map_err(|e| {
+                        CompileError::FailParseValue(
+                            s.to_parse_string(),
+                            "Real".to_string(),
+                            e.to_string(),
+                        )
+                    })
                 })
                 .map(|range| {
                     // 範囲指定がないと[0, 1)で生成されてしまうため上限下限を設定する

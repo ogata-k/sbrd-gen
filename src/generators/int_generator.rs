@@ -30,9 +30,13 @@ impl<R: Randomizer + ?Sized> Generator<R> for IntGenerator {
         let _range = match range {
             None => default_range,
             Some(r) => r.try_convert_with(|s| {
-                s.to_parse_string()
-                    .parse::<SbrdInt>()
-                    .map_err(|e| CompileError::InvalidValue(e.to_string()))
+                s.to_parse_string().parse::<SbrdInt>().map_err(|e| {
+                    CompileError::FailParseValue(
+                        s.to_parse_string(),
+                        "Int".to_string(),
+                        e.to_string(),
+                    )
+                })
             })?,
         };
         if _range.is_empty() {

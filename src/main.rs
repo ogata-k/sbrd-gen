@@ -12,7 +12,7 @@ fn main() {
                 Some(ValueBound::new(Some(6), Some((true, 15)))),
                 "",
                 Some("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-~/\"!\\&%".to_string()),
-                None
+                None, None
             ).into_child(),
             GeneratorBuilder::new_duplicate_permutation_with_select_list(
                 Some(ValueBound::new(Some(3), Some((true, 5)))),
@@ -24,7 +24,14 @@ fn main() {
                     "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.".to_string(),
                     "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.".to_string(),
                     "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string(),
-                ])
+                ]), None
+            ).into_child(),
+            GeneratorBuilder::new_select_int(
+                None,
+                Some(vec![
+                    1,2,3,4,5,6,7,8,9,0,
+                ]),
+                None
             ).into_child(),
             GeneratorBuilder::new_date_time(
                 Some(ValueBound::new(

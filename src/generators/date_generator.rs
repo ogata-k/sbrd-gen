@@ -35,8 +35,15 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateGenerator {
             None => default_range,
             Some(r) => r
                 .try_convert_with(|s| {
-                    SbrdDate::parse_from_str(&s.to_parse_string(), DATE_DEFAULT_FORMAT)
-                        .map_err(|e| CompileError::InvalidValue(e.to_string()))
+                    SbrdDate::parse_from_str(&s.to_parse_string(), DATE_DEFAULT_FORMAT).map_err(
+                        |e| {
+                            CompileError::FailParseValue(
+                                s.to_parse_string(),
+                                "Date".to_string(),
+                                e.to_string(),
+                            )
+                        },
+                    )
                 })
                 .map(|range| {
                     // 生成可能な範囲で生成できるように範囲指定を実装

@@ -35,12 +35,22 @@ impl<R: Randomizer + ?Sized> Generator<R> for IncrementIdGenerator {
                     .get_initial()
                     .to_parse_string()
                     .parse::<SbrdInt>()
-                    .map_err(|e| CompileError::InvalidValue(e.to_string()))?;
+                    .map_err(|e| {
+                        CompileError::FailParseValue(
+                            s.get_initial().to_parse_string(),
+                            "Int".to_string(),
+                            e.to_string(),
+                        )
+                    })?;
 
                 let step_result = s.get_step().as_ref().map(|v| {
-                    v.to_parse_string()
-                        .parse::<SbrdInt>()
-                        .map_err(|e| CompileError::InvalidValue(e.to_string()))
+                    v.to_parse_string().parse::<SbrdInt>().map_err(|e| {
+                        CompileError::FailParseValue(
+                            v.to_parse_string(),
+                            "Int".to_string(),
+                            e.to_string(),
+                        )
+                    })
                 });
 
                 match step_result {

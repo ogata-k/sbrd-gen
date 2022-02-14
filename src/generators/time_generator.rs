@@ -36,8 +36,15 @@ impl<R: Randomizer + ?Sized> Generator<R> for TimeGenerator {
             None => default_range,
             Some(r) => r
                 .try_convert_with(|s| {
-                    SbrdTime::parse_from_str(&s.to_parse_string(), TIME_DEFAULT_FORMAT)
-                        .map_err(|e| CompileError::InvalidValue(e.to_string()))
+                    SbrdTime::parse_from_str(&s.to_parse_string(), TIME_DEFAULT_FORMAT).map_err(
+                        |e| {
+                            CompileError::FailParseValue(
+                                s.to_parse_string(),
+                                "Time".to_string(),
+                                e.to_string(),
+                            )
+                        },
+                    )
                 })
                 .map(|range| {
                     // 生成可能な範囲で生成できるように範囲指定を実装

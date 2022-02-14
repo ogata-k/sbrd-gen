@@ -9,9 +9,6 @@ use std::marker::PhantomData;
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct EvalGenerator<T> {
     nullable: Nullable,
-    /// Supported operators: ! != "" '' () [] . , > < >= <= == + - * / % && || n..m.
-    ///
-    /// Built-in functions: min() max() len() is_empty() array().
     script: String,
     _calculated_type: PhantomData<T>,
 }

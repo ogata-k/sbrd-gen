@@ -28,8 +28,6 @@ pub enum GeneratorType {
     SelectReal,
     SelectString,
     // distribution
-    DistIntUniform,
-    DistRealUniform,
     DistNormal,
 }
 

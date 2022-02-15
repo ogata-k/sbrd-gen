@@ -30,3 +30,4 @@ mod randomize_generator;
 mod real_generator;
 mod select_generator;
 mod time_generator;
+pub mod distribution;

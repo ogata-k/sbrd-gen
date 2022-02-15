@@ -10,6 +10,7 @@ use crate::generators::{
     DuplicatePermutationGenerator, EvalGenerator, FormatGenerator, Generator, IncrementIdGenerator,
     IntGenerator, RandomizeGenerator, Randomizer, RealGenerator, SelectGenerator, TimeGenerator,
 };
+use crate::generators::distribution::{NormalGenerator};
 use crate::value::DataValue;
 use crate::{
     DataValueMap, Nullable, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdString,
@@ -140,7 +141,7 @@ impl GeneratorBuilder {
             GeneratorType::SelectInt => build_generator!(self, R, SelectGenerator<SbrdInt>),
             GeneratorType::SelectReal => build_generator!(self, R, SelectGenerator<SbrdReal>),
             GeneratorType::SelectString => build_generator!(self, R, SelectGenerator<SbrdString>),
-            GeneratorType::DistNormal => unimplemented!(),
+            GeneratorType::DistNormal => build_generator!(self, R, NormalGenerator),
         }
     }
 
@@ -449,7 +450,10 @@ impl GeneratorBuilder {
         this
     }
 
-    pub fn new_dist_normal(parameters: DataValueMap) -> Self {
+    pub fn new_dist_normal(mean: SbrdReal, std_dev: SbrdReal) -> Self {
+        let mut parameters = DataValueMap::new();
+        parameters.insert(NormalGenerator::MEAN.to_string(), mean.into());
+        parameters.insert(NormalGenerator::STD_DEV.to_string(), std_dev.into());
         Self::new(GeneratorType::DistNormal).parameters(parameters)
     }
 }

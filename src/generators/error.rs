@@ -5,9 +5,9 @@ use crate::{DataValue, DataValueMap, GeneratorType, ValueBound};
 pub enum CompileError {
     InvalidType(GeneratorType),
     InvalidValue(String),
+    NotExistValueOf(String),
     /// parse string, type, error string
     FailParseValue(String, String, String),
-    NotExistValueOf(String),
     RangeEmpty(ValueBound<DataValue>),
     EmptyChildren,
     EmptySelectValues,
@@ -15,6 +15,8 @@ pub enum CompileError {
     NotExistDefaultCase,
     AllWeightsZero,
     FileError(std::io::Error),
+    /// Distribution name, error
+    FailBuildDistribution(String, String),
 }
 
 impl std::fmt::Display for CompileError {
@@ -22,10 +24,10 @@ impl std::fmt::Display for CompileError {
         match self {
             CompileError::InvalidType(t) => write!(f, "Invalid Type: {}", t),
             CompileError::InvalidValue(s) => write!(f, "Invalid Value: {}", s),
+            CompileError::NotExistValueOf(s) => write!(f, "Not Exist Value for {}", s),
             CompileError::FailParseValue(s, t, e) => {
                 write!(f, "Fail Parse {} as {} with error: {}", s, t, e)
             }
-            CompileError::NotExistValueOf(s) => write!(f, "Not Exist Value for {}", s),
             CompileError::RangeEmpty(range) => write!(f, "Empty Range: {}", range),
             CompileError::EmptyChildren => write!(f, "Not Exist selectable children"),
             CompileError::EmptySelectValues => write!(f, "Not Exist selectable values"),
@@ -35,6 +37,7 @@ impl std::fmt::Display for CompileError {
             CompileError::NotExistDefaultCase => write!(f, "Not Exist default case condition"),
             CompileError::AllWeightsZero => write!(f, "All weights are zero"),
             CompileError::FileError(fe) => write!(f, "File Error: {}", fe),
+            CompileError::FailBuildDistribution(dn, e) => write!(f, "Fail build {} distribution with error: {}", dn, e),
         }
     }
 }

@@ -53,7 +53,7 @@ pub(crate) trait RandomSelectableGenerator<R: 'static + Randomizer + ?Sized> {
         if !((children.is_some() && (chars.is_none() || values.is_none() || filepath.is_none()))
             || (children.is_none() && (chars.is_some() || values.is_some() || filepath.is_some())))
         {
-            return Err(CompileError::InvalidValue(
+            return Err(CompileError::NotExistValueOf(
                 "children xor (chars, values, file)".to_string(),
             ));
         }

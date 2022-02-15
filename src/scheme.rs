@@ -1,4 +1,4 @@
-use crate::ParentGeneratorBuilder;
+use crate::builder::ParentGeneratorBuilder;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]

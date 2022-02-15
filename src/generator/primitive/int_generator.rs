@@ -1,8 +1,8 @@
-use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::{Generator, Randomizer};
-use crate::{
-    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdInt, ValueBound,
-};
+use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
+use crate::generator::error::{CompileError, GenerateError};
+use crate::generator::{Generator, Randomizer};
+use crate::value::{DataValue, DataValueMap, SbrdInt};
+use crate::GeneratorType;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
 pub struct IntGenerator {

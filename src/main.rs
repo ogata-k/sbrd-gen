@@ -1,11 +1,11 @@
 use rand::thread_rng;
 
-use sbrd_gen::error::{ErrorKind, SbrdGenError};
-use sbrd_gen::*;
+use sbrd_gen::builder::{GeneratorBuilder, ParentGeneratorBuilder};
+use sbrd_gen::value::DataValueMap;
+use sbrd_gen::{ErrorKind, SbrdGenError};
 
 fn main() {
-    let parent_builder = GeneratorBuilder::new_dist_normal(0.0, 1.0)
-    .into_parent("KeyA");
+    let parent_builder = GeneratorBuilder::new_dist_normal(0.0, 1.0).into_parent("KeyA");
     let yaml_string = serde_yaml::to_string(&parent_builder)
         .map_err(|e| e.into_sbrd_gen_error(ErrorKind::SerializeError))
         .unwrap();

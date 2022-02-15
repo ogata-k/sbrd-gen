@@ -1,9 +1,8 @@
-use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::{Generator, Randomizer};
-use crate::{
-    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdInt, SbrdReal,
-    SbrdString,
-};
+use crate::builder::{GeneratorBuilder, Nullable};
+use crate::generator::error::{CompileError, GenerateError};
+use crate::generator::{Generator, Randomizer};
+use crate::value::{DataValue, DataValueMap, SbrdInt, SbrdReal, SbrdString};
+use crate::GeneratorType;
 use rand::seq::SliceRandom;
 use std::fs::File;
 use std::io::{BufRead, BufReader};

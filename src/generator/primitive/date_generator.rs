@@ -1,9 +1,8 @@
-use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::{Generator, Randomizer};
-use crate::{
-    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdDate, ValueBound,
-    DATE_DEFAULT_FORMAT,
-};
+use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
+use crate::generator::error::{CompileError, GenerateError};
+use crate::generator::{Generator, Randomizer};
+use crate::value::{DataValue, DataValueMap, SbrdDate, DATE_DEFAULT_FORMAT};
+use crate::GeneratorType;
 use chrono::Datelike;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]

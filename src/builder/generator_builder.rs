@@ -2,19 +2,23 @@ use serde::{Deserialize, Serialize};
 use std::collections::btree_map::BTreeMap;
 use std::path::PathBuf;
 
-use crate::bound::ValueBound;
-use crate::generator_type::GeneratorType;
-use crate::generators::error::CompileError;
-use crate::generators::{
-    AlwaysNullGenerator, BoolGenerator, CaseWhenGenerator, DateGenerator, DateTimeGenerator,
-    DuplicatePermutationGenerator, EvalGenerator, FormatGenerator, Generator, IncrementIdGenerator,
-    IntGenerator, RandomizeGenerator, Randomizer, RealGenerator, SelectGenerator, TimeGenerator,
+use crate::builder::{Nullable, ValueBound, ValueStep};
+use crate::generator::build_string::{DuplicatePermutationGenerator, FormatGenerator};
+use crate::generator::distribution::NormalGenerator;
+use crate::generator::evaluate::EvalGenerator;
+use crate::generator::primitive::{
+    AlwaysNullGenerator, BoolGenerator, DateGenerator, DateTimeGenerator, IncrementIdGenerator,
+    IntGenerator, RealGenerator, TimeGenerator,
 };
-use crate::generators::distribution::{NormalGenerator};
-use crate::value::DataValue;
-use crate::{
-    DataValueMap, Nullable, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdString,
-    SbrdTime, ValueStep,
+use crate::generator::random_children::CaseWhenGenerator;
+use crate::generator::random_values::SelectGenerator;
+use crate::generator::random_values_children::RandomizeGenerator;
+use crate::generator::CompileError;
+use crate::generator::{Generator, Randomizer};
+use crate::generator_type::GeneratorType;
+use crate::value::{
+    DataValue, DataValueMap, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdString,
+    SbrdTime,
 };
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]

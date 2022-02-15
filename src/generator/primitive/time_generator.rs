@@ -1,9 +1,8 @@
-use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::{Generator, Randomizer};
-use crate::{
-    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdTime, ValueBound,
-    TIME_DEFAULT_FORMAT,
-};
+use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
+use crate::generator::error::{CompileError, GenerateError};
+use crate::generator::{Generator, Randomizer};
+use crate::value::{DataValue, DataValueMap, SbrdTime, TIME_DEFAULT_FORMAT};
+use crate::GeneratorType;
 use chrono::Duration;
 use std::ops::AddAssign;
 

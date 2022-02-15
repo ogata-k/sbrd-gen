@@ -1,8 +1,9 @@
-use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::{Generator, RandomSelectableGenerator, Randomizer, WeightedSelectable};
-use crate::{
-    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdInt, ValueBound,
-};
+use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
+use crate::generator::error::{CompileError, GenerateError};
+use crate::generator::random_values_children::{RandomSelectableGenerator, WeightedSelectable};
+use crate::generator::{Generator, Randomizer};
+use crate::value::{DataValue, DataValueMap, SbrdInt};
+use crate::GeneratorType;
 
 pub struct DuplicatePermutationGenerator<R: 'static + Randomizer + ?Sized> {
     nullable: Nullable,

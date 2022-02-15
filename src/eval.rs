@@ -1,4 +1,4 @@
-use crate::{DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
+use crate::value::{DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
 use evalexpr::{eval_boolean, eval_float, eval_int, EvalexprError};
 
 #[derive(Debug, PartialEq, Clone)]

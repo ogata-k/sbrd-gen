@@ -1,9 +1,9 @@
+use crate::builder::{GeneratorBuilder, Nullable};
 use crate::eval::{EvalResult, Evaluator};
-use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::{Generator, Randomizer};
-use crate::{
-    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdBool, SbrdInt, SbrdReal,
-};
+use crate::generator::error::{CompileError, GenerateError};
+use crate::generator::{Generator, Randomizer};
+use crate::value::{DataValue, DataValueMap, SbrdBool, SbrdInt, SbrdReal};
+use crate::GeneratorType;
 use std::marker::PhantomData;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]

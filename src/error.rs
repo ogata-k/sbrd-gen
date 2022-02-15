@@ -1,4 +1,5 @@
-use crate::generators::error::CompileError;
+use crate::generator::CompileError;
+use std::borrow::Borrow;
 
 #[derive(Debug)]
 pub struct Error {
@@ -18,6 +19,20 @@ impl std::fmt::Display for Error {
 }
 
 impl std::error::Error for Error {}
+
+impl Error {
+    pub fn is_kind_of(&self, kind: ErrorKind) -> bool {
+        self.kind == kind
+    }
+
+    pub fn get_kind(&self) -> ErrorKind {
+        self.kind
+    }
+
+    pub fn get_error_info(&self) -> &dyn std::error::Error {
+        self.info.0.borrow()
+    }
+}
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum ErrorKind {

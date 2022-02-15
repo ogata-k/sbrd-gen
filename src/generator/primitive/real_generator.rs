@@ -1,8 +1,8 @@
-use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::{Generator, Randomizer};
-use crate::{
-    DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdReal, ValueBound,
-};
+use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
+use crate::generator::error::{CompileError, GenerateError};
+use crate::generator::{Generator, Randomizer};
+use crate::value::{DataValue, DataValueMap, SbrdReal};
+use crate::GeneratorType;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct RealGenerator {

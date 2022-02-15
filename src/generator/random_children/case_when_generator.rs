@@ -1,9 +1,9 @@
+use crate::builder::{ChildGeneratorBuilder, GeneratorBuilder, Nullable};
 use crate::eval::Evaluator;
-use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::{Generator, Randomizer};
-use crate::{
-    ChildGeneratorBuilder, DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable,
-};
+use crate::generator::error::{CompileError, GenerateError};
+use crate::generator::{Generator, Randomizer};
+use crate::value::{DataValue, DataValueMap};
+use crate::GeneratorType;
 
 pub struct CaseWhenGenerator<R: 'static + Randomizer + ?Sized> {
     nullable: Nullable,

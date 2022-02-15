@@ -1,6 +1,8 @@
-use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::{Generator, Randomizer};
-use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable, SbrdInt};
+use crate::builder::{GeneratorBuilder, Nullable};
+use crate::generator::error::{CompileError, GenerateError};
+use crate::generator::{Generator, Randomizer};
+use crate::value::{DataValue, DataValueMap, SbrdInt};
+use crate::GeneratorType;
 use std::cell::Cell;
 
 const INITIAL_ID: SbrdInt = 1;

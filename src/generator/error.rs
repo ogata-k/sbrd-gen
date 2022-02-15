@@ -1,5 +1,7 @@
+use crate::builder::ValueBound;
 use crate::eval::EvalError;
-use crate::{DataValue, DataValueMap, GeneratorType, ValueBound};
+use crate::value::{DataValue, DataValueMap};
+use crate::GeneratorType;
 
 #[derive(Debug)]
 pub enum CompileError {
@@ -37,7 +39,9 @@ impl std::fmt::Display for CompileError {
             CompileError::NotExistDefaultCase => write!(f, "Not Exist default case condition"),
             CompileError::AllWeightsZero => write!(f, "All weights are zero"),
             CompileError::FileError(fe) => write!(f, "File Error: {}", fe),
-            CompileError::FailBuildDistribution(dn, e) => write!(f, "Fail build {} distribution with error: {}", dn, e),
+            CompileError::FailBuildDistribution(dn, e) => {
+                write!(f, "Fail build {} distribution with error: {}", dn, e)
+            }
         }
     }
 }

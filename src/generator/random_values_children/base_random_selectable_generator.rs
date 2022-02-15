@@ -1,45 +1,12 @@
+use crate::builder::{ChildGeneratorBuilder, Weight};
+use crate::generator::error::{CompileError, GenerateError};
+use crate::generator::{Generator, Randomizer};
+use crate::value::{DataValue, DataValueMap};
 use either::Either;
 use rand::seq::SliceRandom;
-use rand::Rng;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
-
-use crate::generators::error::{CompileError, GenerateError};
-use crate::{ChildGeneratorBuilder, DataValue, DataValueMap, GeneratorBuilder, Weight};
-
-pub trait Randomizer: Rng {}
-impl<R: Rng> Randomizer for R {}
-
-pub trait Generator<R: Randomizer + ?Sized> {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
-    where
-        Self: Sized;
-
-    fn is_nullable(&self) -> bool;
-
-    fn is_required(&self) -> bool {
-        !self.is_nullable()
-    }
-
-    fn generate(&self, rng: &mut R, value_map: &DataValueMap) -> Result<DataValue, GenerateError> {
-        if self.is_required() {
-            self.generate_without_null(rng, value_map)
-        } else {
-            if rng.gen_bool(0.1) {
-                return Ok(DataValue::Null);
-            }
-
-            self.generate_without_null(rng, value_map)
-        }
-    }
-
-    fn generate_without_null(
-        &self,
-        rng: &mut R,
-        value_map: &DataValueMap,
-    ) -> Result<DataValue, GenerateError>;
-}
 
 pub(crate) type WeightedSelectable<R> = (Weight, Either<String, Box<dyn Generator<R>>>);
 pub(crate) trait RandomSelectableGenerator<R: 'static + Randomizer + ?Sized> {

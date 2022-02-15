@@ -1,6 +1,8 @@
-use crate::generators::error::{CompileError, GenerateError};
-use crate::generators::{Generator, Randomizer};
-use crate::{DataValue, DataValueMap, GeneratorBuilder, GeneratorType, Nullable};
+use crate::builder::{GeneratorBuilder, Nullable};
+use crate::generator::error::{CompileError, GenerateError};
+use crate::generator::{Generator, Randomizer};
+use crate::value::{DataValue, DataValueMap};
+use crate::GeneratorType;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
 pub struct BoolGenerator {

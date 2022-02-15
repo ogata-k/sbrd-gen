@@ -6,7 +6,7 @@ use crate::GeneratorType;
 use chrono::Duration;
 use std::ops::AddAssign;
 
-#[derive(Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct TimeGenerator {
     nullable: Nullable,
     format: String,

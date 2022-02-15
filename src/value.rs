@@ -18,7 +18,7 @@ pub const DATE_TIME_DEFAULT_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
 pub const DATE_DEFAULT_FORMAT: &str = "%Y-%m-%d";
 pub const TIME_DEFAULT_FORMAT: &str = "%H:%M:%S";
 
-#[derive(Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum DataValue {
     Int(SbrdInt),
     Real(SbrdReal),

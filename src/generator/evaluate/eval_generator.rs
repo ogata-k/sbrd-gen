@@ -6,7 +6,7 @@ use crate::value::{DataValue, DataValueMap, SbrdBool, SbrdInt, SbrdReal};
 use crate::GeneratorType;
 use std::marker::PhantomData;
 
-#[derive(Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct EvalGenerator<T> {
     nullable: Nullable,
     script: String,

@@ -5,7 +5,7 @@ use crate::value::{DataValue, DataValueMap, SbrdDate, DATE_DEFAULT_FORMAT};
 use crate::GeneratorType;
 use chrono::Datelike;
 
-#[derive(Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct DateGenerator {
     nullable: Nullable,
     format: String,

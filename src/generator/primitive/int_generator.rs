@@ -4,7 +4,7 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
 use crate::GeneratorType;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct IntGenerator {
     nullable: Nullable,
     range: ValueBound<SbrdInt>,

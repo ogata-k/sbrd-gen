@@ -3,7 +3,7 @@ use rand::distributions::{Distribution, Standard};
 use rand::{Rng, RngCore};
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, PartialOrd, Clone, Copy)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Copy)]
 pub struct ValueBound<T> {
     #[serde(skip_serializing_if = "Option::is_none")]
     start: Option<T>,

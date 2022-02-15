@@ -1,6 +1,6 @@
 use crate::builder::{GeneratorBuilder, Nullable};
+use crate::error::{BuildError, GenerateError};
 use crate::eval::{EvalResult, Evaluator};
-use crate::generator::error::{CompileError, GenerateError};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdBool, SbrdInt, SbrdReal};
 use crate::GeneratorType;
@@ -14,7 +14,7 @@ pub struct EvalGenerator<T> {
 }
 
 impl<R: Randomizer + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F> {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
     {
@@ -26,11 +26,11 @@ impl<R: Randomizer + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGener
         } = builder;
 
         if generator_type != F::get_generator_type() {
-            return Err(CompileError::InvalidType(generator_type));
+            return Err(BuildError::InvalidType(generator_type));
         }
 
         match script {
-            None => Err(CompileError::NotExistValueOf("script".to_string())),
+            None => Err(BuildError::NotExistValueOf("script".to_string())),
             Some(_script) => Ok(Self {
                 nullable,
                 script: _script,

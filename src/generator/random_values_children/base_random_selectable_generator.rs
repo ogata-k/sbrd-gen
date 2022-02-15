@@ -1,5 +1,5 @@
 use crate::builder::{ChildGeneratorBuilder, Weight};
-use crate::generator::error::{CompileError, GenerateError};
+use crate::error::{BuildError, GenerateError};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use either::Either;
@@ -15,12 +15,12 @@ pub(crate) trait RandomSelectableGenerator<R: 'static + Randomizer + ?Sized> {
         chars: Option<String>,
         values: Option<Vec<DataValue>>,
         filepath: Option<PathBuf>,
-    ) -> Result<Vec<WeightedSelectable<R>>, CompileError> {
+    ) -> Result<Vec<WeightedSelectable<R>>, BuildError> {
         // children xor (chars, values, file)
         if !((children.is_some() && (chars.is_none() || values.is_none() || filepath.is_none()))
             || (children.is_none() && (chars.is_some() || values.is_some() || filepath.is_some())))
         {
-            return Err(CompileError::NotExistValueOf(
+            return Err(BuildError::NotExistValueOf(
                 "children xor (chars, values, file)".to_string(),
             ));
         }
@@ -44,20 +44,20 @@ pub(crate) trait RandomSelectableGenerator<R: 'static + Randomizer + ?Sized> {
         }
 
         if let Some(filepath) = filepath {
-            let file = File::open(filepath).map_err(CompileError::FileError)?;
+            let file = File::open(filepath).map_err(BuildError::FileError)?;
             let reader = BufReader::new(file);
             for line in reader.lines() {
-                let line = line.map_err(CompileError::FileError)?;
+                let line = line.map_err(BuildError::FileError)?;
                 select_values.push((1, Either::Left(line)));
             }
         }
 
         if select_values.is_empty() {
-            return Err(CompileError::EmptyRandomize);
+            return Err(BuildError::EmptyRandomize);
         }
 
         if select_values.iter().fold(0, |acc, item| acc + item.0) == 0 {
-            return Err(CompileError::AllWeightsZero);
+            return Err(BuildError::AllWeightsZero);
         }
 
         Ok(select_values)

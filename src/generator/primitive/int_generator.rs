@@ -1,5 +1,5 @@
 use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
-use crate::generator::error::{CompileError, GenerateError};
+use crate::error::{BuildError, GenerateError};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
 use crate::GeneratorType;
@@ -11,7 +11,7 @@ pub struct IntGenerator {
 }
 
 impl<R: Randomizer + ?Sized> Generator<R> for IntGenerator {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
     {
@@ -23,7 +23,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for IntGenerator {
         } = builder;
 
         if generator_type != GeneratorType::Int {
-            return Err(CompileError::InvalidType(generator_type));
+            return Err(BuildError::InvalidType(generator_type));
         }
 
         let default_range = Self::default_range();
@@ -31,7 +31,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for IntGenerator {
             None => default_range,
             Some(r) => r.try_convert_with(|s| {
                 s.to_parse_string().parse::<SbrdInt>().map_err(|e| {
-                    CompileError::FailParseValue(
+                    BuildError::FailParseValue(
                         s.to_parse_string(),
                         "Int".to_string(),
                         e.to_string(),
@@ -40,7 +40,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for IntGenerator {
             })?,
         };
         if _range.is_empty() {
-            return Err(CompileError::RangeEmpty(_range.convert_into()));
+            return Err(BuildError::RangeEmpty(_range.convert_into()));
         }
 
         Ok(Self {

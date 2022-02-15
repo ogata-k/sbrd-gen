@@ -1,5 +1,5 @@
 use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
-use crate::generator::error::{CompileError, GenerateError};
+use crate::error::{BuildError, GenerateError};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdDate, SbrdDateTime, DATE_TIME_DEFAULT_FORMAT};
 use crate::GeneratorType;
@@ -12,7 +12,7 @@ pub struct DateTimeGenerator {
 }
 
 impl<R: Randomizer + ?Sized> Generator<R> for DateTimeGenerator {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
     {
@@ -25,7 +25,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateTimeGenerator {
         } = builder;
 
         if generator_type != GeneratorType::DateTime {
-            return Err(CompileError::InvalidType(generator_type));
+            return Err(BuildError::InvalidType(generator_type));
         }
 
         let default_range = Self::default_range();
@@ -35,7 +35,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateTimeGenerator {
                 .try_convert_with(|s| {
                     SbrdDateTime::parse_from_str(&s.to_parse_string(), DATE_TIME_DEFAULT_FORMAT)
                         .map_err(|e| {
-                            CompileError::FailParseValue(
+                            BuildError::FailParseValue(
                                 s.to_parse_string(),
                                 "DateTime".to_string(),
                                 e.to_string(),
@@ -48,7 +48,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateTimeGenerator {
                 })?,
         };
         if _range.is_empty() {
-            return Err(CompileError::RangeEmpty(_range.convert_into()));
+            return Err(BuildError::RangeEmpty(_range.convert_into()));
         }
 
         Ok(Self {

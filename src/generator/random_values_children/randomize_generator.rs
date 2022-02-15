@@ -1,5 +1,5 @@
 use crate::builder::{GeneratorBuilder, Nullable};
-use crate::generator::error::{CompileError, GenerateError};
+use crate::error::{BuildError, GenerateError};
 use crate::generator::random_values_children::{RandomSelectableGenerator, WeightedSelectable};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
@@ -17,7 +17,7 @@ impl<R: Randomizer + ?Sized> RandomSelectableGenerator<R> for RandomizeGenerator
 }
 
 impl<R: Randomizer + ?Sized> Generator<R> for RandomizeGenerator<R> {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
     {
@@ -32,7 +32,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for RandomizeGenerator<R> {
         } = builder;
 
         if generator_type != GeneratorType::Randomize {
-            return Err(CompileError::InvalidType(generator_type));
+            return Err(BuildError::InvalidType(generator_type));
         }
 
         let selectable_values = Self::build_selectable(children, chars, values, filepath)?;

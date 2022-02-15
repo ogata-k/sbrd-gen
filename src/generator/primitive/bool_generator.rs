@@ -1,5 +1,5 @@
 use crate::builder::{GeneratorBuilder, Nullable};
-use crate::generator::error::{CompileError, GenerateError};
+use crate::error::{BuildError, GenerateError};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
@@ -10,7 +10,7 @@ pub struct BoolGenerator {
 }
 
 impl<R: Randomizer + ?Sized> Generator<R> for BoolGenerator {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
     {
@@ -21,7 +21,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for BoolGenerator {
         } = builder;
 
         if generator_type != GeneratorType::Bool {
-            return Err(CompileError::InvalidType(generator_type));
+            return Err(BuildError::InvalidType(generator_type));
         }
 
         Ok(Self { nullable })

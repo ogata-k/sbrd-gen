@@ -1,6 +1,6 @@
 use crate::builder::{ChildGeneratorBuilder, GeneratorBuilder, Nullable};
+use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
-use crate::generator::error::{CompileError, GenerateError};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
@@ -11,7 +11,7 @@ pub struct CaseWhenGenerator<R: 'static + Randomizer + ?Sized> {
 }
 
 impl<R: Randomizer + ?Sized> Generator<R> for CaseWhenGenerator<R> {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
     {
@@ -23,11 +23,11 @@ impl<R: Randomizer + ?Sized> Generator<R> for CaseWhenGenerator<R> {
         } = builder;
 
         if generator_type != GeneratorType::CaseWhen {
-            return Err(CompileError::InvalidType(generator_type));
+            return Err(BuildError::InvalidType(generator_type));
         }
 
         match children {
-            None => Err(CompileError::NotExistValueOf("children".to_string())),
+            None => Err(BuildError::NotExistValueOf("children".to_string())),
             Some(children) => {
                 let mut _children: Vec<(Option<String>, Box<dyn Generator<R>>)> = Vec::new();
                 let mut has_default_case = false;
@@ -40,11 +40,11 @@ impl<R: Randomizer + ?Sized> Generator<R> for CaseWhenGenerator<R> {
                 }
 
                 if _children.is_empty() {
-                    return Err(CompileError::EmptyChildren);
+                    return Err(BuildError::EmptyChildren);
                 }
 
                 if !has_default_case {
-                    return Err(CompileError::NotExistDefaultCase);
+                    return Err(BuildError::NotExistDefaultCase);
                 }
 
                 Ok(Self {

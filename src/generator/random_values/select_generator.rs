@@ -1,5 +1,5 @@
 use crate::builder::{GeneratorBuilder, Nullable};
-use crate::generator::error::{CompileError, GenerateError};
+use crate::error::{BuildError, GenerateError};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt, SbrdReal, SbrdString};
 use crate::GeneratorType;
@@ -14,7 +14,7 @@ pub struct SelectGenerator<T: ForSelectGeneratorType> {
 }
 
 impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectGenerator<T> {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
     {
@@ -28,7 +28,7 @@ impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectG
         } = builder;
 
         if generator_type != T::get_generator_type() {
-            return Err(CompileError::InvalidType(generator_type));
+            return Err(BuildError::InvalidType(generator_type));
         }
 
         let mut selectable_values: Vec<T> = Vec::new();
@@ -45,16 +45,16 @@ impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectG
         }
 
         if let Some(filepath) = filepath {
-            let file = File::open(filepath).map_err(CompileError::FileError)?;
+            let file = File::open(filepath).map_err(BuildError::FileError)?;
             let reader = BufReader::new(file);
             for line in reader.lines() {
-                let line = line.map_err(CompileError::FileError)?;
+                let line = line.map_err(BuildError::FileError)?;
                 selectable_values.push(T::parse(&line)?);
             }
         }
 
         if selectable_values.is_empty() {
-            return Err(CompileError::EmptySelectValues);
+            return Err(BuildError::EmptySelectValues);
         }
 
         Ok(Self {
@@ -81,7 +81,7 @@ impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectG
 
 pub trait ForSelectGeneratorType {
     fn get_generator_type() -> GeneratorType;
-    fn parse(s: &str) -> Result<Self, CompileError>
+    fn parse(s: &str) -> Result<Self, BuildError>
     where
         Self: Sized;
     fn to_data_value(&self) -> DataValue;
@@ -92,9 +92,9 @@ impl ForSelectGeneratorType for SbrdInt {
         GeneratorType::SelectInt
     }
 
-    fn parse(s: &str) -> Result<SbrdInt, CompileError> {
+    fn parse(s: &str) -> Result<SbrdInt, BuildError> {
         SbrdInt::from_str(s).map_err(|e| {
-            CompileError::FailParseValue(s.to_string(), "Int".to_string(), e.to_string())
+            BuildError::FailParseValue(s.to_string(), "Int".to_string(), e.to_string())
         })
     }
 
@@ -108,9 +108,9 @@ impl ForSelectGeneratorType for SbrdReal {
         GeneratorType::SelectReal
     }
 
-    fn parse(s: &str) -> Result<SbrdReal, CompileError> {
+    fn parse(s: &str) -> Result<SbrdReal, BuildError> {
         SbrdReal::from_str(s).map_err(|e| {
-            CompileError::FailParseValue(s.to_string(), "Real".to_string(), e.to_string())
+            BuildError::FailParseValue(s.to_string(), "Real".to_string(), e.to_string())
         })
     }
 
@@ -124,7 +124,7 @@ impl ForSelectGeneratorType for SbrdString {
         GeneratorType::SelectString
     }
 
-    fn parse(s: &str) -> Result<String, CompileError> {
+    fn parse(s: &str) -> Result<String, BuildError> {
         Ok(s.to_string())
     }
 

@@ -1,5 +1,5 @@
 use crate::builder::GeneratorBuilder;
-use crate::generator::error::{CompileError, GenerateError};
+use crate::error::{BuildError, GenerateError};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
@@ -8,14 +8,14 @@ use crate::GeneratorType;
 pub struct AlwaysNullGenerator {}
 
 impl<R: Randomizer + ?Sized> Generator<R> for AlwaysNullGenerator {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
     {
         let GeneratorBuilder { generator_type, .. } = builder;
 
         if generator_type != GeneratorType::AlwaysNull {
-            return Err(CompileError::InvalidType(generator_type));
+            return Err(BuildError::InvalidType(generator_type));
         }
 
         Ok(Self {})

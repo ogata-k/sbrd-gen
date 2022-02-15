@@ -3,6 +3,7 @@ use std::collections::btree_map::BTreeMap;
 use std::path::PathBuf;
 
 use crate::builder::{Nullable, ValueBound, ValueStep};
+use crate::error::BuildError;
 use crate::generator::build_string::{DuplicatePermutationGenerator, FormatGenerator};
 use crate::generator::distribution::NormalGenerator;
 use crate::generator::evaluate::EvalGenerator;
@@ -13,7 +14,6 @@ use crate::generator::primitive::{
 use crate::generator::random_children::CaseWhenGenerator;
 use crate::generator::random_values::SelectGenerator;
 use crate::generator::random_values_children::RandomizeGenerator;
-use crate::generator::CompileError;
 use crate::generator::{Generator, Randomizer};
 use crate::generator_type::GeneratorType;
 use crate::value::{
@@ -123,7 +123,7 @@ macro_rules! build_generator {
 impl GeneratorBuilder {
     pub fn build<R: 'static + Randomizer + ?Sized>(
         self,
-    ) -> Result<Box<dyn Generator<R>>, CompileError> {
+    ) -> Result<Box<dyn Generator<R>>, BuildError> {
         match self.generator_type {
             GeneratorType::Int => build_generator!(self, R, IntGenerator),
             GeneratorType::Real => build_generator!(self, R, RealGenerator),

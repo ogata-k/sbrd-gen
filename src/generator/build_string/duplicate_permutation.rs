@@ -1,5 +1,5 @@
 use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
-use crate::generator::error::{CompileError, GenerateError};
+use crate::error::{BuildError, GenerateError};
 use crate::generator::random_values_children::{RandomSelectableGenerator, WeightedSelectable};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
@@ -19,7 +19,7 @@ impl<R: Randomizer + ?Sized> RandomSelectableGenerator<R> for DuplicatePermutati
 }
 
 impl<R: Randomizer + ?Sized> Generator<R> for DuplicatePermutationGenerator<R> {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
     {
@@ -36,7 +36,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for DuplicatePermutationGenerator<R> {
         } = builder;
 
         if generator_type != GeneratorType::DuplicatePermutation {
-            return Err(CompileError::InvalidType(generator_type));
+            return Err(BuildError::InvalidType(generator_type));
         }
 
         let count_range = match range {
@@ -44,7 +44,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for DuplicatePermutationGenerator<R> {
             Some(r) => r
                 .try_convert_with(|s| {
                     s.to_parse_string().parse::<SbrdInt>().map_err(|e| {
-                        CompileError::FailParseValue(
+                        BuildError::FailParseValue(
                             s.to_parse_string(),
                             "Int".to_string(),
                             e.to_string(),
@@ -55,11 +55,11 @@ impl<R: Randomizer + ?Sized> Generator<R> for DuplicatePermutationGenerator<R> {
         };
         if let Some(s) = count_range.get_start() {
             if s < &0 {
-                return Err(CompileError::InvalidValue(count_range.to_string()));
+                return Err(BuildError::InvalidValue(count_range.to_string()));
             }
         }
         if count_range.is_empty() {
-            return Err(CompileError::RangeEmpty(count_range.convert_into()));
+            return Err(BuildError::RangeEmpty(count_range.convert_into()));
         }
 
         let _separator = separator.unwrap_or_else(|| "".to_string());

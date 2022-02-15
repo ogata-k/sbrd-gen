@@ -1,5 +1,5 @@
 use crate::builder::{GeneratorBuilder, Nullable};
-use crate::generator::error::{CompileError, GenerateError};
+use crate::error::{BuildError, GenerateError};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdReal};
 use crate::GeneratorType;
@@ -13,7 +13,7 @@ pub struct NormalGenerator {
 }
 
 impl<R: Randomizer + ?Sized> Generator<R> for NormalGenerator {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
     {
@@ -25,17 +25,17 @@ impl<R: Randomizer + ?Sized> Generator<R> for NormalGenerator {
         } = builder;
 
         if generator_type != GeneratorType::DistNormal {
-            return Err(CompileError::InvalidType(generator_type));
+            return Err(BuildError::InvalidType(generator_type));
         }
 
         let (mean, std_dev): (SbrdReal, SbrdReal) = match parameters {
-            None => Err(CompileError::NotExistValueOf("parameters".to_string())),
+            None => Err(BuildError::NotExistValueOf("parameters".to_string())),
             Some(parameters) => {
                 let _mean = parameters
                     .get(Self::MEAN)
                     .map(|v| {
                         v.to_parse_string().parse::<SbrdReal>().map_err(|e| {
-                            CompileError::FailParseValue(
+                            BuildError::FailParseValue(
                                 v.to_parse_string(),
                                 "Real".to_string(),
                                 e.to_string(),
@@ -48,7 +48,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for NormalGenerator {
                     .get(Self::STD_DEV)
                     .map(|v| {
                         v.to_parse_string().parse::<SbrdReal>().map_err(|e| {
-                            CompileError::FailParseValue(
+                            BuildError::FailParseValue(
                                 v.to_parse_string(),
                                 "Real".to_string(),
                                 e.to_string(),
@@ -57,7 +57,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for NormalGenerator {
                     })
                     .unwrap_or_else(|| Ok(1.0))?;
                 if _std_dev < 0.0 {
-                    return Err(CompileError::InvalidValue(format!(
+                    return Err(BuildError::InvalidValue(format!(
                         "std_dev {} is less than 0.0",
                         _std_dev
                     )));
@@ -70,7 +70,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for NormalGenerator {
         Ok(Self {
             nullable,
             distribution: Normal::new(mean, std_dev).map_err(|e| {
-                CompileError::FailBuildDistribution("Normal".to_string(), e.to_string())
+                BuildError::FailBuildDistribution("Normal".to_string(), e.to_string())
             })?,
         })
     }

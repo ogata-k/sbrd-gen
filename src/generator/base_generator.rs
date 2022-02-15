@@ -1,5 +1,5 @@
 use crate::builder::GeneratorBuilder;
-use crate::generator::error::{CompileError, GenerateError};
+use crate::error::{BuildError, GenerateError};
 use crate::value::{DataValue, DataValueMap};
 use rand::Rng;
 
@@ -7,7 +7,7 @@ pub trait Randomizer: Rng {}
 impl<R: Rng> Randomizer for R {}
 
 pub trait Generator<R: Randomizer + ?Sized> {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized;
 

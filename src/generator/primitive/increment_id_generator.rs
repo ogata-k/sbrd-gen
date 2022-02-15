@@ -1,5 +1,5 @@
 use crate::builder::{GeneratorBuilder, Nullable};
-use crate::generator::error::{CompileError, GenerateError};
+use crate::error::{BuildError, GenerateError};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
 use crate::GeneratorType;
@@ -15,7 +15,7 @@ pub struct IncrementIdGenerator {
 }
 
 impl<R: Randomizer + ?Sized> Generator<R> for IncrementIdGenerator {
-    fn create(builder: GeneratorBuilder) -> Result<Self, CompileError>
+    fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
     {
@@ -27,7 +27,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for IncrementIdGenerator {
         } = builder;
 
         if generator_type != GeneratorType::IncrementId {
-            return Err(CompileError::InvalidType(generator_type));
+            return Err(BuildError::InvalidType(generator_type));
         }
 
         let (initial_id, step): (SbrdInt, SbrdInt) = match increment {
@@ -38,7 +38,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for IncrementIdGenerator {
                     .to_parse_string()
                     .parse::<SbrdInt>()
                     .map_err(|e| {
-                        CompileError::FailParseValue(
+                        BuildError::FailParseValue(
                             s.get_initial().to_parse_string(),
                             "Int".to_string(),
                             e.to_string(),
@@ -47,7 +47,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for IncrementIdGenerator {
 
                 let step_result = s.get_step().as_ref().map(|v| {
                     v.to_parse_string().parse::<SbrdInt>().map_err(|e| {
-                        CompileError::FailParseValue(
+                        BuildError::FailParseValue(
                             v.to_parse_string(),
                             "Int".to_string(),
                             e.to_string(),

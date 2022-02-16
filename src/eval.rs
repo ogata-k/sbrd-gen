@@ -15,7 +15,8 @@ impl<'a> Evaluator<'a> {
         Self { script, context }
     }
 
-    pub fn format_script(&self) -> SbrdString {
+    pub fn format_script(&self) -> EvalResult<SbrdString> {
+        // @todo スクリプトのフォーマットの正当性を判定できるようにしたい
         let mut replaced_script = self.script.to_string();
         for (key, value) in self.context.iter() {
             // formatは{key}をvalueで置換して表示する
@@ -24,18 +25,18 @@ impl<'a> Evaluator<'a> {
             replaced_script = replaced_script.replace(&format, &eval_value);
         }
 
-        replaced_script
+        Ok(replaced_script)
     }
 
     pub fn eval_int(&self) -> EvalResult<SbrdInt> {
-        eval_int(&self.format_script()).map(|v| v as SbrdInt)
+        eval_int(&self.format_script()?).map(|v| v as SbrdInt)
     }
 
     pub fn eval_real(&self) -> EvalResult<SbrdReal> {
-        eval_float(&self.format_script()).map(|v| v as SbrdReal)
+        eval_float(&self.format_script()?).map(|v| v as SbrdReal)
     }
 
     pub fn eval_bool(&self) -> EvalResult<SbrdBool> {
-        eval_boolean(&self.format_script()).map(|v| v as SbrdBool)
+        eval_boolean(&self.format_script()?).map(|v| v as SbrdBool)
     }
 }

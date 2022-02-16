@@ -46,7 +46,19 @@ impl<R: Randomizer + ?Sized> Generator<R> for FormatGenerator {
         value_map: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         Ok(DataValue::String(
-            Evaluator::new(&self.format, value_map).format_script(),
+            Evaluator::new(&self.format, value_map)
+                .format_script()
+                .map_err(|e| {
+                    GenerateError::FailEval(
+                        e,
+                        self.format.to_string(),
+                        value_map
+                            .clone()
+                            .into_iter()
+                            .map(|(k, v)| (k.to_string(), v))
+                            .collect::<DataValueMap<String>>(),
+                    )
+                })?,
         ))
     }
 }

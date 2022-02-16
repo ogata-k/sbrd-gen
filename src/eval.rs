@@ -4,14 +4,14 @@ use evalexpr::{eval_boolean, eval_float, eval_int, EvalexprError};
 #[derive(Debug, PartialEq, Clone)]
 pub struct Evaluator<'a> {
     script: &'a str,
-    context: &'a DataValueMap,
+    context: &'a DataValueMap<&'a str>,
 }
 
 pub type EvalError = EvalexprError;
 pub type EvalResult<T> = Result<T, EvalError>;
 impl<'a> Evaluator<'a> {
     /// scriptはcontextの各エントリー`(key, value)`をもとに"{key}"を`value`で置き換える形で処理される
-    pub fn new(script: &'a str, context: &'a DataValueMap) -> Self {
+    pub fn new(script: &'a str, context: &'a DataValueMap<&str>) -> Self {
         Self { script, context }
     }
 

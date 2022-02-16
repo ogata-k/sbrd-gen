@@ -65,7 +65,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateTimeGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _value_map: &DataValueMap,
+        _value_map: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         let timestamp_range = self.range.convert_with(|date_time| date_time.timestamp());
         let timestamp_value = rng.gen_range(timestamp_range);

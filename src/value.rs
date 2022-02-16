@@ -5,7 +5,8 @@ use std::fmt;
 use serde::de::{Error, Unexpected, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-pub type DataValueMap = BTreeMap<String, DataValue>;
+pub type ValueMap<K, S> = BTreeMap<K, S>;
+pub type DataValueMap<K> = ValueMap<K, DataValue>;
 pub type SbrdInt = i32;
 pub type SbrdReal = f32;
 pub type SbrdBool = bool;

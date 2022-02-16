@@ -81,7 +81,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for DuplicatePermutationGenerator<R> {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap,
+        value_map: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         let mut result: String = String::new();
         let mut is_first = true;

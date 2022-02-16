@@ -70,7 +70,7 @@ impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectG
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _value_map: &DataValueMap,
+        _value_map: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         self.selectable_values
             .choose(rng)

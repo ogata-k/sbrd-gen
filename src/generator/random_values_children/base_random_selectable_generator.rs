@@ -65,7 +65,11 @@ pub(crate) trait RandomSelectableGenerator<R: 'static + Randomizer + ?Sized> {
 
     fn get_selectable(&self) -> &[WeightedSelectable<R>];
 
-    fn choose(&self, rng: &mut R, value_map: &DataValueMap) -> Result<DataValue, GenerateError> {
+    fn choose(
+        &self,
+        rng: &mut R,
+        value_map: &DataValueMap<&str>,
+    ) -> Result<DataValue, GenerateError> {
         self.get_selectable()
             .choose_weighted(rng, |item| item.0)
             .map_err(|err| GenerateError::FailGenerate(err.to_string()))

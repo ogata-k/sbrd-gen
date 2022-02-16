@@ -17,7 +17,11 @@ pub trait Generator<R: Randomizer + ?Sized> {
         !self.is_nullable()
     }
 
-    fn generate(&self, rng: &mut R, value_map: &DataValueMap) -> Result<DataValue, GenerateError> {
+    fn generate(
+        &self,
+        rng: &mut R,
+        value_map: &DataValueMap<&str>,
+    ) -> Result<DataValue, GenerateError> {
         if self.is_required() {
             self.generate_without_null(rng, value_map)
         } else {
@@ -32,6 +36,6 @@ pub trait Generator<R: Randomizer + ?Sized> {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap,
+        value_map: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError>;
 }

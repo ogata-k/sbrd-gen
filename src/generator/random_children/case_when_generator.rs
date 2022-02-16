@@ -62,7 +62,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for CaseWhenGenerator<R> {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap,
+        value_map: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         for (condition, generator) in self.children.iter() {
             return match condition {
@@ -70,7 +70,14 @@ impl<R: Randomizer + ?Sized> Generator<R> for CaseWhenGenerator<R> {
                 Some(_condition) => {
                     let evaluator = Evaluator::new(_condition, value_map);
                     let is_satisfy = evaluator.eval_bool().map_err(|e| {
-                        GenerateError::FailEval(e, _condition.clone(), value_map.clone())
+                        GenerateError::FailEval(
+                            e,
+                            _condition.clone(),
+                            value_map
+                                .into_iter()
+                                .map(|(k, v)| (k.to_string(), v.clone()))
+                                .collect::<DataValueMap<String>>(),
+                        )
                     })?;
                     if !is_satisfy {
                         continue;

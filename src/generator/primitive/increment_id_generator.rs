@@ -76,7 +76,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for IncrementIdGenerator {
     fn generate_without_null(
         &self,
         _rng: &mut R,
-        _value_map: &DataValueMap,
+        _value_map: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         let id = self.current_id.get();
         self.current_id.replace(id + self.step);

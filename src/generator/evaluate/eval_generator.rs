@@ -46,17 +46,25 @@ impl<R: Randomizer + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGener
     fn generate_without_null(
         &self,
         _rng: &mut R,
-        value_map: &DataValueMap,
+        value_map: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
-        F::evaluate(&self.script, value_map)
-            .map_err(|e| GenerateError::FailEval(e, self.script.clone(), value_map.clone()))
+        F::evaluate(&self.script, value_map).map_err(|e| {
+            GenerateError::FailEval(
+                e,
+                self.script.clone(),
+                value_map
+                    .into_iter()
+                    .map(|(k, v)| (k.to_string(), v.clone()))
+                    .collect::<DataValueMap<String>>(),
+            )
+        })
     }
 }
 
 pub trait ForEvalGeneratorType {
     fn get_generator_type() -> GeneratorType;
 
-    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap) -> EvalResult<DataValue>;
+    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue>;
 }
 
 impl ForEvalGeneratorType for SbrdInt {
@@ -64,7 +72,7 @@ impl ForEvalGeneratorType for SbrdInt {
         GeneratorType::EvalInt
     }
 
-    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap) -> EvalResult<DataValue> {
+    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
         let evaluator = Evaluator::new(script, context);
         evaluator.eval_int().map(|v| v.into())
     }
@@ -74,7 +82,7 @@ impl ForEvalGeneratorType for SbrdReal {
         GeneratorType::EvalReal
     }
 
-    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap) -> EvalResult<DataValue> {
+    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
         let evaluator = Evaluator::new(script, context);
         evaluator.eval_real().map(|v| v.into())
     }
@@ -84,7 +92,7 @@ impl ForEvalGeneratorType for SbrdBool {
         GeneratorType::EvalBool
     }
 
-    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap) -> EvalResult<DataValue> {
+    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
         let evaluator = Evaluator::new(script, context);
         evaluator.eval_bool().map(|v| v.into())
     }

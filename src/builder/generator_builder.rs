@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::collections::btree_map::BTreeMap;
 use std::path::PathBuf;
 
 use crate::builder::{Nullable, ValueBound, ValueStep};
@@ -107,7 +106,7 @@ pub struct GeneratorBuilder {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) script: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) parameters: Option<BTreeMap<String, DataValue>>,
+    pub(crate) parameters: Option<DataValueMap<String>>,
 }
 
 macro_rules! build_generator {
@@ -531,7 +530,7 @@ impl GeneratorBuilder {
         self
     }
 
-    fn parameters(mut self, parameters: DataValueMap) -> Self {
+    fn parameters(mut self, parameters: DataValueMap<String>) -> Self {
         self.parameters = Some(parameters);
         self
     }

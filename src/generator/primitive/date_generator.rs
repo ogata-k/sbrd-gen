@@ -67,7 +67,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _value_map: &DataValueMap,
+        _value_map: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         let num_days_range = self.range.convert_with(|date| date.num_days_from_ce());
         let num_days_value = rng.gen_range(num_days_range);

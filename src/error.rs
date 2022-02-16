@@ -5,30 +5,30 @@ use crate::GeneratorType;
 use std::borrow::Borrow;
 
 #[derive(Debug)]
-pub struct SbrdError {
-    kind: SbrdErrorKind,
-    info: SbrdErrorInfo,
+pub struct SchemeError {
+    kind: SchemeErrorKind,
+    info: SchemeErrorInfo,
 }
 
-impl std::fmt::Display for SbrdError {
+impl std::fmt::Display for SchemeError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.kind {
-            SbrdErrorKind::ParseError => write!(f, "Parse error: {}", self.info),
-            SbrdErrorKind::BuildError => write!(f, "Build error: {}", self.info),
-            SbrdErrorKind::GenerateError => write!(f, "Generate error: {}", self.info),
-            SbrdErrorKind::SerializeError => write!(f, "Serialize error: {}", self.info),
+            SchemeErrorKind::ParseError => write!(f, "Parse error: {}", self.info),
+            SchemeErrorKind::BuildError => write!(f, "Build error: {}", self.info),
+            SchemeErrorKind::GenerateError => write!(f, "Generate error: {}", self.info),
+            SchemeErrorKind::SerializeError => write!(f, "Serialize error: {}", self.info),
         }
     }
 }
 
-impl std::error::Error for SbrdError {}
+impl std::error::Error for SchemeError {}
 
-impl SbrdError {
-    pub fn is_kind_of(&self, kind: SbrdErrorKind) -> bool {
+impl SchemeError {
+    pub fn is_kind_of(&self, kind: SchemeErrorKind) -> bool {
         self.kind == kind
     }
 
-    pub fn get_kind(&self) -> SbrdErrorKind {
+    pub fn get_kind(&self) -> SchemeErrorKind {
         self.kind
     }
 
@@ -38,7 +38,7 @@ impl SbrdError {
 }
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
-pub enum SbrdErrorKind {
+pub enum SchemeErrorKind {
     ParseError,
     BuildError,
     GenerateError,
@@ -46,35 +46,38 @@ pub enum SbrdErrorKind {
 }
 
 #[derive(Debug)]
-struct SbrdErrorInfo(Box<dyn std::error::Error>);
+struct SchemeErrorInfo(Box<dyn std::error::Error>);
 
-impl std::fmt::Display for SbrdErrorInfo {
+impl std::fmt::Display for SchemeErrorInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }
 
-impl From<BuildError> for SbrdError {
+impl From<BuildError> for SchemeError {
     fn from(e: BuildError) -> Self {
-        e.into_sbrd_gen_error(SbrdErrorKind::BuildError)
+        e.into_sbrd_gen_error(SchemeErrorKind::BuildError)
     }
 }
 
 pub trait IntoSbrdError: 'static + std::error::Error + Sized {
-    fn into_sbrd_gen_error(self, kind: SbrdErrorKind) -> SbrdError {
-        SbrdError {
+    fn into_sbrd_gen_error(self, kind: SchemeErrorKind) -> SchemeError {
+        SchemeError {
             kind,
-            info: SbrdErrorInfo(Box::new(self)),
+            info: SchemeErrorInfo(Box::new(self)),
         }
     }
 }
 
 impl<E> IntoSbrdError for E where E: 'static + std::error::Error + Sized {}
 
-pub type SbrdGenResult<T> = std::result::Result<T, SbrdError>;
+pub type SchemeResult<T> = std::result::Result<T, SchemeError>;
 
 #[derive(Debug)]
 pub enum BuildError {
+    SpecifiedKeyNotUnique(Vec<String>),
+    NotExistSpecifiedKey(String, Vec<String>),
+    AlreadyExistKey(String),
     InvalidType(GeneratorType),
     InvalidValue(String),
     NotExistValueOf(String),
@@ -94,6 +97,13 @@ pub enum BuildError {
 impl std::fmt::Display for BuildError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            BuildError::SpecifiedKeyNotUnique(keys) => {
+                write!(f, "Not Unique Specified Keys: {:?}", keys)
+            }
+            BuildError::NotExistSpecifiedKey(key, keys) => {
+                write!(f, "Not Exist Key \"{}\" in {:?}", key, keys)
+            }
+            BuildError::AlreadyExistKey(k) => write!(f, "Already Exist Key: {}", k),
             BuildError::InvalidType(t) => write!(f, "Invalid Type: {}", t),
             BuildError::InvalidValue(s) => write!(f, "Invalid Value: {}", s),
             BuildError::NotExistValueOf(s) => write!(f, "Not Exist Value for {}", s),
@@ -121,7 +131,7 @@ impl std::error::Error for BuildError {}
 #[derive(Debug)]
 pub enum GenerateError {
     /// eval error, unmodified script, context
-    FailEval(EvalError, String, DataValueMap),
+    FailEval(EvalError, String, DataValueMap<String>),
     /// reason
     FailGenerate(String),
 }

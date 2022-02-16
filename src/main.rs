@@ -1,98 +1,34 @@
 use rand::thread_rng;
-
-use sbrd_gen::builder::{GeneratorBuilder, ParentGeneratorBuilder};
-use sbrd_gen::error::{IntoSbrdError, SbrdErrorKind};
-use sbrd_gen::value::DataValueMap;
+use sbrd_gen::builder::GeneratorBuilder;
+use sbrd_gen::SchemeBuilder;
 
 fn main() {
-    let parent_builder = GeneratorBuilder::new_dist_normal(0.0, 1.0).into_parent("KeyA");
-    let yaml_string = serde_yaml::to_string(&parent_builder)
-        .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::SerializeError))
-        .unwrap();
-    println!("[builder]\n{}", &yaml_string);
-
-    let deserialized: ParentGeneratorBuilder = serde_yaml::from_str(&yaml_string)
-        .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::ParseError))
-        .unwrap();
-    // println!("[builder]\n{:?}", deserialized);
-
-    assert_eq!(deserialized, parent_builder);
-
-    let (key, builder) = parent_builder.split_key();
-    let generator = builder
-        .build()
-        .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::BuildError))
-        .unwrap();
+    let keys = vec!["KeyA".to_string(), "KeyB".to_string(), "KeyC".to_string()];
+    let builders = vec![
+        GeneratorBuilder::new_dist_normal(0.0, 1.0).into_parent("KeyA"),
+        GeneratorBuilder::new_int(Some((-500..=500).into())).into_parent("dummy_int"),
+        GeneratorBuilder::new_real(None).into_parent("dummy_real"),
+        GeneratorBuilder::new_bool().into_parent("dummy_bool"),
+        GeneratorBuilder::new_date_time(None, None).into_parent("dummy_date_time"),
+        GeneratorBuilder::new_date(None, None).into_parent("dummy_date"),
+        GeneratorBuilder::new_time(None, None).into_parent("dummy_time"),
+        GeneratorBuilder::new_format("\"{dummy_date_time}\" or \"{dummy_date} {dummy_time}\"")
+            .into_parent("KeyB"),
+        GeneratorBuilder::new_eval_bool("\"{dummy_date_time}\" == \"{dummy_date} {dummy_time}\"")
+            .into_parent("KeyC"),
+    ];
+    let scheme = SchemeBuilder::new(keys, builders).build().unwrap();
 
     let mut rng = thread_rng();
-    println!("[generate for \"{}\"]", key);
-    for index in 1..=10 {
-        let mut value_map = DataValueMap::new();
-        value_map.insert(
-            "dummy_int".to_string(),
-            GeneratorBuilder::new_int(Some((-500..=500).into()))
-                .build()
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::BuildError))
-                .unwrap()
-                .generate(&mut rng, &value_map)
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::GenerateError))
-                .unwrap(),
+    let count = 10;
+    for index in 1..=count {
+        let generated_values = scheme.generate(&mut rng).unwrap();
+        println!(
+            "\n{}:\n\tRES {} \n\tDBG {:?}\n\tNFV {:?}",
+            index,
+            generated_values,
+            generated_values,
+            generated_values.get_all_values()
         );
-        value_map.insert(
-            "dummy_real".to_string(),
-            GeneratorBuilder::new_real(None)
-                .build()
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::BuildError))
-                .unwrap()
-                .generate(&mut rng, &value_map)
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::GenerateError))
-                .unwrap(),
-        );
-        value_map.insert(
-            "dummy_bool".to_string(),
-            GeneratorBuilder::new_bool()
-                .build()
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::BuildError))
-                .unwrap()
-                .generate(&mut rng, &value_map)
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::GenerateError))
-                .unwrap(),
-        );
-        value_map.insert(
-            "dummy_date_time".to_string(),
-            GeneratorBuilder::new_date_time(None, Option::<String>::None)
-                .build()
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::BuildError))
-                .unwrap()
-                .generate(&mut rng, &value_map)
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::GenerateError))
-                .unwrap(),
-        );
-        value_map.insert(
-            "dummy_date".to_string(),
-            GeneratorBuilder::new_date(None, Option::<String>::None)
-                .build()
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::BuildError))
-                .unwrap()
-                .generate(&mut rng, &value_map)
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::GenerateError))
-                .unwrap(),
-        );
-        value_map.insert(
-            "dummy_time".to_string(),
-            GeneratorBuilder::new_time(None, Option::<String>::None)
-                .build()
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::BuildError))
-                .unwrap()
-                .generate(&mut rng, &value_map)
-                .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::GenerateError))
-                .unwrap(),
-        );
-
-        let generate_value = generator
-            .generate(&mut rng, &value_map)
-            .map_err(|e| e.into_sbrd_gen_error(SbrdErrorKind::GenerateError))
-            .unwrap();
-        println!("{} : {}", index, generate_value);
     }
 }

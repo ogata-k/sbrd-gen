@@ -68,7 +68,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for TimeGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _value_map: &DataValueMap,
+        _value_map: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         let upper_bound = self
             .range

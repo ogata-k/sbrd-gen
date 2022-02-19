@@ -1,6 +1,8 @@
 use rand::thread_rng;
 use sbrd_gen::builder::GeneratorBuilder;
+use sbrd_gen::writer::{CsvWriter, GeneratedValueWriter};
 use sbrd_gen::SchemeBuilder;
+use std::io::stdout;
 
 fn main() {
     let keys = vec!["KeyA".to_string(), "KeyB".to_string(), "KeyC".to_string()];
@@ -12,7 +14,7 @@ fn main() {
         GeneratorBuilder::new_date_time(None, None).into_parent("dummy_date_time"),
         GeneratorBuilder::new_date(None, None).into_parent("dummy_date"),
         GeneratorBuilder::new_time(None, None).into_parent("dummy_time"),
-        GeneratorBuilder::new_format("\"{dummy_date_time}\" or \"{dummy_date} {dummy_time}\"")
+        GeneratorBuilder::new_format("{dummy_date_time}, {dummy_date} {dummy_time}")
             .into_parent("KeyB"),
         GeneratorBuilder::new_eval_bool("\"{dummy_date_time}\" == \"{dummy_date} {dummy_time}\"")
             .into_parent("KeyC"),
@@ -20,15 +22,9 @@ fn main() {
     let scheme = SchemeBuilder::new(keys, builders).build().unwrap();
 
     let mut rng = thread_rng();
-    let count = 10;
-    for index in 1..=count {
-        let generated_values = scheme.generate(&mut rng).unwrap();
-        println!(
-            "\n{}:\n\tRES {} \n\tDBG {:?}\n\tNFV {:?}",
-            index,
-            generated_values,
-            generated_values,
-            generated_values.get_all_values()
-        );
-    }
+    let mut writer = CsvWriter::from_writer(stdout());
+
+    writer
+        .write_with_generate(true, &scheme, &mut rng, 10)
+        .unwrap();
 }

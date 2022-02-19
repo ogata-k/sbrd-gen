@@ -1,8 +1,9 @@
 use crate::builder::ParentGeneratorBuilder;
-use crate::error::{BuildError, IntoSbrdError, SchemeErrorKind, SchemeResult};
+use crate::error::{BuildError, GenerateError, IntoSbrdError, SchemeErrorKind, SchemeResult};
 use crate::generator::{Generator, Randomizer};
-use crate::value::{DataValue, DataValueMap, ValueMap};
+use crate::value::{DataValue, DataValueMap};
 use serde::de::DeserializeOwned;
+use serde::ser::Error;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
@@ -136,14 +137,18 @@ pub struct GeneratedValues<'a> {
 
 impl<'a> std::fmt::Debug for GeneratedValues<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let key_values = self.get_values_each_key();
+        let key_values = self
+            .filter_values_with_key()
+            .map_err(|e| std::fmt::Error::custom(e.to_string()))?;
         f.debug_map().entries(key_values).finish()
     }
 }
 
 impl<'a> std::fmt::Display for GeneratedValues<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let key_values = self.get_values_each_key();
+        let key_values = self
+            .filter_values_with_key()
+            .map_err(|e| std::fmt::Error::custom(e.to_string()))?;
         write!(f, "{{")?;
         for (i, (k, v)) in key_values.iter().enumerate() {
             if i != 0 {
@@ -166,22 +171,45 @@ impl<'a> GeneratedValues<'a> {
         &self.generated_values
     }
 
-    pub fn get_values_each_key<'b>(&'b self) -> Vec<(&'a str, &'b DataValue)> {
+    pub fn filter_values(&self) -> SchemeResult<Vec<&DataValue>> {
         let mut result = Vec::new();
         for key in self.keys.iter() {
-            let value = self.generated_values.get(key.as_str()).unwrap_or_else(|| {
-                panic!(
-                    "Checked exist key \"{}\" is not exist generated values {:?}",
-                    key,
+            let value_result = self.generated_values.get(key.as_str());
+            let value = value_result.ok_or_else(|| {
+                GenerateError::NotExistGeneratedKey(
+                    key.to_string(),
                     self.generated_values
                         .iter()
-                        .map(|(k, v)| (k.to_string(), v.to_string()))
-                        .collect::<ValueMap<String, String>>()
+                        .map(|(k, v)| (k.to_string(), v.clone()))
+                        .collect::<DataValueMap<String>>(),
                 )
-            });
+                .into_sbrd_gen_error(SchemeErrorKind::GenerateError)
+            })?;
+
+            result.push(value);
+        }
+
+        Ok(result)
+    }
+
+    pub fn filter_values_with_key<'b>(&'b self) -> SchemeResult<Vec<(&'a str, &'b DataValue)>> {
+        let mut result = Vec::new();
+        for key in self.keys.iter() {
+            let value_result = self.generated_values.get(key.as_str());
+            let value = value_result.ok_or_else(|| {
+                GenerateError::NotExistGeneratedKey(
+                    key.to_string(),
+                    self.generated_values
+                        .iter()
+                        .map(|(k, v)| (k.to_string(), v.clone()))
+                        .collect::<DataValueMap<String>>(),
+                )
+                .into_sbrd_gen_error(SchemeErrorKind::GenerateError)
+            })?;
+
             result.push((key.as_str(), value));
         }
 
-        result
+        Ok(result)
     }
 }

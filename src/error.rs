@@ -16,7 +16,7 @@ impl std::fmt::Display for SchemeError {
             SchemeErrorKind::ParseError => write!(f, "Parse error: {}", self.info),
             SchemeErrorKind::BuildError => write!(f, "Build error: {}", self.info),
             SchemeErrorKind::GenerateError => write!(f, "Generate error: {}", self.info),
-            SchemeErrorKind::SerializeError => write!(f, "Serialize error: {}", self.info),
+            SchemeErrorKind::OutputError => write!(f, "Output error: {}", self.info),
         }
     }
 }
@@ -42,7 +42,7 @@ pub enum SchemeErrorKind {
     ParseError,
     BuildError,
     GenerateError,
-    SerializeError,
+    OutputError,
 }
 
 #[derive(Debug)]
@@ -134,6 +134,8 @@ pub enum GenerateError {
     FailEval(EvalError, String, DataValueMap<String>),
     /// reason
     FailGenerate(String),
+    /// Key name, Generated values
+    NotExistGeneratedKey(String, DataValueMap<String>),
 }
 
 impl std::fmt::Display for GenerateError {
@@ -148,6 +150,9 @@ impl std::fmt::Display for GenerateError {
             }
             GenerateError::FailGenerate(s) => {
                 write!(f, "Fail Generate valid data. Because {}", s)
+            }
+            GenerateError::NotExistGeneratedKey(key, values) => {
+                write!(f, "Not exist key \"{}\" in {:?}", key, values)
             }
         }
     }

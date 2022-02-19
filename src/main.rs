@@ -1,6 +1,6 @@
 use rand::thread_rng;
 use sbrd_gen::builder::GeneratorBuilder;
-use sbrd_gen::writer::{CsvWriter, GeneratedValueWriter};
+use sbrd_gen::writer::{GeneratedValueWriter, PrettyJsonWriter};
 use sbrd_gen::SchemeBuilder;
 use std::io::stdout;
 
@@ -22,7 +22,7 @@ fn main() {
     let scheme = SchemeBuilder::new(keys, builders).build().unwrap();
 
     let mut rng = thread_rng();
-    let mut writer = CsvWriter::from_writer(stdout());
+    let mut writer = PrettyJsonWriter::from_writer(stdout());
 
     writer
         .write_with_generate(true, &scheme, &mut rng, 10)

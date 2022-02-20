@@ -1,10 +1,10 @@
 use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
+use crate::file::open_sbrd_file;
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt, SbrdReal, SbrdString};
 use crate::GeneratorType;
 use rand::seq::SliceRandom;
-use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
@@ -45,7 +45,7 @@ impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectG
         }
 
         if let Some(filepath) = filepath {
-            let file = File::open(filepath).map_err(BuildError::FileError)?;
+            let file = open_sbrd_file(filepath).map_err(BuildError::FileError)?;
             let reader = BufReader::new(file);
             for line in reader.lines() {
                 let line = line.map_err(BuildError::FileError)?;

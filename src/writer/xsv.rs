@@ -147,9 +147,9 @@ impl<W: io::Write> XsvWriter<W> {
         let mut values_list: Vec<Vec<DataValue>> = Vec::new();
         for _ in 1..=count {
             let generated = scheme.generate(rng)?;
-            let values = generated.filter_values()?;
+            let values = generated.into_values()?;
 
-            values_list.push(values.into_iter().cloned().collect());
+            values_list.push(values);
         }
 
         if use_key_header {
@@ -176,7 +176,7 @@ impl<W: io::Write> XsvWriter<W> {
 
         for _ in 1..=count {
             let generated = scheme.generate(rng)?;
-            let values = generated.filter_values()?;
+            let values = generated.into_values()?;
 
             self.serialize(values)?;
         }

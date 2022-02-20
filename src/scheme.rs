@@ -212,4 +212,70 @@ impl<'a> GeneratedValues<'a> {
 
         Ok(result)
     }
+
+    pub fn into_values(self) -> SchemeResult<Vec<DataValue>> {
+        let mut result = Vec::new();
+        let GeneratedValues {
+            keys,
+            mut generated_values,
+        } = self;
+
+        // check
+        for key in keys.iter() {
+            if !generated_values.contains_key(key.as_str()) {
+                return Err(GenerateError::NotExistGeneratedKey(
+                    key.to_string(),
+                    generated_values
+                        .into_iter()
+                        .map(|(k, v)| (k.to_string(), v))
+                        .collect::<DataValueMap<String>>(),
+                )
+                .into_sbrd_gen_error(SchemeErrorKind::GenerateError));
+            }
+        }
+
+        // drain
+        for key in keys.iter() {
+            let value_result = generated_values.remove_entry(key.as_str());
+            let (_, value) = value_result
+                .unwrap_or_else(|| panic!("Already checked {}'s value is not exist.", key));
+
+            result.push(value);
+        }
+
+        Ok(result)
+    }
+
+    pub fn into_values_with_key(self) -> SchemeResult<Vec<(String, DataValue)>> {
+        let mut result = Vec::new();
+        let GeneratedValues {
+            keys,
+            mut generated_values,
+        } = self;
+
+        // check
+        for key in keys.iter() {
+            if !generated_values.contains_key(key.as_str()) {
+                return Err(GenerateError::NotExistGeneratedKey(
+                    key.to_string(),
+                    generated_values
+                        .into_iter()
+                        .map(|(k, v)| (k.to_string(), v))
+                        .collect::<DataValueMap<String>>(),
+                )
+                .into_sbrd_gen_error(SchemeErrorKind::GenerateError));
+            }
+        }
+
+        // drain
+        for key in keys.iter() {
+            let value_result = generated_values.remove_entry(key.as_str());
+            let (key, value) = value_result
+                .unwrap_or_else(|| panic!("Already checked {}'s value is not exist.", key));
+
+            result.push((key.to_string(), value));
+        }
+
+        Ok(result)
+    }
 }

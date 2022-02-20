@@ -76,15 +76,11 @@ impl<'a, R: 'static + Randomizer + ?Sized> Serialize for SerializeWithGenerate<'
 
         for _ in 0..*self.count {
             let generated = {
-                let mut rng = self.rng.try_lock().map_err(|e| S::Error::custom(e))?;
-                self.scheme
-                    .generate(*rng)
-                    .map_err(|e| S::Error::custom(e))?
+                let mut rng = self.rng.try_lock().map_err(S::Error::custom)?;
+                self.scheme.generate(*rng).map_err(S::Error::custom)?
             };
 
-            let values = generated
-                .filter_values_with_key()
-                .map_err(|e| S::Error::custom(e))?;
+            let values = generated.into_values_with_key().map_err(S::Error::custom)?;
 
             let json_map = GeneratedDisplayValues::new(
                 values

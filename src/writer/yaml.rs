@@ -47,11 +47,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for YamlWriter<W> {
         let mut values_list: Vec<GeneratedDisplayValues<String, DataValue>> = Vec::new();
         for _ in 1..=count {
             let generated = scheme.generate(rng)?;
-            let values = generated
-                .filter_values_with_key()?
-                .into_iter()
-                .map(|(k, v)| (k.to_string(), v.clone()))
-                .collect();
+            let values = generated.into_values_with_key()?;
 
             let value_map = GeneratedDisplayValues::new(values);
             values_list.push(value_map);
@@ -120,11 +116,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for YamlWriter<W> {
                 .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::OutputError))?;
             for _ in 1..=count {
                 let generated = scheme.generate(rng)?;
-                let values = generated
-                    .filter_values_with_key()?
-                    .into_iter()
-                    .map(|(k, v)| (k.to_string(), v.clone()))
-                    .collect();
+                let values = generated.into_values_with_key()?;
 
                 let value_map = GeneratedDisplayValues::new(values);
                 SerializeSeq::serialize_element(&mut seq_state, &value_map)

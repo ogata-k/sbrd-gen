@@ -8,137 +8,33 @@ use crate::writer::GeneratedValueWriter;
 use crate::Scheme;
 use serde::ser::{SerializeMap, SerializeSeq};
 use serde::Serializer;
-use serde_json::ser::{CompactFormatter, PrettyFormatter};
-use serde_json::Serializer as JsonSerializer;
+use serde_yaml::Serializer as YamlSerializer;
 use std::borrow::BorrowMut;
 use std::io;
-use std::marker::PhantomData;
 
-pub struct CompactJsonWriter<W: io::Write> {
-    json_writer: JsonWriter<W, CompactFormatter>,
-}
-
-impl<W: io::Write> GeneratedValueWriter<W> for CompactJsonWriter<W> {
-    fn from_writer(writer: W) -> Self {
-        Self {
-            json_writer: JsonWriter::from_writer(writer),
-        }
-    }
-
-    fn into_inner(self) -> W {
-        self.json_writer.into_inner()
-    }
-
-    fn flush(&mut self) -> SchemeResult<()> {
-        self.json_writer.flush()
-    }
-
-    fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
-        &mut self,
-        use_key_header: bool,
-        scheme: &Scheme<R>,
-        rng: &mut R,
-        count: u64,
-    ) -> SchemeResult<()> {
-        self.json_writer
-            .write_after_all_generated(use_key_header, scheme, rng, count)
-    }
-
-    fn write_with_generate<R: 'static + Randomizer + ?Sized>(
-        &mut self,
-        use_key_header: bool,
-        scheme: &Scheme<R>,
-        rng: &mut R,
-        count: u64,
-    ) -> SchemeResult<()> {
-        self.json_writer
-            .write_with_generate(use_key_header, scheme, rng, count)
-    }
-}
-
-pub struct PrettyJsonWriter<'a, W: io::Write> {
-    json_writer: JsonWriter<W, PrettyFormatter<'a>>,
-}
-
-impl<'a, W: io::Write> GeneratedValueWriter<W> for PrettyJsonWriter<'a, W> {
-    fn from_writer(writer: W) -> Self {
-        Self {
-            json_writer: JsonWriter::from_writer(writer),
-        }
-    }
-
-    fn into_inner(self) -> W {
-        self.json_writer.into_inner()
-    }
-
-    fn flush(&mut self) -> SchemeResult<()> {
-        self.json_writer.flush()
-    }
-
-    fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
-        &mut self,
-        use_key_header: bool,
-        scheme: &Scheme<R>,
-        rng: &mut R,
-        count: u64,
-    ) -> SchemeResult<()> {
-        self.json_writer
-            .write_after_all_generated(use_key_header, scheme, rng, count)
-    }
-
-    fn write_with_generate<R: 'static + Randomizer + ?Sized>(
-        &mut self,
-        use_key_header: bool,
-        scheme: &Scheme<R>,
-        rng: &mut R,
-        count: u64,
-    ) -> SchemeResult<()> {
-        self.json_writer
-            .write_with_generate(use_key_header, scheme, rng, count)
-    }
-}
-
-trait BuildJsonFormatter: serde_json::ser::Formatter {
-    fn build_formatter() -> Self;
-}
-
-impl BuildJsonFormatter for CompactFormatter {
-    fn build_formatter() -> Self {
-        CompactFormatter
-    }
-}
-
-impl<'a> BuildJsonFormatter for PrettyFormatter<'a> {
-    fn build_formatter() -> Self {
-        PrettyFormatter::new()
-    }
-}
-
-struct JsonWriter<W: io::Write, F: BuildJsonFormatter> {
+pub struct YamlWriter<W: io::Write> {
     writer: W,
-    formatter: PhantomData<F>,
 }
 
-impl<W: io::Write, F: BuildJsonFormatter> JsonWriter<W, F> {
+impl<W: io::Write> YamlWriter<W> {
+    fn build_serializer(&mut self) -> YamlSerializer<&mut W> {
+        YamlSerializer::new(&mut self.writer)
+    }
+}
+
+impl<W: io::Write> GeneratedValueWriter<W> for YamlWriter<W> {
     fn from_writer(writer: W) -> Self {
-        Self {
-            writer,
-            formatter: PhantomData,
-        }
+        Self { writer }
     }
 
-    fn build_serializer(&mut self) -> JsonSerializer<&mut W, F> {
-        JsonSerializer::with_formatter(&mut self.writer, F::build_formatter())
+    fn into_inner(self) -> W {
+        self.writer
     }
 
     fn flush(&mut self) -> SchemeResult<()> {
         self.writer
             .flush()
             .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::OutputError))
-    }
-
-    fn into_inner(self) -> W {
-        self.writer
     }
 
     fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(

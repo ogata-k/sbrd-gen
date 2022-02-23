@@ -3,7 +3,8 @@
 use clap::{AppSettings, ArgEnum, Parser};
 use rand::prelude::ThreadRng;
 use rand::thread_rng;
-use sbrd_gen::error::{IntoSbrdError, SchemaErrorKind, SchemaResult};
+use sbrd_gen::error::{BuildError, SchemaResult};
+use sbrd_gen::file::set_schema_file_path;
 use sbrd_gen::generator::Randomizer;
 use sbrd_gen::parser::{JsonParser, SchemaParser, YamlParser};
 use sbrd_gen::writer::{CsvWriter, GeneratedValueWriter, PrettyJsonWriter, TsvWriter, YamlWriter};
@@ -13,7 +14,6 @@ use std::io;
 use std::io::{stdout, BufWriter, Stdout};
 use std::path::PathBuf;
 use std::process::exit;
-use sbrd_gen::file::set_schema_file_path;
 
 #[derive(ArgEnum, Debug, Eq, PartialEq, Copy, Clone)]
 #[clap(rename_all = "kebab-case")]
@@ -70,7 +70,10 @@ impl SbrdGenApp {
         set_schema_file_path(self.schema_file_path.as_path());
 
         let file = File::open(self.schema_file_path.as_path()).unwrap_or_else(|e| {
-            eprintln!("{}", e.into_sbrd_gen_error(SchemaErrorKind::ParseError));
+            eprintln!(
+                "{}",
+                BuildError::FileError(e, self.schema_file_path.clone())
+            );
             exit(exitcode::IOERR);
         });
 

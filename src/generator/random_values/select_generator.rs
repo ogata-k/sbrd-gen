@@ -45,10 +45,11 @@ impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectG
         }
 
         if let Some(filepath) = filepath {
-            let file = open_sbrd_file(filepath).map_err(BuildError::FileError)?;
+            let file = open_sbrd_file(filepath.as_path())
+                .map_err(|e| BuildError::FileError(e, filepath.clone()))?;
             let reader = BufReader::new(file);
             for line in reader.lines() {
-                let line = line.map_err(BuildError::FileError)?;
+                let line = line.map_err(|e| BuildError::FileError(e, filepath.clone()))?;
                 selectable_values.push(T::parse(&line)?);
             }
         }

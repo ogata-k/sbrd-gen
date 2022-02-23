@@ -89,7 +89,7 @@ pub enum BuildError {
     EmptyRandomize,
     NotExistDefaultCase,
     AllWeightsZero,
-    FileError(std::io::Error),
+    FileError(std::io::Error, std::path::PathBuf),
     /// Distribution name, error
     FailBuildDistribution(String, String),
 }
@@ -118,7 +118,12 @@ impl std::fmt::Display for BuildError {
             }
             BuildError::NotExistDefaultCase => write!(f, "Not Exist default case condition"),
             BuildError::AllWeightsZero => write!(f, "All weights are zero"),
-            BuildError::FileError(fe) => write!(f, "File Error: {}", fe),
+            BuildError::FileError(fe, path) => write!(
+                f,
+                "File Error: {} at filepath `{}`",
+                fe,
+                path.as_path().display()
+            ),
             BuildError::FailBuildDistribution(dn, e) => {
                 write!(f, "Fail build {} distribution with error: {}", dn, e)
             }

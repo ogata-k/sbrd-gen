@@ -5,30 +5,30 @@ use crate::GeneratorType;
 use std::borrow::Borrow;
 
 #[derive(Debug)]
-pub struct SchemeError {
-    kind: SchemeErrorKind,
-    info: SchemeErrorInfo,
+pub struct SchemaError {
+    kind: SchemaErrorKind,
+    info: SchemaErrorInfo,
 }
 
-impl std::fmt::Display for SchemeError {
+impl std::fmt::Display for SchemaError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.kind {
-            SchemeErrorKind::ParseError => write!(f, "Parse error: {}", self.info),
-            SchemeErrorKind::BuildError => write!(f, "Build error: {}", self.info),
-            SchemeErrorKind::GenerateError => write!(f, "Generate error: {}", self.info),
-            SchemeErrorKind::OutputError => write!(f, "Output error: {}", self.info),
+            SchemaErrorKind::ParseError => write!(f, "Parse error: {}", self.info),
+            SchemaErrorKind::BuildError => write!(f, "Build error: {}", self.info),
+            SchemaErrorKind::GenerateError => write!(f, "Generate error: {}", self.info),
+            SchemaErrorKind::OutputError => write!(f, "Output error: {}", self.info),
         }
     }
 }
 
-impl std::error::Error for SchemeError {}
+impl std::error::Error for SchemaError {}
 
-impl SchemeError {
-    pub fn is_kind_of(&self, kind: SchemeErrorKind) -> bool {
+impl SchemaError {
+    pub fn is_kind_of(&self, kind: SchemaErrorKind) -> bool {
         self.kind == kind
     }
 
-    pub fn get_kind(&self) -> SchemeErrorKind {
+    pub fn get_kind(&self) -> SchemaErrorKind {
         self.kind
     }
 
@@ -38,7 +38,7 @@ impl SchemeError {
 }
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
-pub enum SchemeErrorKind {
+pub enum SchemaErrorKind {
     ParseError,
     BuildError,
     GenerateError,
@@ -46,32 +46,32 @@ pub enum SchemeErrorKind {
 }
 
 #[derive(Debug)]
-struct SchemeErrorInfo(Box<dyn std::error::Error>);
+struct SchemaErrorInfo(Box<dyn std::error::Error>);
 
-impl std::fmt::Display for SchemeErrorInfo {
+impl std::fmt::Display for SchemaErrorInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }
 
-impl From<BuildError> for SchemeError {
+impl From<BuildError> for SchemaError {
     fn from(e: BuildError) -> Self {
-        e.into_sbrd_gen_error(SchemeErrorKind::BuildError)
+        e.into_sbrd_gen_error(SchemaErrorKind::BuildError)
     }
 }
 
 pub trait IntoSbrdError: 'static + std::error::Error + Sized {
-    fn into_sbrd_gen_error(self, kind: SchemeErrorKind) -> SchemeError {
-        SchemeError {
+    fn into_sbrd_gen_error(self, kind: SchemaErrorKind) -> SchemaError {
+        SchemaError {
             kind,
-            info: SchemeErrorInfo(Box::new(self)),
+            info: SchemaErrorInfo(Box::new(self)),
         }
     }
 }
 
 impl<E> IntoSbrdError for E where E: 'static + std::error::Error + Sized {}
 
-pub type SchemeResult<T> = std::result::Result<T, SchemeError>;
+pub type SchemaResult<T> = std::result::Result<T, SchemaError>;
 
 #[derive(Debug)]
 pub enum BuildError {

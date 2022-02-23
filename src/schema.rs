@@ -1,24 +1,24 @@
 use crate::builder::ParentGeneratorBuilder;
-use crate::error::{BuildError, GenerateError, IntoSbrdError, SchemeErrorKind, SchemeResult};
+use crate::error::{BuildError, GenerateError, IntoSbrdError, SchemaErrorKind, SchemaResult};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use serde::ser::Error;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
-pub struct SchemeBuilder {
+pub struct SchemaBuilder {
     keys: Vec<String>,
     #[serde(rename = "generators")]
     builders: Vec<ParentGeneratorBuilder>,
 }
 
-impl SchemeBuilder {
-    pub fn new(keys: Vec<String>, builders: Vec<ParentGeneratorBuilder>) -> SchemeBuilder {
-        SchemeBuilder { keys, builders }
+impl SchemaBuilder {
+    pub fn new(keys: Vec<String>, builders: Vec<ParentGeneratorBuilder>) -> SchemaBuilder {
+        SchemaBuilder { keys, builders }
     }
 
-    pub fn build<R: 'static + Randomizer + ?Sized>(self) -> SchemeResult<Scheme<R>> {
-        let SchemeBuilder {
+    pub fn build<R: 'static + Randomizer + ?Sized>(self) -> SchemaResult<Schema<R>> {
+        let SchemaBuilder {
             keys: specified_keys,
             builders,
         } = self;
@@ -31,7 +31,7 @@ impl SchemeBuilder {
         cloned.dedup();
         if cloned.len() != specified_keys.len() {
             return Err(BuildError::SpecifiedKeyNotUnique(specified_keys)
-                .into_sbrd_gen_error(SchemeErrorKind::BuildError));
+                .into_sbrd_gen_error(SchemaErrorKind::BuildError));
         }
 
         for parent_builder in builders.into_iter() {
@@ -39,7 +39,7 @@ impl SchemeBuilder {
 
             if checked.contains(&key) {
                 return Err(BuildError::AlreadyExistKey(key)
-                    .into_sbrd_gen_error(SchemeErrorKind::BuildError));
+                    .into_sbrd_gen_error(SchemaErrorKind::BuildError));
             }
 
             let generator = builder.build()?;
@@ -50,30 +50,30 @@ impl SchemeBuilder {
             if !checked.contains(specified_key) {
                 return Err(
                     BuildError::NotExistSpecifiedKey(specified_key.to_string(), checked)
-                        .into_sbrd_gen_error(SchemeErrorKind::BuildError),
+                        .into_sbrd_gen_error(SchemaErrorKind::BuildError),
                 );
             }
         }
 
-        Ok(Scheme {
+        Ok(Schema {
             keys: specified_keys,
             generators,
         })
     }
 }
 
-pub struct Scheme<R: 'static + Randomizer + ?Sized> {
+pub struct Schema<R: 'static + Randomizer + ?Sized> {
     keys: Vec<String>,
     generators: Vec<(String, Box<dyn Generator<R>>)>,
 }
 
-impl<R: 'static + Randomizer + ?Sized> Scheme<R> {
-    pub fn generate(&self, rng: &mut R) -> SchemeResult<GeneratedValues> {
+impl<R: 'static + Randomizer + ?Sized> Schema<R> {
+    pub fn generate(&self, rng: &mut R) -> SchemaResult<GeneratedValues> {
         let mut generated_values = DataValueMap::new();
         for (key, generator) in self.generators.iter() {
             let generated = generator
                 .generate(rng, &generated_values)
-                .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::GenerateError))?;
+                .map_err(|e| e.into_sbrd_gen_error(SchemaErrorKind::GenerateError))?;
             generated_values.insert(key, generated);
         }
 
@@ -129,7 +129,7 @@ impl<'a> GeneratedValues<'a> {
         &self.generated_values
     }
 
-    pub fn filter_values(&self) -> SchemeResult<Vec<&DataValue>> {
+    pub fn filter_values(&self) -> SchemaResult<Vec<&DataValue>> {
         let mut result = Vec::new();
         for key in self.keys.iter() {
             let value_result = self.generated_values.get(key.as_str());
@@ -141,7 +141,7 @@ impl<'a> GeneratedValues<'a> {
                         .map(|(k, v)| (k.to_string(), v.clone()))
                         .collect::<DataValueMap<String>>(),
                 )
-                .into_sbrd_gen_error(SchemeErrorKind::GenerateError)
+                .into_sbrd_gen_error(SchemaErrorKind::GenerateError)
             })?;
 
             result.push(value);
@@ -150,7 +150,7 @@ impl<'a> GeneratedValues<'a> {
         Ok(result)
     }
 
-    pub fn filter_values_with_key<'b>(&'b self) -> SchemeResult<Vec<(&'a str, &'b DataValue)>> {
+    pub fn filter_values_with_key<'b>(&'b self) -> SchemaResult<Vec<(&'a str, &'b DataValue)>> {
         let mut result = Vec::new();
         for key in self.keys.iter() {
             let value_result = self.generated_values.get(key.as_str());
@@ -162,7 +162,7 @@ impl<'a> GeneratedValues<'a> {
                         .map(|(k, v)| (k.to_string(), v.clone()))
                         .collect::<DataValueMap<String>>(),
                 )
-                .into_sbrd_gen_error(SchemeErrorKind::GenerateError)
+                .into_sbrd_gen_error(SchemaErrorKind::GenerateError)
             })?;
 
             result.push((key.as_str(), value));
@@ -171,7 +171,7 @@ impl<'a> GeneratedValues<'a> {
         Ok(result)
     }
 
-    pub fn into_values(self) -> SchemeResult<Vec<DataValue>> {
+    pub fn into_values(self) -> SchemaResult<Vec<DataValue>> {
         let mut result = Vec::new();
         let GeneratedValues {
             keys,
@@ -188,7 +188,7 @@ impl<'a> GeneratedValues<'a> {
                         .map(|(k, v)| (k.to_string(), v))
                         .collect::<DataValueMap<String>>(),
                 )
-                .into_sbrd_gen_error(SchemeErrorKind::GenerateError));
+                .into_sbrd_gen_error(SchemaErrorKind::GenerateError));
             }
         }
 
@@ -204,7 +204,7 @@ impl<'a> GeneratedValues<'a> {
         Ok(result)
     }
 
-    pub fn into_values_with_key(self) -> SchemeResult<Vec<(String, DataValue)>> {
+    pub fn into_values_with_key(self) -> SchemaResult<Vec<(String, DataValue)>> {
         let mut result = Vec::new();
         let GeneratedValues {
             keys,
@@ -221,7 +221,7 @@ impl<'a> GeneratedValues<'a> {
                         .map(|(k, v)| (k.to_string(), v))
                         .collect::<DataValueMap<String>>(),
                 )
-                .into_sbrd_gen_error(SchemeErrorKind::GenerateError));
+                .into_sbrd_gen_error(SchemaErrorKind::GenerateError));
             }
         }
 

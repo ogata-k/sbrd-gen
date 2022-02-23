@@ -2,23 +2,23 @@ use std::fs::File;
 use std::path::PathBuf;
 use std::{env, io};
 
-const SCHEME_FILE_PATH_KEY: &str = "SBRD_SCHEME_FILE";
+const SCHEMA_FILE_PATH_KEY: &str = "SBRD_SCHEMA_FILE";
 
-pub fn set_scheme_file_path<P>(scheme_filepath: P)
+pub fn set_schema_file_path<P>(schema_filepath: P)
 where
     P: Into<PathBuf>,
 {
-    let path = scheme_filepath.into();
-    env::set_var(SCHEME_FILE_PATH_KEY, path);
+    let path = schema_filepath.into();
+    env::set_var(SCHEMA_FILE_PATH_KEY, path);
 }
 
 pub(crate) fn open_sbrd_file<P>(filepath: P) -> io::Result<File>
 where
     P: Into<PathBuf>,
 {
-    match env::var(SCHEME_FILE_PATH_KEY) {
-        Ok(scheme_filepath) => {
-            let mut _filepath = PathBuf::from(scheme_filepath);
+    match env::var(SCHEMA_FILE_PATH_KEY) {
+        Ok(schema_filepath) => {
+            let mut _filepath = PathBuf::from(schema_filepath);
             _filepath.set_file_name(filepath.into());
             File::open(_filepath)
         }

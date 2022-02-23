@@ -1,5 +1,5 @@
 pub use generator_type::*;
-pub use scheme::*;
+pub use schema::*;
 
 pub mod builder;
 pub mod error;
@@ -8,6 +8,6 @@ pub mod file;
 pub mod generator;
 mod generator_type;
 pub mod parser;
-mod scheme;
+mod schema;
 pub mod value;
 pub mod writer;

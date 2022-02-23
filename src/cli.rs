@@ -3,11 +3,11 @@
 use clap::{AppSettings, ArgEnum, Parser};
 use rand::prelude::ThreadRng;
 use rand::thread_rng;
-use sbrd_gen::error::{IntoSbrdError, SchemeErrorKind, SchemeResult};
+use sbrd_gen::error::{IntoSbrdError, SchemaErrorKind, SchemaResult};
 use sbrd_gen::generator::Randomizer;
-use sbrd_gen::parser::{JsonParser, SchemeParser, YamlParser};
+use sbrd_gen::parser::{JsonParser, SchemaParser, YamlParser};
 use sbrd_gen::writer::{CsvWriter, GeneratedValueWriter, PrettyJsonWriter, TsvWriter, YamlWriter};
-use sbrd_gen::{Scheme, SchemeBuilder};
+use sbrd_gen::{Schema, SchemaBuilder};
 use std::fs::File;
 use std::io;
 use std::io::{stdout, BufWriter, Stdout};
@@ -36,13 +36,13 @@ pub enum OutputType {
 #[clap(global_setting(AppSettings::NextLineHelp))]
 #[deny(missing_docs)]
 pub struct SbrdGenApp {
-    /// Scheme for generate value
+    /// Schema for generate value
     ///
-    /// You must specify `keys` and `builders` as sequence in the scheme.
-    /// To learn more about the schema, see: https://github.com/ogata-k/sbrd-gen/blob/master/README.md#about-scheme
-    scheme_file_path: PathBuf,
+    /// You must specify `keys` and `builders` as sequence in the schema.
+    /// To learn more about the schema, see: https://github.com/ogata-k/sbrd-gen/blob/master/README.md#about-schema
+    schema_file_path: PathBuf,
 
-    /// Type of Parser for scheme
+    /// Type of Parser for schema
     #[clap(short = 'p', long = "parser", arg_enum, default_value_t = ParserType::Yaml)]
     parser_type: ParserType,
 
@@ -58,19 +58,19 @@ pub struct SbrdGenApp {
     #[clap(long = "no-header")]
     no_header: bool,
 
-    /// Flag for only check scheme
+    /// Flag for only check schema
     #[clap(long = "dry-run")]
     dry_run: bool,
 }
 
 impl SbrdGenApp {
     pub fn run(self) -> ! {
-        let file = File::open(self.scheme_file_path.as_path()).unwrap_or_else(|e| {
-            eprintln!("{}", e.into_sbrd_gen_error(SchemeErrorKind::ParseError));
+        let file = File::open(self.schema_file_path.as_path()).unwrap_or_else(|e| {
+            eprintln!("{}", e.into_sbrd_gen_error(SchemaErrorKind::ParseError));
             exit(exitcode::IOERR);
         });
 
-        let scheme_builder: SchemeBuilder = match self.parser_type {
+        let schema_builder: SchemaBuilder = match self.parser_type {
             ParserType::Yaml => YamlParser::parse_from_reader(file),
             ParserType::Json => JsonParser::parse_from_reader(file),
         }
@@ -79,7 +79,7 @@ impl SbrdGenApp {
             exit(exitcode::IOERR);
         });
 
-        let scheme = scheme_builder.build().unwrap_or_else(|e| {
+        let schema = schema_builder.build().unwrap_or_else(|e| {
             eprintln!("{}", e);
             exit(exitcode::IOERR);
         });
@@ -94,21 +94,21 @@ impl SbrdGenApp {
 
         type Output = BufWriter<Stdout>;
         let output = BufWriter::new(stdout());
-        let output_result: SchemeResult<()> = match self.output_type {
+        let output_result: SchemaResult<()> = match self.output_type {
             OutputType::Yaml => {
-                self.write_all_data::<Output, YamlWriter<Output>, Rng>(output, &scheme, &mut rng)
+                self.write_all_data::<Output, YamlWriter<Output>, Rng>(output, &schema, &mut rng)
             }
             OutputType::Json => {
                 // use human readable json writer
                 self.write_all_data::<Output, PrettyJsonWriter<Output>, Rng>(
-                    output, &scheme, &mut rng,
+                    output, &schema, &mut rng,
                 )
             }
             OutputType::Csv => {
-                self.write_all_data::<Output, CsvWriter<Output>, Rng>(output, &scheme, &mut rng)
+                self.write_all_data::<Output, CsvWriter<Output>, Rng>(output, &schema, &mut rng)
             }
             OutputType::Tsv => {
-                self.write_all_data::<Output, TsvWriter<Output>, Rng>(output, &scheme, &mut rng)
+                self.write_all_data::<Output, TsvWriter<Output>, Rng>(output, &schema, &mut rng)
             }
         };
 
@@ -123,9 +123,9 @@ impl SbrdGenApp {
     fn write_all_data<O, Writer, R>(
         &self,
         output: O,
-        scheme: &Scheme<R>,
+        schema: &Schema<R>,
         rng: &mut R,
-    ) -> SchemeResult<()>
+    ) -> SchemaResult<()>
     where
         O: io::Write,
         Writer: GeneratedValueWriter<O>,
@@ -133,7 +133,7 @@ impl SbrdGenApp {
     {
         let mut writer = Writer::from_writer(output);
         writer
-            .write_with_generate(!self.no_header, scheme, rng, self.count)
+            .write_with_generate(!self.no_header, schema, rng, self.count)
             .map_err(|e| match writer.flush() {
                 Ok(()) => e,
                 Err(flush_error) => flush_error,

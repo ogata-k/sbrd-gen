@@ -1,6 +1,6 @@
-use crate::error::SchemeResult;
+use crate::error::SchemaResult;
 use crate::generator::Randomizer;
-use crate::Scheme;
+use crate::Schema;
 use serde::ser::{Error, SerializeMap, SerializeSeq};
 use serde::{Serialize, Serializer};
 use std::sync::Mutex;
@@ -8,21 +8,21 @@ use std::sync::Mutex;
 pub trait GeneratedValueWriter<W: std::io::Write> {
     fn from_writer(writer: W) -> Self;
     fn into_inner(self) -> W;
-    fn flush(&mut self) -> SchemeResult<()>;
+    fn flush(&mut self) -> SchemaResult<()>;
     fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
-        scheme: &Scheme<R>,
+        schema: &Schema<R>,
         rng: &mut R,
         count: u64,
-    ) -> SchemeResult<()>;
+    ) -> SchemaResult<()>;
     fn write_with_generate<R: 'static + Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
-        scheme: &Scheme<R>,
+        schema: &Schema<R>,
         rng: &mut R,
         count: u64,
-    ) -> SchemeResult<()>;
+    ) -> SchemaResult<()>;
 }
 
 pub const DUMMY_KEYS_NAME: &str = "keys";
@@ -52,15 +52,15 @@ impl<K: Serialize, V: Serialize> Serialize for GeneratedDisplayValues<K, V> {
 }
 
 pub struct SerializeWithGenerate<'a, R: 'static + Randomizer + ?Sized> {
-    scheme: &'a Scheme<R>,
+    schema: &'a Schema<R>,
     rng: Mutex<&'a mut R>,
     count: &'a u64,
 }
 
 impl<'a, R: 'static + Randomizer + ?Sized> SerializeWithGenerate<'a, R> {
-    pub(in crate::writer) fn new(scheme: &'a Scheme<R>, rng: &'a mut R, count: &'a u64) -> Self {
+    pub(in crate::writer) fn new(schema: &'a Schema<R>, rng: &'a mut R, count: &'a u64) -> Self {
         Self {
-            scheme,
+            schema,
             rng: Mutex::new(rng),
             count,
         }
@@ -77,7 +77,7 @@ impl<'a, R: 'static + Randomizer + ?Sized> Serialize for SerializeWithGenerate<'
         for _ in 0..*self.count {
             let generated = {
                 let mut rng = self.rng.try_lock().map_err(S::Error::custom)?;
-                self.scheme.generate(*rng).map_err(S::Error::custom)?
+                self.schema.generate(*rng).map_err(S::Error::custom)?
             };
 
             let values = generated.into_values_with_key().map_err(S::Error::custom)?;

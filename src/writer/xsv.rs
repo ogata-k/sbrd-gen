@@ -1,8 +1,8 @@
-use crate::error::{IntoSbrdError, SchemeErrorKind, SchemeResult};
+use crate::error::{IntoSbrdError, SchemaErrorKind, SchemaResult};
 use crate::generator::Randomizer;
 use crate::value::DataValue;
 use crate::writer::GeneratedValueWriter;
-use crate::Scheme;
+use crate::Schema;
 use csv::QuoteStyle;
 use serde::Serialize;
 use std::io;
@@ -22,30 +22,30 @@ impl<W: io::Write> GeneratedValueWriter<W> for CsvWriter<W> {
         self.xsv_writer.into_inner()
     }
 
-    fn flush(&mut self) -> SchemeResult<()> {
+    fn flush(&mut self) -> SchemaResult<()> {
         self.xsv_writer.flush()
     }
 
     fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
-        scheme: &Scheme<R>,
+        schema: &Schema<R>,
         rng: &mut R,
         count: u64,
-    ) -> SchemeResult<()> {
+    ) -> SchemaResult<()> {
         self.xsv_writer
-            .write_after_all_generated(use_key_header, scheme, rng, count)
+            .write_after_all_generated(use_key_header, schema, rng, count)
     }
 
     fn write_with_generate<R: 'static + Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
-        scheme: &Scheme<R>,
+        schema: &Schema<R>,
         rng: &mut R,
         count: u64,
-    ) -> SchemeResult<()> {
+    ) -> SchemaResult<()> {
         self.xsv_writer
-            .write_with_generate(use_key_header, scheme, rng, count)
+            .write_with_generate(use_key_header, schema, rng, count)
     }
 }
 
@@ -64,30 +64,30 @@ impl<W: io::Write> GeneratedValueWriter<W> for TsvWriter<W> {
         self.xsv_writer.into_inner()
     }
 
-    fn flush(&mut self) -> SchemeResult<()> {
+    fn flush(&mut self) -> SchemaResult<()> {
         self.xsv_writer.flush()
     }
 
     fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
-        scheme: &Scheme<R>,
+        schema: &Schema<R>,
         rng: &mut R,
         count: u64,
-    ) -> SchemeResult<()> {
+    ) -> SchemaResult<()> {
         self.xsv_writer
-            .write_after_all_generated(use_key_header, scheme, rng, count)
+            .write_after_all_generated(use_key_header, schema, rng, count)
     }
 
     fn write_with_generate<R: 'static + Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
-        scheme: &Scheme<R>,
+        schema: &Schema<R>,
         rng: &mut R,
         count: u64,
-    ) -> SchemeResult<()> {
+    ) -> SchemaResult<()> {
         self.xsv_writer
-            .write_with_generate(use_key_header, scheme, rng, count)
+            .write_with_generate(use_key_header, schema, rng, count)
     }
 }
 
@@ -110,27 +110,27 @@ impl<W: io::Write> XsvWriter<W> {
         Self { writer, delimiter }
     }
 
-    fn flush(&mut self) -> SchemeResult<()> {
+    fn flush(&mut self) -> SchemaResult<()> {
         self.writer
             .flush()
-            .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::OutputError))
+            .map_err(|e| e.into_sbrd_gen_error(SchemaErrorKind::OutputError))
     }
 
-    fn serialize<S: Serialize>(&mut self, record: S) -> SchemeResult<()> {
+    fn serialize<S: Serialize>(&mut self, record: S) -> SchemaResult<()> {
         let mut xsv_writer = self.build_xsv_writer();
         xsv_writer
             .serialize(record)
-            .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::OutputError))?;
+            .map_err(|e| e.into_sbrd_gen_error(SchemaErrorKind::OutputError))?;
         xsv_writer
             .flush()
-            .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::OutputError))?;
+            .map_err(|e| e.into_sbrd_gen_error(SchemaErrorKind::OutputError))?;
         let format_input = xsv_writer
             .into_inner()
-            .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::OutputError))?;
+            .map_err(|e| e.into_sbrd_gen_error(SchemaErrorKind::OutputError))?;
 
         self.writer
             .write_all(format_input.as_slice())
-            .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::OutputError))
+            .map_err(|e| e.into_sbrd_gen_error(SchemaErrorKind::OutputError))
     }
 
     fn into_inner(self) -> W {
@@ -140,20 +140,20 @@ impl<W: io::Write> XsvWriter<W> {
     fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
-        scheme: &Scheme<R>,
+        schema: &Schema<R>,
         rng: &mut R,
         count: u64,
-    ) -> SchemeResult<()> {
+    ) -> SchemaResult<()> {
         let mut values_list: Vec<Vec<DataValue>> = Vec::new();
         for _ in 1..=count {
-            let generated = scheme.generate(rng)?;
+            let generated = schema.generate(rng)?;
             let values = generated.into_values()?;
 
             values_list.push(values);
         }
 
         if use_key_header {
-            self.serialize(scheme.get_keys())?;
+            self.serialize(schema.get_keys())?;
         }
         for values in values_list {
             self.serialize(values)?;
@@ -166,16 +166,16 @@ impl<W: io::Write> XsvWriter<W> {
     fn write_with_generate<R: 'static + Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
-        scheme: &Scheme<R>,
+        schema: &Schema<R>,
         rng: &mut R,
         count: u64,
-    ) -> SchemeResult<()> {
+    ) -> SchemaResult<()> {
         if use_key_header {
-            self.serialize(scheme.get_keys())?;
+            self.serialize(schema.get_keys())?;
         }
 
         for _ in 1..=count {
-            let generated = scheme.generate(rng)?;
+            let generated = schema.generate(rng)?;
             let values = generated.into_values()?;
 
             self.serialize(values)?;

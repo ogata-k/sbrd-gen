@@ -13,6 +13,7 @@ use std::io;
 use std::io::{stdout, BufWriter, Stdout};
 use std::path::PathBuf;
 use std::process::exit;
+use sbrd_gen::file::set_schema_file_path;
 
 #[derive(ArgEnum, Debug, Eq, PartialEq, Copy, Clone)]
 #[clap(rename_all = "kebab-case")]
@@ -65,6 +66,9 @@ pub struct SbrdGenApp {
 
 impl SbrdGenApp {
     pub fn run(self) -> ! {
+        // set load current filepath
+        set_schema_file_path(self.schema_file_path.as_path());
+
         let file = File::open(self.schema_file_path.as_path()).unwrap_or_else(|e| {
             eprintln!("{}", e.into_sbrd_gen_error(SchemaErrorKind::ParseError));
             exit(exitcode::IOERR);

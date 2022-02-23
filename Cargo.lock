@@ -156,6 +156,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90c8b61e4acbb2e4fbcf9d4c7af4d431f38c2a60b975b1d03d0276fbb032ec5d"
 
 [[package]]
+name = "exitcode"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de853764b47027c2e862a995c34978ffa63c1501f2e15f987ba11bd4f9bba193"
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -395,6 +401,7 @@ dependencies = [
  "csv",
  "either",
  "evalexpr",
+ "exitcode",
  "rand",
  "rand_distr",
  "serde",

@@ -1,7 +1,18 @@
 #![allow(deprecated)]
 
 use clap::{AppSettings, ArgEnum, Parser};
+use rand::prelude::ThreadRng;
+use rand::thread_rng;
+use sbrd_gen::error::{IntoSbrdError, SchemeErrorKind, SchemeResult};
+use sbrd_gen::generator::Randomizer;
+use sbrd_gen::parser::{JsonParser, SchemeParser, YamlParser};
+use sbrd_gen::writer::{CsvWriter, GeneratedValueWriter, PrettyJsonWriter, TsvWriter, YamlWriter};
+use sbrd_gen::{Scheme, SchemeBuilder};
+use std::fs::File;
+use std::io;
+use std::io::{stdout, BufWriter, Stdout};
 use std::path::PathBuf;
+use std::process::exit;
 
 #[derive(ArgEnum, Debug, Eq, PartialEq, Copy, Clone)]
 #[clap(rename_all = "kebab-case")]
@@ -33,7 +44,7 @@ pub struct SbrdGenApp {
 
     /// Type of Parser for scheme
     #[clap(short = 'p', long = "parser", arg_enum, default_value_t = ParserType::Yaml)]
-    parser: ParserType,
+    parser_type: ParserType,
 
     /// Type of Output for this generator
     #[clap(short = 't', long = "type", arg_enum, default_value_t = OutputType::Json)]
@@ -41,7 +52,7 @@ pub struct SbrdGenApp {
 
     /// Count of generate values
     #[clap(short = 'n', long = "num", default_value = "10")]
-    count: u32,
+    count: u64,
 
     /// Flag for generate without key's header
     #[clap(long = "no-header")]
@@ -54,6 +65,78 @@ pub struct SbrdGenApp {
 
 impl SbrdGenApp {
     pub fn run(self) -> ! {
-        todo!()
+        let file = File::open(self.scheme_file_path.as_path()).unwrap_or_else(|e| {
+            eprintln!("{}", e.into_sbrd_gen_error(SchemeErrorKind::ParseError));
+            exit(exitcode::IOERR);
+        });
+
+        let scheme_builder: SchemeBuilder = match self.parser_type {
+            ParserType::Yaml => YamlParser::parse_from_reader(file),
+            ParserType::Json => JsonParser::parse_from_reader(file),
+        }
+        .unwrap_or_else(|e| {
+            eprintln!("{}", e);
+            exit(exitcode::IOERR);
+        });
+
+        let scheme = scheme_builder.build().unwrap_or_else(|e| {
+            eprintln!("{}", e);
+            exit(exitcode::IOERR);
+        });
+
+        if self.dry_run {
+            println!("Parse Succeed");
+            exit(exitcode::OK);
+        }
+
+        type Rng = ThreadRng;
+        let mut rng = thread_rng();
+
+        type Output = BufWriter<Stdout>;
+        let output = BufWriter::new(stdout());
+        let output_result: SchemeResult<()> = match self.output_type {
+            OutputType::Yaml => {
+                self.write_all_data::<Output, YamlWriter<Output>, Rng>(output, &scheme, &mut rng)
+            }
+            OutputType::Json => {
+                // use human readable json writer
+                self.write_all_data::<Output, PrettyJsonWriter<Output>, Rng>(
+                    output, &scheme, &mut rng,
+                )
+            }
+            OutputType::Csv => {
+                self.write_all_data::<Output, CsvWriter<Output>, Rng>(output, &scheme, &mut rng)
+            }
+            OutputType::Tsv => {
+                self.write_all_data::<Output, TsvWriter<Output>, Rng>(output, &scheme, &mut rng)
+            }
+        };
+
+        output_result.unwrap_or_else(|e| {
+            eprintln!("{}", e);
+            exit(exitcode::SOFTWARE);
+        });
+
+        exit(exitcode::OK)
+    }
+
+    fn write_all_data<O, Writer, R>(
+        &self,
+        output: O,
+        scheme: &Scheme<R>,
+        rng: &mut R,
+    ) -> SchemeResult<()>
+    where
+        O: io::Write,
+        Writer: GeneratedValueWriter<O>,
+        R: 'static + Randomizer + ?Sized,
+    {
+        let mut writer = Writer::from_writer(output);
+        writer
+            .write_with_generate(!self.no_header, scheme, rng, self.count)
+            .map_err(|e| match writer.flush() {
+                Ok(()) => e,
+                Err(flush_error) => flush_error,
+            })
     }
 }

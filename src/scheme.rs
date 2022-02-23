@@ -2,21 +2,8 @@ use crate::builder::ParentGeneratorBuilder;
 use crate::error::{BuildError, GenerateError, IntoSbrdError, SchemeErrorKind, SchemeResult};
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
-use serde::de::DeserializeOwned;
 use serde::ser::Error;
 use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Eq, PartialEq, Copy, Clone)]
-pub enum ParserType {
-    Yaml,
-    Json,
-}
-
-impl Default for ParserType {
-    fn default() -> Self {
-        ParserType::Yaml
-    }
-}
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct SchemeBuilder {
@@ -28,35 +15,6 @@ pub struct SchemeBuilder {
 impl SchemeBuilder {
     pub fn new(keys: Vec<String>, builders: Vec<ParentGeneratorBuilder>) -> SchemeBuilder {
         SchemeBuilder { keys, builders }
-    }
-
-    pub fn parse_from_str<T>(parse_type: ParserType, s: &str) -> SchemeResult<Self>
-    where
-        T: DeserializeOwned,
-    {
-        let parsed: Self = match parse_type {
-            ParserType::Yaml => serde_yaml::from_str(s)
-                .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::ParseError))?,
-            ParserType::Json => serde_json::from_str(s)
-                .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::ParseError))?,
-        };
-
-        Ok(parsed)
-    }
-
-    pub fn parse_from_reader<R, T>(parse_type: ParserType, rdr: R) -> SchemeResult<Self>
-    where
-        R: std::io::Read,
-        T: DeserializeOwned,
-    {
-        let parsed: Self = match parse_type {
-            ParserType::Yaml => serde_yaml::from_reader(rdr)
-                .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::ParseError))?,
-            ParserType::Json => serde_json::from_reader(rdr)
-                .map_err(|e| e.into_sbrd_gen_error(SchemeErrorKind::ParseError))?,
-        };
-
-        Ok(parsed)
     }
 
     pub fn build<R: 'static + Randomizer + ?Sized>(self) -> SchemeResult<Scheme<R>> {

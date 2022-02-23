@@ -1,10 +1,18 @@
+mod cli;
+
+use crate::cli::SbrdGenApp;
+use clap::Parser;
 use rand::thread_rng;
 use sbrd_gen::builder::GeneratorBuilder;
-use sbrd_gen::writer::{GeneratedValueWriter, YamlWriter};
+use sbrd_gen::writer::{GeneratedValueWriter, PrettyJsonWriter};
 use sbrd_gen::SchemeBuilder;
 use std::io::stdout;
 
 fn main() {
+    let app: SbrdGenApp = SbrdGenApp::parse();
+    println!("{:?}", app);
+    println!("-----------------------------------------------------------------------------------");
+
     let keys = vec!["KeyA".to_string(), "KeyB".to_string(), "KeyC".to_string()];
     let builders = vec![
         GeneratorBuilder::new_dist_normal(0.0, 1.0).into_parent("KeyA"),
@@ -22,7 +30,7 @@ fn main() {
     let scheme = SchemeBuilder::new(keys, builders).build().unwrap();
 
     let mut rng = thread_rng();
-    let mut writer = YamlWriter::from_writer(stdout());
+    let mut writer = PrettyJsonWriter::from_writer(stdout());
 
     writer
         .write_with_generate(true, &scheme, &mut rng, 10)

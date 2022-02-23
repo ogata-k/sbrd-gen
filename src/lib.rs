@@ -7,6 +7,7 @@ pub mod eval;
 pub mod file;
 pub mod generator;
 mod generator_type;
+pub mod parser;
 mod scheme;
 pub mod value;
 pub mod writer;

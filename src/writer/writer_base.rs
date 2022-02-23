@@ -25,10 +25,10 @@ pub trait GeneratedValueWriter<W: std::io::Write> {
     ) -> SchemeResult<()>;
 }
 
-pub(in crate::writer) const DUMMY_KEYS_NAME: &str = "keys";
-pub(in crate::writer) const DUMMY_VALUES_NAME: &str = "values";
+pub const DUMMY_KEYS_NAME: &str = "keys";
+pub const DUMMY_VALUES_NAME: &str = "values";
 
-pub(in crate::writer) struct GeneratedDisplayValues<K: Serialize, V: Serialize> {
+pub struct GeneratedDisplayValues<K: Serialize, V: Serialize> {
     key_values: Vec<(K, V)>,
 }
 
@@ -51,7 +51,7 @@ impl<K: Serialize, V: Serialize> Serialize for GeneratedDisplayValues<K, V> {
     }
 }
 
-pub(in crate::writer) struct SerializeWithGenerate<'a, R: 'static + Randomizer + ?Sized> {
+pub struct SerializeWithGenerate<'a, R: 'static + Randomizer + ?Sized> {
     scheme: &'a Scheme<R>,
     rng: Mutex<&'a mut R>,
     count: &'a u64,
@@ -82,12 +82,7 @@ impl<'a, R: 'static + Randomizer + ?Sized> Serialize for SerializeWithGenerate<'
 
             let values = generated.into_values_with_key().map_err(S::Error::custom)?;
 
-            let json_map = GeneratedDisplayValues::new(
-                values
-                    .into_iter()
-                    .map(|(k, v)| (k.to_string(), v.clone()))
-                    .collect(),
-            );
+            let json_map = GeneratedDisplayValues::new(values);
             seq_state.serialize_element(&json_map)?;
         }
 

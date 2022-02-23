@@ -28,7 +28,7 @@ pub struct SbrdGenApp {
     /// Scheme for generate value
     ///
     /// You must specify `keys` and `builders` as sequence in the scheme.
-    /// To learn more about the schema, see: https://github.com/ogata-k/sbrd-gen/README.md###About%20Scheme
+    /// To learn more about the schema, see: https://github.com/ogata-k/sbrd-gen/README.md#About%20Scheme
     scheme_file_path: PathBuf,
 
     /// Type of Parser for scheme

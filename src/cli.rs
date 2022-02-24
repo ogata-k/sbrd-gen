@@ -40,7 +40,7 @@ pub struct SbrdGenApp {
     /// Schema for generate value
     ///
     /// You must specify `keys` and `builders` as sequence in the schema.
-    /// To learn more about the schema, see: https://github.com/ogata-k/sbrd-gen/blob/master/README.md#about-schema
+    /// To learn more about the schema, see: https://github.com/ogata-k/sbrd-gen/blob/v0.1.x/README.md#about-schema
     schema_file_path: PathBuf,
 
     /// Type of Parser for schema

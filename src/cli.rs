@@ -33,7 +33,9 @@ pub enum OutputType {
 }
 
 #[derive(Parser, Debug, PartialEq, Eq, Clone)]
-#[clap(author, version, about)]
+#[clap(version)]
+#[clap(author)]
+#[clap(about="\nThis is a Schema-Based Random Data GENerator.\nThis command writes to standard output with generate dummy data.\n\nIf you find issue, please tell us at https://github.com/ogata-k/sbrd-gen/issues?q=")]
 #[clap(global_setting(AppSettings::DeriveDisplayOrder))]
 #[clap(global_setting(AppSettings::NextLineHelp))]
 pub struct SbrdGenApp {

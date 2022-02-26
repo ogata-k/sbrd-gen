@@ -3,8 +3,12 @@ name = "sbrd-gen"
 version = "0.1.0"
 edition = "2021"
 authors = ["ogata-k <ogtkzk712@gmail.com>"]
-description = "This is a Schema-Based Random Data GENerator. This command writes to standard output with generate dummy data.\n\nIf you find issue, plese tell us at https://github.com/ogata-k/sbrd-gen/issues?q="
+description = "A crate for Schema-Based Random Data GENerator"
 license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/ogata-k/sbrd-gen"
+categories = ["command-line-utilities", "development-tools", "science"]
+keywords = ["generator", "cli", "random", "faker", "development"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

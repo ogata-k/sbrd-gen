@@ -35,7 +35,6 @@ pub enum OutputType {
 #[clap(author, version, about)]
 #[clap(global_setting(AppSettings::DeriveDisplayOrder))]
 #[clap(global_setting(AppSettings::NextLineHelp))]
-#[deny(missing_docs)]
 pub struct SbrdGenApp {
     /// Schema for generate value
     ///

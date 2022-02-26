@@ -78,9 +78,15 @@ impl<T> ValueBound<T> {
         } = self;
 
         ValueBound {
-            start: start.map(|s| convert(s)),
+            start: start.map(|s| {
+                #[allow(clippy::redundant_closure)]
+                convert(s)
+            }),
             include_end,
-            end: end.map(|e| convert(e)),
+            end: end.map(|e| {
+                #[allow(clippy::redundant_closure)]
+                convert(e)
+            }),
         }
     }
 

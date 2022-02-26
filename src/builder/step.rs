@@ -35,7 +35,10 @@ impl<T> ValueStep<T> {
 
         ValueStep {
             initial: convert(initial),
-            step: step.map(|e| convert(e)),
+            step: step.map(|e| {
+                #[allow(clippy::redundant_closure)]
+                convert(e)
+            }),
         }
     }
 

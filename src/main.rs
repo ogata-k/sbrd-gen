@@ -1,3 +1,5 @@
+#![deny(unused_variables, deprecated, unsafe_code, dead_code, path_statements)]
+
 mod cli;
 
 use crate::cli::SbrdGenApp;

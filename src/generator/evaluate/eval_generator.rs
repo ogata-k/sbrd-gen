@@ -53,7 +53,7 @@ impl<R: Randomizer + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGener
                 e,
                 self.script.clone(),
                 value_map
-                    .into_iter()
+                    .iter()
                     .map(|(k, v)| (k.to_string(), v.clone()))
                     .collect::<DataValueMap<String>>(),
             )

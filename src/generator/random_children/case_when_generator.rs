@@ -74,7 +74,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for CaseWhenGenerator<R> {
                             e,
                             _condition.clone(),
                             value_map
-                                .into_iter()
+                                .iter()
                                 .map(|(k, v)| (k.to_string(), v.clone()))
                                 .collect::<DataValueMap<String>>(),
                         )

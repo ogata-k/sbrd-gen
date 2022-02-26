@@ -1,3 +1,5 @@
+#![deny(unused_variables, deprecated, unsafe_code, dead_code, path_statements)]
+
 pub use generator_type::*;
 pub use schema::*;
 

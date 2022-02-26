@@ -1,3 +1,4 @@
+#![deny(missing_debug_implementations)]
 #![allow(deprecated)]
 
 use clap::{AppSettings, ArgEnum, Parser};

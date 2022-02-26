@@ -1,3 +1,5 @@
+#![deny(missing_debug_implementations)]
+
 use crate::builder::ParentGeneratorBuilder;
 use crate::error::{BuildError, GenerateError, IntoSbrdError, SchemaErrorKind, SchemaResult};
 use crate::generator::{Generator, Randomizer};
@@ -62,6 +64,7 @@ impl SchemaBuilder {
     }
 }
 
+#[allow(missing_debug_implementations)]
 pub struct Schema<R: 'static + Randomizer + ?Sized> {
     keys: Vec<String>,
     generators: Vec<(String, Box<dyn Generator<R>>)>,

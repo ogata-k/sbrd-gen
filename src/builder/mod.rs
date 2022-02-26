@@ -1,3 +1,5 @@
+#![deny(missing_debug_implementations)]
+
 pub use bound::*;
 pub use generator_builder::*;
 pub use nullable::*;

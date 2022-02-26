@@ -1,3 +1,5 @@
+#![deny(missing_debug_implementations)]
+
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use std::collections::BTreeMap;
 use std::fmt;

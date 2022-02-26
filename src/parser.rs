@@ -1,3 +1,5 @@
+#![deny(missing_debug_implementations)]
+
 use crate::error::{IntoSbrdError, SchemaErrorKind, SchemaResult};
 use crate::SchemaBuilder;
 
@@ -6,6 +8,7 @@ pub trait SchemaParser {
     fn parse_from_reader<R: std::io::Read>(rdr: R) -> SchemaResult<SchemaBuilder>;
 }
 
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 pub struct YamlParser;
 impl SchemaParser for YamlParser {
     fn parse_from_str(input: &str) -> SchemaResult<SchemaBuilder>
@@ -20,6 +23,7 @@ impl SchemaParser for YamlParser {
     }
 }
 
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 pub struct JsonParser;
 impl SchemaParser for JsonParser {
     fn parse_from_str(input: &str) -> SchemaResult<SchemaBuilder>

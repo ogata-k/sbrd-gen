@@ -1,3 +1,5 @@
+#![deny(missing_debug_implementations)]
+
 use crate::builder::ValueBound;
 use crate::eval::EvalError;
 use crate::value::{DataValue, DataValueMap};

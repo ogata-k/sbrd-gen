@@ -1,3 +1,5 @@
+#![deny(missing_debug_implementations)]
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Copy)]

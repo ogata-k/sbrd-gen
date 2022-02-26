@@ -8,17 +8,20 @@ description = "This is a Schema-Based Random Data GENerator. This command writes
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = { version = "1.0.136", features = ["derive"] }
-serde_with = "1.11.0"
-serde_yaml = "0.8.23"
-serde_json = "1.0.79"
-csv = "1.1.6"
-
 rand = { version = "0.8.4", features = ["alloc"] }
 rand_distr = "0.4.3"
 chrono = "0.4.19"
 evalexpr = "7.0.0"
 either = "1.6.1"
 
+# Serialize or Deserialize
+serde = { version = "1.0.136", features = ["derive"] }
+serde_with = "1.11.0"
+serde_yaml = "0.8.23"
+serde_json = "1.0.79"
+csv = "1.1.6"
+
+# Only use CLI
 clap = { version = "3.1.0", features = ["cargo", "derive"] }
 exitcode = "1.1.2"
+human-panic = "1.0.3"

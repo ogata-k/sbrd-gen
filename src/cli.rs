@@ -136,7 +136,7 @@ impl SbrdGenApp {
     where
         O: io::Write,
         Writer: GeneratedValueWriter<O>,
-        R: 'static + Randomizer + ?Sized,
+        R: Randomizer + ?Sized,
     {
         let mut writer = Writer::from_writer(output);
         writer

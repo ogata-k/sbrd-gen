@@ -120,9 +120,7 @@ macro_rules! build_generator {
 // building
 //
 impl GeneratorBuilder {
-    pub fn build<R: 'static + Randomizer + ?Sized>(
-        self,
-    ) -> Result<Box<dyn Generator<R>>, BuildError> {
+    pub fn build<R: Randomizer + ?Sized>(self) -> Result<Box<dyn Generator<R>>, BuildError> {
         match self.generator_type {
             GeneratorType::Int => build_generator!(self, R, IntGenerator),
             GeneratorType::Real => build_generator!(self, R, RealGenerator),

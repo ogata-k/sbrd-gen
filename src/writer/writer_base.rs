@@ -9,14 +9,14 @@ pub trait GeneratedValueWriter<W: std::io::Write> {
     fn from_writer(writer: W) -> Self;
     fn into_inner(self) -> W;
     fn flush(&mut self) -> SchemaResult<()>;
-    fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
+    fn write_after_all_generated<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
         rng: &mut R,
         count: u64,
     ) -> SchemaResult<()>;
-    fn write_with_generate<R: 'static + Randomizer + ?Sized>(
+    fn write_with_generate<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -51,13 +51,13 @@ impl<K: Serialize, V: Serialize> Serialize for GeneratedDisplayValues<K, V> {
     }
 }
 
-pub struct SerializeWithGenerate<'a, R: 'static + Randomizer + ?Sized> {
+pub struct SerializeWithGenerate<'a, R: Randomizer + ?Sized> {
     schema: &'a Schema<R>,
     rng: Mutex<&'a mut R>,
     count: &'a u64,
 }
 
-impl<'a, R: 'static + Randomizer + ?Sized> SerializeWithGenerate<'a, R> {
+impl<'a, R: Randomizer + ?Sized> SerializeWithGenerate<'a, R> {
     pub(in crate::writer) fn new(schema: &'a Schema<R>, rng: &'a mut R, count: &'a u64) -> Self {
         Self {
             schema,
@@ -67,7 +67,7 @@ impl<'a, R: 'static + Randomizer + ?Sized> SerializeWithGenerate<'a, R> {
     }
 }
 
-impl<'a, R: 'static + Randomizer + ?Sized> Serialize for SerializeWithGenerate<'a, R> {
+impl<'a, R: Randomizer + ?Sized> Serialize for SerializeWithGenerate<'a, R> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,

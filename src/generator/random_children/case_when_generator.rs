@@ -5,7 +5,7 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
-pub struct CaseWhenGenerator<R: 'static + Randomizer + ?Sized> {
+pub struct CaseWhenGenerator<R: Randomizer + ?Sized> {
     nullable: Nullable,
     children: Vec<(Option<String>, Box<dyn Generator<R>>)>,
 }

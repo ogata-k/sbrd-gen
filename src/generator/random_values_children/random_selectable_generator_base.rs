@@ -9,7 +9,7 @@ use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
 pub(crate) type WeightedSelectable<R> = (Weight, Either<String, Box<dyn Generator<R>>>);
-pub(crate) trait RandomSelectableGenerator<R: 'static + Randomizer + ?Sized> {
+pub(crate) trait RandomSelectableGenerator<R: Randomizer + ?Sized> {
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,
         chars: Option<String>,

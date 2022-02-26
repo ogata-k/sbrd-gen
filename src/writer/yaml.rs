@@ -37,7 +37,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for YamlWriter<W> {
             .map_err(|e| e.into_sbrd_gen_error(SchemaErrorKind::OutputError))
     }
 
-    fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
+    fn write_after_all_generated<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -86,7 +86,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for YamlWriter<W> {
         Ok(())
     }
 
-    fn write_with_generate<R: 'static + Randomizer + ?Sized>(
+    fn write_with_generate<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,

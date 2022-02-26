@@ -5,7 +5,7 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
-pub struct RandomizeGenerator<R: 'static + Randomizer + ?Sized> {
+pub struct RandomizeGenerator<R: Randomizer + ?Sized> {
     nullable: Nullable,
     selectable_values: Vec<WeightedSelectable<R>>,
 }

@@ -5,7 +5,7 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
 use crate::GeneratorType;
 
-pub struct DuplicatePermutationGenerator<R: 'static + Randomizer + ?Sized> {
+pub struct DuplicatePermutationGenerator<R: Randomizer + ?Sized> {
     nullable: Nullable,
     count_range: ValueBound<SbrdInt>,
     separator: String,

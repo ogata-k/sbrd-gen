@@ -33,7 +33,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for CompactJsonWriter<W> {
         self.json_writer.flush()
     }
 
-    fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
+    fn write_after_all_generated<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -44,7 +44,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for CompactJsonWriter<W> {
             .write_after_all_generated(use_key_header, schema, rng, count)
     }
 
-    fn write_with_generate<R: 'static + Randomizer + ?Sized>(
+    fn write_with_generate<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -75,7 +75,7 @@ impl<'a, W: io::Write> GeneratedValueWriter<W> for PrettyJsonWriter<'a, W> {
         self.json_writer.flush()
     }
 
-    fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
+    fn write_after_all_generated<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -86,7 +86,7 @@ impl<'a, W: io::Write> GeneratedValueWriter<W> for PrettyJsonWriter<'a, W> {
             .write_after_all_generated(use_key_header, schema, rng, count)
     }
 
-    fn write_with_generate<R: 'static + Randomizer + ?Sized>(
+    fn write_with_generate<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -141,7 +141,7 @@ impl<W: io::Write, F: BuildJsonFormatter> JsonWriter<W, F> {
         self.writer
     }
 
-    fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
+    fn write_after_all_generated<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -190,7 +190,7 @@ impl<W: io::Write, F: BuildJsonFormatter> JsonWriter<W, F> {
         Ok(())
     }
 
-    fn write_with_generate<R: 'static + Randomizer + ?Sized>(
+    fn write_with_generate<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,

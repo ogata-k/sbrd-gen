@@ -19,7 +19,7 @@ impl SchemaBuilder {
         SchemaBuilder { keys, builders }
     }
 
-    pub fn build<R: 'static + Randomizer + ?Sized>(self) -> SchemaResult<Schema<R>> {
+    pub fn build<R: Randomizer + ?Sized>(self) -> SchemaResult<Schema<R>> {
         let SchemaBuilder {
             keys: specified_keys,
             builders,
@@ -65,12 +65,12 @@ impl SchemaBuilder {
 }
 
 #[allow(missing_debug_implementations)]
-pub struct Schema<R: 'static + Randomizer + ?Sized> {
+pub struct Schema<R: Randomizer + ?Sized> {
     keys: Vec<String>,
     generators: Vec<(String, Box<dyn Generator<R>>)>,
 }
 
-impl<R: 'static + Randomizer + ?Sized> Schema<R> {
+impl<R: Randomizer + ?Sized> Schema<R> {
     pub fn generate(&self, rng: &mut R) -> SchemaResult<GeneratedValues> {
         let mut generated_values = DataValueMap::new();
         for (key, generator) in self.generators.iter() {

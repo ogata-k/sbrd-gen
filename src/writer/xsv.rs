@@ -26,7 +26,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for CsvWriter<W> {
         self.xsv_writer.flush()
     }
 
-    fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
+    fn write_after_all_generated<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -37,7 +37,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for CsvWriter<W> {
             .write_after_all_generated(use_key_header, schema, rng, count)
     }
 
-    fn write_with_generate<R: 'static + Randomizer + ?Sized>(
+    fn write_with_generate<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -68,7 +68,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for TsvWriter<W> {
         self.xsv_writer.flush()
     }
 
-    fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
+    fn write_after_all_generated<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -79,7 +79,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for TsvWriter<W> {
             .write_after_all_generated(use_key_header, schema, rng, count)
     }
 
-    fn write_with_generate<R: 'static + Randomizer + ?Sized>(
+    fn write_with_generate<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -137,7 +137,7 @@ impl<W: io::Write> XsvWriter<W> {
         self.writer
     }
 
-    fn write_after_all_generated<R: 'static + Randomizer + ?Sized>(
+    fn write_after_all_generated<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,
@@ -163,7 +163,7 @@ impl<W: io::Write> XsvWriter<W> {
         Ok(())
     }
 
-    fn write_with_generate<R: 'static + Randomizer + ?Sized>(
+    fn write_with_generate<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
         schema: &Schema<R>,

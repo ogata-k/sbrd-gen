@@ -3,8 +3,8 @@ use crate::error::{BuildError, GenerateError};
 use crate::value::{DataValue, DataValueMap};
 use rand::Rng;
 
-pub trait Randomizer: Rng {}
-impl<R: Rng> Randomizer for R {}
+pub trait Randomizer: 'static + Rng {}
+impl<R: 'static + Rng> Randomizer for R {}
 
 pub trait Generator<R: Randomizer + ?Sized> {
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>

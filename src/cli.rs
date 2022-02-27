@@ -1,4 +1,4 @@
-#![deny(missing_docs, missing_debug_implementations)]
+#![deny(missing_docs, broken_intra_doc_links, missing_debug_implementations)]
 #![allow(deprecated)]
 //! Application for Sbrd Generator.
 

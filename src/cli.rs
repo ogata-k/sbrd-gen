@@ -1,5 +1,6 @@
-#![deny(missing_debug_implementations)]
+#![deny(missing_docs, missing_debug_implementations)]
 #![allow(deprecated)]
+//! Application for Sbrd Generator.
 
 use clap::{AppSettings, ArgEnum, Parser};
 use rand::prelude::ThreadRng;
@@ -16,26 +17,37 @@ use std::io::{stdout, BufWriter, Stdout};
 use std::path::PathBuf;
 use std::process::exit;
 
+/// Type of Parser for schema
 #[derive(ArgEnum, Debug, Eq, PartialEq, Copy, Clone)]
 #[clap(rename_all = "kebab-case")]
 pub enum ParserType {
+    /// parse from yaml
     Yaml,
+    /// parse from json
     Json,
 }
 
+/// Type of Output for this generator
 #[derive(ArgEnum, Debug, Eq, PartialEq, Copy, Clone)]
 #[clap(rename_all = "kebab-case")]
 pub enum OutputType {
+    /// write as yaml
     Yaml,
+    /// write as json
     Json,
+    /// write as csv
     Csv,
+    /// write as tsv
     Tsv,
 }
 
+/// Application for Sbrd Generator
 #[derive(Parser, Debug, PartialEq, Eq, Clone)]
 #[clap(version)]
 #[clap(author)]
-#[clap(about="\nThis is a Schema-Based Random Data GENerator.\nThis command writes to standard output with generate dummy data.\n\nIf you find issue, please tell us at https://github.com/ogata-k/sbrd-gen/issues?q=")]
+#[clap(
+    about = "\nThis is a Schema-Based Random Data GENerator.\nThis command writes to standard output with generate dummy data.\n\nIf you find issue, please tell us at https://github.com/ogata-k/sbrd-gen/issues?q="
+)]
 #[clap(global_setting(AppSettings::DeriveDisplayOrder))]
 #[clap(global_setting(AppSettings::NextLineHelp))]
 pub struct SbrdGenApp {
@@ -67,6 +79,7 @@ pub struct SbrdGenApp {
 }
 
 impl SbrdGenApp {
+    /// run app
     pub fn run(self) -> ! {
         // set load current filepath
         set_schema_file_path(self.schema_file_path.as_path());
@@ -129,6 +142,7 @@ impl SbrdGenApp {
         exit(exitcode::OK)
     }
 
+    /// helper to write all generated value's data
     fn write_all_data<O, Writer, R>(
         &self,
         output: O,

@@ -1,8 +1,11 @@
+//! Module of value boundary
+
 use rand::distributions::uniform::{SampleRange, SampleUniform, UniformSampler};
 use rand::distributions::{Distribution, Standard};
 use rand::{Rng, RngCore};
 use serde::{Deserialize, Serialize};
 
+/// Value boundary
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Copy)]
 pub struct ValueBound<T> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,10 +34,15 @@ impl<T> Default for ValueBound<T> {
 }
 
 impl<T> ValueBound<T> {
+    /// Create as [`RangeFull`]
+    ///
+    /// [`RangeFull`]: https://doc.rust-lang.org/nightly/core/ops/struct.RangeFull.html
     pub fn new_full() -> Self {
         Self::new(None, None)
     }
 
+    /// Create value boundary from start to end.
+    /// If end is `Some((true, _))`, then include end.
     pub fn new(start: Option<T>, end: Option<(bool, T)>) -> Self {
         let (_include_end, _end): (bool, Option<T>) = match end {
             None => (false, None),
@@ -48,18 +56,22 @@ impl<T> ValueBound<T> {
         }
     }
 
+    /// Get start value
     pub fn get_start(&self) -> &Option<T> {
         &self.start
     }
 
+    /// Get end value
     pub fn get_end(&self) -> &Option<T> {
         &self.end
     }
 
+    /// Check include end
     pub fn is_include_end(&self) -> bool {
         self.include_end
     }
 
+    /// Convert into other with into-method.
     pub fn convert_into<U>(self) -> ValueBound<U>
     where
         T: Into<U>,
@@ -67,6 +79,7 @@ impl<T> ValueBound<T> {
         self.convert_with(|v| v.into())
     }
 
+    /// Convert into other with custom-method.
     pub fn convert_with<F, U>(self, mut convert: F) -> ValueBound<U>
     where
         F: FnMut(T) -> U,
@@ -90,6 +103,7 @@ impl<T> ValueBound<T> {
         }
     }
 
+    /// Try convert into other with custom-method.
     pub fn try_convert_with<F, U, E>(self, mut convert: F) -> Result<ValueBound<U>, E>
     where
         F: FnMut(T) -> Result<U, E>,
@@ -117,6 +131,7 @@ impl<T> ValueBound<T> {
         })
     }
 
+    /// Replace from no bound with other's bound each start and end.
     pub fn without_no_bound_from_other(self, other: ValueBound<T>) -> ValueBound<T> {
         let Self {
             start,
@@ -142,6 +157,7 @@ impl<T> ValueBound<T> {
 }
 
 impl<T: std::cmp::PartialOrd> ValueBound<T> {
+    /// Check contains value
     pub fn contains(&self, v: &T) -> bool {
         let Self {
             start,
@@ -157,13 +173,13 @@ impl<T: std::cmp::PartialOrd> ValueBound<T> {
         }
     }
 
+    /// Check range is empty.
     pub fn is_empty(&self) -> bool {
         let Self {
             start,
             include_end,
             end,
         } = &self;
-
         match (start, end) {
             (Some(s), Some(e)) => !((*include_end && s <= e) || (!*include_end && s < e)),
             // 厳密には違う時があるが判定ができないのであきらめる

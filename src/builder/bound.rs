@@ -1,5 +1,6 @@
 //! Module of value boundary
 
+use std::ops::RangeBounds;
 use rand::distributions::uniform::{SampleRange, SampleUniform, UniformSampler};
 use rand::distributions::{Distribution, Standard};
 use rand::{Rng, RngCore};
@@ -165,11 +166,13 @@ impl<T: std::cmp::PartialOrd> ValueBound<T> {
             end,
         } = &self;
 
-        match (start, end) {
-            (Some(s), Some(e)) => s <= v && ((*include_end && v <= e) || (!*include_end && v < e)),
-            (Some(s), None) => s <= v,
-            (None, Some(e)) => (*include_end && v <= e) || (!*include_end && v < e),
-            (None, None) => true,
+        match (start, include_end, end) {
+            (None, _, None) => (..).contains(&v),
+            (None, true, Some(e)) => (..=e).contains(&v),
+            (None, false, Some(e)) => (..e).contains(&v),
+            (Some(s), _, None) => (s..).contains(&v),
+            (Some(s), true, Some(e)) => (s..=e).contains(&v),
+            (Some(s), false, Some(e)) => (s..e).contains(&v),
         }
     }
 
@@ -180,10 +183,15 @@ impl<T: std::cmp::PartialOrd> ValueBound<T> {
             include_end,
             end,
         } = &self;
-        match (start, end) {
-            (Some(s), Some(e)) => !((*include_end && s <= e) || (!*include_end && s < e)),
-            // 厳密には違う時があるが判定ができないのであきらめる
-            (_, _) => false,
+        match (start, include_end, end) {
+            (None, _, None) => false,
+            (None, true, Some(_)) => false,
+            // endのとる値で範囲が空か決まるが、最少を指定することはめったにないのであきらめて最小以外を指定していることにする
+            (None, false, Some(_)) => true,
+            // include start
+            (Some(_), _, None) => false,
+            (Some(s), true, Some(e)) => (s..=e).is_empty(),
+            (Some(s), false, Some(e)) => (s..e).is_empty(),
         }
     }
 }

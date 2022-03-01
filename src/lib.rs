@@ -1,4 +1,5 @@
-#![deny(unused_variables, deprecated, unsafe_code, dead_code, path_statements)]
+#![deny(missing_docs, rustdoc::broken_intra_doc_links, unused_variables, deprecated, unsafe_code, dead_code, path_statements)]
+//! Library Crate for Schema Based Random GENerator.
 
 pub use generator_type::*;
 pub use schema::*;

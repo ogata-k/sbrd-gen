@@ -1,4 +1,4 @@
-//! Module of value boundary
+//! Module for value boundary
 
 use std::ops::RangeBounds;
 use rand::distributions::uniform::{SampleRange, SampleUniform, UniformSampler};
@@ -6,7 +6,7 @@ use rand::distributions::{Distribution, Standard};
 use rand::{Rng, RngCore};
 use serde::{Deserialize, Serialize};
 
-/// Value boundary
+/// Value boundary option
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Copy)]
 pub struct ValueBound<T> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -72,7 +72,7 @@ impl<T> ValueBound<T> {
         self.include_end
     }
 
-    /// Convert into other with into-method.
+    /// Convert into other with into-method
     pub fn convert_into<U>(self) -> ValueBound<U>
     where
         T: Into<U>,
@@ -80,7 +80,7 @@ impl<T> ValueBound<T> {
         self.convert_with(|v| v.into())
     }
 
-    /// Convert into other with custom-method.
+    /// Convert into other with custom-method
     pub fn convert_with<F, U>(self, mut convert: F) -> ValueBound<U>
     where
         F: FnMut(T) -> U,
@@ -104,7 +104,7 @@ impl<T> ValueBound<T> {
         }
     }
 
-    /// Try convert into other with custom-method.
+    /// Try convert into other with custom-method
     pub fn try_convert_with<F, U, E>(self, mut convert: F) -> Result<ValueBound<U>, E>
     where
         F: FnMut(T) -> Result<U, E>,
@@ -132,7 +132,7 @@ impl<T> ValueBound<T> {
         })
     }
 
-    /// Replace from no bound with other's bound each start and end.
+    /// Replace from no bound with other's bound each start and end
     pub fn without_no_bound_from_other(self, other: ValueBound<T>) -> ValueBound<T> {
         let Self {
             start,

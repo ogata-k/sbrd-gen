@@ -1,4 +1,5 @@
 #![deny(missing_debug_implementations)]
+//! Module for builder and it's fields
 
 pub use bound::*;
 pub use generator_builder::*;

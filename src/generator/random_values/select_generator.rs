@@ -1,16 +1,22 @@
 use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
-use crate::file::open_sbrd_file;
-use crate::generator::{Generator, Randomizer};
+use crate::generator::{Generator, RandomValueGenerator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt, SbrdReal, SbrdString};
 use crate::GeneratorType;
 use rand::seq::SliceRandom;
-use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
 pub struct SelectGenerator<T: ForSelectGeneratorType> {
     nullable: Nullable,
     selectable_values: Vec<T>,
+}
+
+impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> RandomValueGenerator<R, T>
+    for SelectGenerator<T>
+{
+    fn parse(input: &str) -> Result<T, BuildError> {
+        T::parse(input)
+    }
 }
 
 impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectGenerator<T> {
@@ -31,32 +37,8 @@ impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectG
             return Err(BuildError::InvalidType(generator_type));
         }
 
-        let mut selectable_values: Vec<T> = Vec::new();
-        if let Some(chars) = chars {
-            for c in chars.chars() {
-                selectable_values.push(T::parse(&c.to_string())?);
-            }
-        }
-
-        if let Some(values) = values {
-            for value in values.into_iter() {
-                selectable_values.push(T::parse(&value.to_parse_string())?);
-            }
-        }
-
-        if let Some(filepath) = filepath {
-            let file = open_sbrd_file(filepath.as_path())
-                .map_err(|e| BuildError::FileError(e, filepath.clone()))?;
-            let reader = BufReader::new(file);
-            for line in reader.lines() {
-                let line = line.map_err(|e| BuildError::FileError(e, filepath.clone()))?;
-                selectable_values.push(T::parse(&line)?);
-            }
-        }
-
-        if selectable_values.is_empty() {
-            return Err(BuildError::EmptySelectValues);
-        }
+        let selectable_values =
+            <Self as RandomValueGenerator<R, T>>::build_selectable(chars, values, filepath)?;
 
         Ok(Self {
             nullable,

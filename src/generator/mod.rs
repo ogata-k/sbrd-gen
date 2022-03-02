@@ -1,3 +1,5 @@
+//! Module for generator
+
 pub use generator_base::*;
 
 pub mod build_string;

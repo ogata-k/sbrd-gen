@@ -1,10 +1,10 @@
 //! Module for value boundary
 
-use std::ops::RangeBounds;
 use rand::distributions::uniform::{SampleRange, SampleUniform, UniformSampler};
 use rand::distributions::{Distribution, Standard};
 use rand::{Rng, RngCore};
 use serde::{Deserialize, Serialize};
+use std::ops::RangeBounds;
 
 /// Value boundary option
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Copy)]

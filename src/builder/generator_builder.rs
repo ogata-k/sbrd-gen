@@ -17,7 +17,10 @@ use crate::generator::random_values::SelectGenerator;
 use crate::generator::random_values_children::RandomizeGenerator;
 use crate::generator::{Generator, Randomizer};
 use crate::generator_type::GeneratorType;
-use crate::value::{DataValue, DataValueMap, DATE_DEFAULT_FORMAT, DATE_TIME_DEFAULT_FORMAT, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdString, SbrdTime, TIME_DEFAULT_FORMAT};
+use crate::value::{
+    DataValue, DataValueMap, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdString,
+    SbrdTime, DATE_DEFAULT_FORMAT, DATE_TIME_DEFAULT_FORMAT, TIME_DEFAULT_FORMAT,
+};
 
 /// Generator Builder used in [`SchemeBuilder`] as Generator Builder.
 ///
@@ -327,9 +330,12 @@ impl GeneratorBuilder {
     pub fn new_date(range: Option<ValueBound<SbrdDate>>, format: Option<String>) -> Self {
         let mut this = Self::new(GeneratorType::Date);
         if let Some(range) = range {
-            this = this.range(
-                range.convert_with(|v| Into::<SbrdDate>::into(v).format(DATE_DEFAULT_FORMAT).to_string().into()),
-            );
+            this = this.range(range.convert_with(|v| {
+                Into::<SbrdDate>::into(v)
+                    .format(DATE_DEFAULT_FORMAT)
+                    .to_string()
+                    .into()
+            }));
         }
 
         if let Some(_format) = format {
@@ -349,9 +355,12 @@ impl GeneratorBuilder {
     pub fn new_time(range: Option<ValueBound<SbrdTime>>, format: Option<String>) -> Self {
         let mut this = Self::new(GeneratorType::Time);
         if let Some(range) = range {
-            this = this.range(
-                range.convert_with(|v| Into::<SbrdTime>::into(v).format(TIME_DEFAULT_FORMAT).to_string().into()),
-            );
+            this = this.range(range.convert_with(|v| {
+                Into::<SbrdTime>::into(v)
+                    .format(TIME_DEFAULT_FORMAT)
+                    .to_string()
+                    .into()
+            }));
         }
 
         if let Some(_format) = format {

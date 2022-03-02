@@ -5,6 +5,7 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
 use crate::GeneratorType;
 
+/// The generator with permuting string joined by separator
 pub struct DuplicatePermutationGenerator<R: Randomizer + ?Sized> {
     nullable: Nullable,
     count_range: ValueBound<SbrdInt>,
@@ -106,6 +107,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for DuplicatePermutationGenerator<R> {
 }
 
 impl<R: Randomizer + ?Sized> DuplicatePermutationGenerator<R> {
+    /// default count range
     fn default_range() -> ValueBound<SbrdInt> {
         ValueBound::new(Some(1), Some((true, 15)))
     }

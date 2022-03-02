@@ -5,6 +5,7 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
+/// The generator with string formatted by specified format
 #[derive(Debug, PartialEq, Clone)]
 pub struct FormatGenerator {
     nullable: Nullable,

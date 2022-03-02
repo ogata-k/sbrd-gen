@@ -6,6 +6,7 @@ use crate::GeneratorType;
 use rand::distributions::Distribution;
 use rand_distr::Normal;
 
+/// The generator with generate from normal distribution
 #[derive(Debug, Clone, Copy)]
 pub struct NormalGenerator {
     nullable: Nullable,

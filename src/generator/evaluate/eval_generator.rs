@@ -6,6 +6,7 @@ use crate::value::{DataValue, DataValueMap, SbrdBool, SbrdInt, SbrdReal};
 use crate::GeneratorType;
 use std::marker::PhantomData;
 
+/// The generator with generate with evaluate generated value
 #[derive(Debug, PartialEq, Clone)]
 pub struct EvalGenerator<T> {
     nullable: Nullable,
@@ -48,7 +49,7 @@ impl<R: Randomizer + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGener
         _rng: &mut R,
         value_map: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
-        F::evaluate(&self.script, value_map).map_err(|e| {
+        F::eval_script(&self.script, value_map).map_err(|e| {
             GenerateError::FailEval(
                 e,
                 self.script.clone(),
@@ -61,10 +62,13 @@ impl<R: Randomizer + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGener
     }
 }
 
+/// Helper traits for generators that generate evaluable values
 pub trait ForEvalGeneratorType {
+    /// The type of the generator
     fn get_generator_type() -> GeneratorType;
 
-    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue>;
+    /// evaluate the script with the context
+    fn eval_script<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue>;
 }
 
 impl ForEvalGeneratorType for SbrdInt {
@@ -72,7 +76,7 @@ impl ForEvalGeneratorType for SbrdInt {
         GeneratorType::EvalInt
     }
 
-    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
+    fn eval_script<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
         let evaluator = Evaluator::new(script, context);
         evaluator.eval_int().map(|v| v.into())
     }
@@ -82,7 +86,7 @@ impl ForEvalGeneratorType for SbrdReal {
         GeneratorType::EvalReal
     }
 
-    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
+    fn eval_script<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
         let evaluator = Evaluator::new(script, context);
         evaluator.eval_real().map(|v| v.into())
     }
@@ -92,7 +96,7 @@ impl ForEvalGeneratorType for SbrdBool {
         GeneratorType::EvalBool
     }
 
-    fn evaluate<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
+    fn eval_script<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
         let evaluator = Evaluator::new(script, context);
         evaluator.eval_bool().map(|v| v.into())
     }

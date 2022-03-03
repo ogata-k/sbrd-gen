@@ -5,8 +5,11 @@ use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
 /// The generator with use the child generator which satisfy condition.
-/// If a child generator's condition is Option::Some, then evaluate it's condition.
-/// If a child generator's condition is None, then default condition. Default condition always must exist.
+/// If a child generator's condition is [`Option::Some`], then evaluate it's condition.
+/// If a child generator's condition is [`Option::None`], then default condition. Default condition always must exist.
+///
+/// [`Option::Some`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.Some
+/// [`Option::None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None
 pub struct CaseWhenGenerator<R: Randomizer + ?Sized> {
     nullable: Nullable,
     children: Vec<CasedChild<R>>,

@@ -67,7 +67,7 @@ pub trait ForEvalGeneratorType {
     /// The type of the generator
     fn get_generator_type() -> GeneratorType;
 
-    /// evaluate the script with the context
+    /// Evaluate the script with the context
     fn eval_script<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue>;
 }
 

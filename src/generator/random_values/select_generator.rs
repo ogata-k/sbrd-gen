@@ -6,6 +6,7 @@ use crate::GeneratorType;
 use rand::seq::SliceRandom;
 use std::str::FromStr;
 
+/// The generator with generate value from value's list as the type
 pub struct SelectGenerator<T: ForSelectGeneratorType> {
     nullable: Nullable,
     selectable_values: Vec<T>,
@@ -62,11 +63,17 @@ impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectG
     }
 }
 
+/// Helper traits for generators that the generate value
 pub trait ForSelectGeneratorType {
+    /// The type of the generator
     fn get_generator_type() -> GeneratorType;
+
+    /// Function of parser the input value
     fn parse(s: &str) -> Result<Self, BuildError>
     where
         Self: Sized;
+
+    /// Function of converter for a generated value
     fn to_data_value(&self) -> DataValue;
 }
 

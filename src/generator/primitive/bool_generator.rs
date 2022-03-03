@@ -4,6 +4,7 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
+/// The generator with generate boolean value
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct BoolGenerator {
     nullable: Nullable,

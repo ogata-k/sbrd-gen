@@ -1,3 +1,5 @@
+//! Module for generator with generate a primitive value.
+
 pub use always_null_generator::*;
 pub use bool_generator::*;
 pub use date_generator::*;

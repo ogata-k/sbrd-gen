@@ -4,6 +4,7 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdReal};
 use crate::GeneratorType;
 
+/// The generator with generate real value with range of generated value.
 #[derive(Debug, PartialEq, Clone)]
 pub struct RealGenerator {
     nullable: Nullable,

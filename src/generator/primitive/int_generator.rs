@@ -4,6 +4,7 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
 use crate::GeneratorType;
 
+/// The generator with generate integer value with range of generated value.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct IntGenerator {
     nullable: Nullable,

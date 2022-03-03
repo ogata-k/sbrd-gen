@@ -6,6 +6,13 @@ use crate::GeneratorType;
 use chrono::Duration;
 use std::ops::AddAssign;
 
+/// The generator with generate date time value with the format
+///
+/// See [`format::strftime` module] for more information on `format` option.
+/// The default for `format` and the format when parsing is [`TIME_DEFAULT_FORMAT`].
+///
+/// [`format::strftime` module]: https://docs.rs/chrono/0.4.19/chrono/format/strftime/index.html#specifiers
+/// [`TIME_DEFAULT_FORMAT`]: ../value/constant.TIME_DEFAULT_FORMAT.html
 #[derive(Debug, PartialEq, Clone)]
 pub struct TimeGenerator {
     nullable: Nullable,

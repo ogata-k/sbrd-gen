@@ -4,6 +4,9 @@ use crate::generator::{CasedChild, Generator, RandomCasedChildGenerator, Randomi
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
+/// The generator with use the child generator which satisfy condition.
+/// If a child generator's condition is Option::Some, then evaluate it's condition.
+/// If a child generator's condition is None, then default condition. Default condition always must exist.
 pub struct CaseWhenGenerator<R: Randomizer + ?Sized> {
     nullable: Nullable,
     children: Vec<CasedChild<R>>,

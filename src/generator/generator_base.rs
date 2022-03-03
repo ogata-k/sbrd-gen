@@ -9,20 +9,26 @@ use rand::Rng;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
+/// Core of random data generator
 pub trait Randomizer: 'static + Rng {}
 impl<R: 'static + Rng> Randomizer for R {}
 
+/// Base trait for a generator
 pub trait Generator<R: Randomizer + ?Sized> {
+    /// Create generator from builder
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized;
 
+    /// Can generate null flag
     fn is_nullable(&self) -> bool;
 
+    /// Cannot generate null flag
     fn is_required(&self) -> bool {
         !self.is_nullable()
     }
 
+    /// Generate dummy data considering nullable
     fn generate(
         &self,
         rng: &mut R,
@@ -39,6 +45,7 @@ pub trait Generator<R: Randomizer + ?Sized> {
         }
     }
 
+    /// Generate dummy data not considering nullable
     fn generate_without_null(
         &self,
         rng: &mut R,
@@ -46,8 +53,17 @@ pub trait Generator<R: Randomizer + ?Sized> {
     ) -> Result<DataValue, GenerateError>;
 }
 
+/// Child generator with condition
 pub type CasedChild<R> = (Option<String>, Box<dyn Generator<R>>);
+/// Base trait for a generator use child generators with condition.
+///
+/// If a child generator's condition is [`Option::Some`], then evaluate it's condition.
+/// If a child generator's condition is [`Option::None`], then default condition. Default condition always must exist.
+///
+/// [`Option::Some`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.Some
+/// [`Option::None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None
 pub trait RandomCasedChildGenerator<R: Randomizer + ?Sized> {
+    /// Build selectable child generator list
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,
     ) -> Result<Vec<CasedChild<R>>, BuildError> {
@@ -77,8 +93,10 @@ pub trait RandomCasedChildGenerator<R: Randomizer + ?Sized> {
         }
     }
 
+    /// Get selectable child generators
     fn get_children(&self) -> &[CasedChild<R>];
 
+    /// Generate dummy data considering nullable from picked out child generator
     fn generate_from_children(
         &self,
         rng: &mut R,
@@ -114,9 +132,12 @@ pub trait RandomCasedChildGenerator<R: Randomizer + ?Sized> {
     }
 }
 
+/// Base trait for a generator from input values
 pub trait RandomValueGenerator<R: Randomizer + ?Sized, T> {
+    /// Function of parser the input value
     fn parse(input: &str) -> Result<T, BuildError>;
 
+    /// Build selectable value
     fn build_selectable(
         chars: Option<String>,
         values: Option<Vec<DataValue>>,
@@ -153,8 +174,11 @@ pub trait RandomValueGenerator<R: Randomizer + ?Sized, T> {
     }
 }
 
+/// Value or Child generator with weight
 pub type WeightedValueChild<R> = (Weight, Either<String, Box<dyn Generator<R>>>);
+/// Base trait for a generator use picked out value from input values or generated value picked out child generator
 pub trait RandomValueChildGenerator<R: Randomizer + ?Sized> {
+    /// Build selectable value and child generator with weight list
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,
         chars: Option<String>,
@@ -209,8 +233,10 @@ pub trait RandomValueChildGenerator<R: Randomizer + ?Sized> {
         Ok(select_values)
     }
 
+    /// Get selectable list
     fn get_selectable(&self) -> &[WeightedValueChild<R>];
 
+    /// Pick out value from input values or generated value picked out child generator
     fn choose(
         &self,
         rng: &mut R,

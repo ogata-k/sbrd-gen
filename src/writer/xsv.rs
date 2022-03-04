@@ -7,6 +7,7 @@ use csv::QuoteStyle;
 use serde::Serialize;
 use std::io;
 
+/// A writer that outputs as Comma-Separated Values for the key and the generated value
 pub struct CsvWriter<W: io::Write> {
     xsv_writer: XsvWriter<W>,
 }
@@ -49,6 +50,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for CsvWriter<W> {
     }
 }
 
+/// A writer that outputs as Tab-Separated Values for the key and the generated value
 pub struct TsvWriter<W: io::Write> {
     xsv_writer: XsvWriter<W>,
 }
@@ -91,6 +93,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for TsvWriter<W> {
     }
 }
 
+/// A writer that outputs as XSV for the key and the generated value
 struct XsvWriter<W: io::Write> {
     writer: W,
     delimiter: u8,

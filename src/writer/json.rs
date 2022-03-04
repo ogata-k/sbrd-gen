@@ -14,6 +14,7 @@ use std::borrow::BorrowMut;
 use std::io;
 use std::marker::PhantomData;
 
+/// A writer that outputs as Json with no extra spaces for the key and the generated value
 pub struct CompactJsonWriter<W: io::Write> {
     json_writer: JsonWriter<W, CompactFormatter>,
 }
@@ -56,6 +57,7 @@ impl<W: io::Write> GeneratedValueWriter<W> for CompactJsonWriter<W> {
     }
 }
 
+/// A writer that outputs as Json with human-readable for the key and the generated value
 pub struct PrettyJsonWriter<'a, W: io::Write> {
     json_writer: JsonWriter<W, PrettyFormatter<'a>>,
 }
@@ -114,6 +116,7 @@ impl<'a> BuildJsonFormatter for PrettyFormatter<'a> {
     }
 }
 
+/// A writer that outputs as Json for the key and the generated value
 struct JsonWriter<W: io::Write, F: BuildJsonFormatter> {
     writer: W,
     formatter: PhantomData<F>,

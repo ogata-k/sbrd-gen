@@ -12,6 +12,7 @@ use serde_yaml::Serializer as YamlSerializer;
 use std::borrow::BorrowMut;
 use std::io;
 
+/// A writer that outputs as Yaml for the key and the generated value
 pub struct YamlWriter<W: io::Write> {
     writer: W,
 }

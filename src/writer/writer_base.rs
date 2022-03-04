@@ -5,10 +5,18 @@ use serde::ser::{Error, SerializeMap, SerializeSeq};
 use serde::{Serialize, Serializer};
 use std::sync::Mutex;
 
+/// Trait of Writer for keys and generated values
 pub trait GeneratedValueWriter<W: std::io::Write> {
+    /// Create from the writer
     fn from_writer(writer: W) -> Self;
+
+    /// Take writer
     fn into_inner(self) -> W;
+
+    /// Flush buffers that have not been written yet
     fn flush(&mut self) -> SchemaResult<()>;
+
+    /// Generate all values and then write keys and the values
     fn write_after_all_generated<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
@@ -16,6 +24,8 @@ pub trait GeneratedValueWriter<W: std::io::Write> {
         rng: &mut R,
         count: u64,
     ) -> SchemaResult<()>;
+
+    /// Write keys and generated values while generating values
     fn write_with_generate<R: Randomizer + ?Sized>(
         &mut self,
         use_key_header: bool,
@@ -25,9 +35,12 @@ pub trait GeneratedValueWriter<W: std::io::Write> {
     ) -> SchemaResult<()>;
 }
 
+/// dummy key of `keys` for a KVS
 pub const DUMMY_KEYS_NAME: &str = "keys";
+/// dummy key of `values` for a KVS
 pub const DUMMY_VALUES_NAME: &str = "values";
 
+/// A Sequence of generated values
 pub struct GeneratedDisplayValues<K: Serialize, V: Serialize> {
     key_values: Vec<(K, V)>,
 }
@@ -51,6 +64,7 @@ impl<K: Serialize, V: Serialize> Serialize for GeneratedDisplayValues<K, V> {
     }
 }
 
+/// A Sequence of generated values while generating it
 pub struct SerializeWithGenerate<'a, R: Randomizer + ?Sized> {
     schema: &'a Schema<R>,
     rng: Mutex<&'a mut R>,

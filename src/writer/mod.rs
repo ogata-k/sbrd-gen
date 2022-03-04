@@ -1,3 +1,5 @@
+//! Module for writer
+
 pub use json::*;
 pub use writer_base::*;
 pub use xsv::*;

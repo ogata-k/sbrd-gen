@@ -1,4 +1,5 @@
 #![deny(missing_debug_implementations)]
+//! Module for errors used in this crate
 
 use crate::builder::ValueBound;
 use crate::eval::EvalError;
@@ -6,6 +7,7 @@ use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 use std::borrow::Borrow;
 
+/// A Error for a Schema
 #[derive(Debug)]
 pub struct SchemaError {
     kind: SchemaErrorKind,
@@ -26,27 +28,36 @@ impl std::fmt::Display for SchemaError {
 impl std::error::Error for SchemaError {}
 
 impl SchemaError {
+    /// Check error's kind
     pub fn is_kind_of(&self, kind: SchemaErrorKind) -> bool {
         self.kind == kind
     }
 
+    /// Get error's kind
     pub fn get_kind(&self) -> SchemaErrorKind {
         self.kind
     }
 
+    /// Get error's information
     pub fn get_error_info(&self) -> &dyn std::error::Error {
         self.info.0.borrow()
     }
 }
 
+/// Kinds of error for a Schema
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum SchemaErrorKind {
+    /// Error kind for parser
     ParseError,
+    /// Error kind for generator builder
     BuildError,
+    /// Error kind for generating a value
     GenerateError,
+    /// Error kind for writing to output
     OutputError,
 }
 
+/// Error information
 #[derive(Debug)]
 struct SchemaErrorInfo(Box<dyn std::error::Error>);
 
@@ -62,7 +73,13 @@ impl From<BuildError> for SchemaError {
     }
 }
 
+/// Trait for convert to [`SchemaError`] from other error
+///
+/// [`SchemaError`]: ./struct.SchemaError.html
 pub trait IntoSbrdError: 'static + std::error::Error + Sized {
+    /// Converter function to [`SchemaError`] from other error
+    ///
+    /// [`SchemaError`]: ./struct.SchemaError.html
     fn into_sbrd_gen_error(self, kind: SchemaErrorKind) -> SchemaError {
         SchemaError {
             kind,
@@ -73,26 +90,92 @@ pub trait IntoSbrdError: 'static + std::error::Error + Sized {
 
 impl<E> IntoSbrdError for E where E: 'static + std::error::Error + Sized {}
 
+/// Alias of [`Result`] type
+///
+/// [`Result`]: https://doc.rust-lang.org/std/result/enum.Result.html
 pub type SchemaResult<T> = std::result::Result<T, SchemaError>;
 
+/// Error for generator builder
 #[derive(Debug)]
 pub enum BuildError {
+    /// Specified `keys` in the Schema is not unique.
+    ///
+    /// # Arguments
+    /// * 0: Specified `keys`
     SpecifiedKeyNotUnique(Vec<String>),
+
+    /// Specified `key` does not exist in generated values
+    ///
+    /// # Arguments
+    /// * 0: Specified `key`
+    /// * 1: Keys of generated values
     NotExistSpecifiedKey(String, Vec<String>),
+
+    /// Specified `key` in the Schema already exist.
+    ///
+    /// # Arguments
+    /// * 0: Specified `key`
     AlreadyExistKey(String),
+
+    /// Specified `type` in thea Schema is not valid type.
+    ///
+    /// # Arguments
+    /// * 0: Specified `type`
     InvalidType(GeneratorType),
+
+    /// Specified value in the Schema is not valid value.
+    ///
+    /// # Arguments
+    /// * 0: Specified value's string
     InvalidValue(String),
+
+    /// Specified value's key does not exist in the Schema.
+    ///
+    /// # Arguments
+    /// * 0: Specified value's key
     NotExistValueOf(String),
-    /// parse string, type, error string
+
+    /// Fail parse specified value in the Schema.
+    ///
+    /// # Arguments
+    /// * 0: Parse target value
+    /// * 1: Parse target type
+    /// * 2: Parse error message
     FailParseValue(String, String, String),
+
+    /// Specified `range` in the Schema is empty range.
+    ///
+    /// # Arguments
+    /// * 0: Range bound
     RangeEmpty(ValueBound<DataValue>),
+
+    /// Specified `children` in the Schema does not exist or does not have child.
     EmptyChildren,
+
+    /// Specified `values` in the Schema does not exist or does not have value.
     EmptySelectValues,
+
+    /// Specified randomize values at the keys: `children`, `chars`, `values`, `filepath` is empty.
     EmptyRandomize,
+
+    /// Specified default case at the key `case` in the Schema at a child generator does not exist
     NotExistDefaultCase,
+
+    /// Specified some of values at the key `weight` in the Schema at a child generator does not exist
     AllWeightsZero,
+
+    /// Input/Output Error for a file.
+    ///
+    /// # Arguments
+    /// * 0: Error information
+    /// * 1: Occurred filepath
     FileError(std::io::Error, std::path::PathBuf),
-    /// Distribution name, error
+
+    /// Error for fail build distribution with the specified parameters at the key `parameters` in the Schema
+    ///
+    /// # Arguments
+    /// * 0: Name of the distribution
+    /// * 1: Error information
     FailBuildDistribution(String, String),
 }
 
@@ -135,13 +218,28 @@ impl std::fmt::Display for BuildError {
 
 impl std::error::Error for BuildError {}
 
+/// Error for generator builder
 #[derive(Debug)]
 pub enum GenerateError {
-    /// eval error, unmodified script, context
+    /// Evaluate error while generating value
+    ///
+    /// # Arguments
+    /// * 0: Error information
+    /// * 1: Script
+    /// * 2: Context key-values
     FailEval(EvalError, String, DataValueMap<String>),
-    /// reason
+
+    /// Error for generate value while generating value
+    ///
+    /// # Arguments
+    /// * 0: Error message
     FailGenerate(String),
-    /// Key name, Generated values
+
+    /// Not found generate values at the key while generating value
+    ///
+    /// # Arguments
+    /// * 0: Key
+    /// * 1: Generated values
     NotExistGeneratedKey(String, DataValueMap<String>),
 }
 

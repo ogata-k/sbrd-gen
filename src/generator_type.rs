@@ -85,7 +85,7 @@ pub enum GeneratorType {
     //
     // randomize children
     //
-    /// Type for [` CaseWhenGenerator`]
+    /// Type for [`CaseWhenGenerator`]
     ///
     /// [`CaseWhenGenerator`]: ../generator/random_child/struct.CaseWhenGenerator.html
     CaseWhen,

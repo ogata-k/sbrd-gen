@@ -46,7 +46,8 @@ pub struct GeneratedDisplayValues<K: Serialize, V: Serialize> {
 }
 
 impl<K: Serialize, V: Serialize> GeneratedDisplayValues<K, V> {
-    pub(in crate::writer) fn new(key_values: Vec<(K, V)>) -> Self {
+    /// Constructor
+    pub fn new(key_values: Vec<(K, V)>) -> Self {
         Self { key_values }
     }
 }
@@ -72,7 +73,8 @@ pub struct SerializeWithGenerate<'a, R: Randomizer + ?Sized> {
 }
 
 impl<'a, R: Randomizer + ?Sized> SerializeWithGenerate<'a, R> {
-    pub(in crate::writer) fn new(schema: &'a Schema<R>, rng: &'a mut R, count: &'a u64) -> Self {
+    /// Constructor
+    pub fn new(schema: &'a Schema<R>, rng: &'a mut R, count: &'a u64) -> Self {
         Self {
             schema,
             rng: Mutex::new(rng),

@@ -1,4 +1,5 @@
 #![deny(missing_debug_implementations)]
+//! Module for evaluator for `script` and `format`
 
 use crate::value::{DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
 use evalexpr::{eval_boolean, eval_float, eval_int, EvalexprError};

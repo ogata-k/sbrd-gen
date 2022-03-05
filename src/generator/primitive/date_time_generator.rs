@@ -4,13 +4,15 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdDate, SbrdDateTime, DATE_TIME_DEFAULT_FORMAT};
 use crate::GeneratorType;
 
-/// The generator with generate date time value with the format
+/// The generator with generate [`SbrdDateTime`] value as [`DataValue::String`] with the format
 ///
 /// See [`format::strftime` module] for more information on `format` option.
 /// The default for `format` and the format when parsing is [`DATE_TIME_DEFAULT_FORMAT`].
 ///
+/// [`SbrdDateTime`]: ../../value/type.SbrdDateTime.html
+/// [`DataValue::String`]: ../../value/enum.DataValue.html#variant.String
 /// [`format::strftime` module]: https://docs.rs/chrono/0.4.19/chrono/format/strftime/index.html#specifiers
-/// [`DATE_TIME_DEFAULT_FORMAT`]: ../value/constant.DATE_TIME_DEFAULT_FORMAT.html
+/// [`DATE_TIME_DEFAULT_FORMAT`]: ../../value/constant.DATE_TIME_DEFAULT_FORMAT.html
 #[derive(Debug, PartialEq, Clone)]
 pub struct DateTimeGenerator {
     nullable: Nullable,

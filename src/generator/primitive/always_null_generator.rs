@@ -4,7 +4,9 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
-/// The generator with always generate null
+/// The generator with always generate [`DataValue::Null`]
+///
+/// [`DataValue::Null`]: ../../value/enum.DataValue.html#variant.Null
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct AlwaysNullGenerator {}
 

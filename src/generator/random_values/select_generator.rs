@@ -6,7 +6,9 @@ use crate::GeneratorType;
 use rand::seq::SliceRandom;
 use std::str::FromStr;
 
-/// The generator with generate value from value's list as the type
+/// The generator with generate [`DataValue::String`] value from value's list as the type
+///
+/// [`DataValue::String`]: ../../value/enum.DataValue.html#variant.String
 pub struct SelectGenerator<T: ForSelectGeneratorType> {
     nullable: Nullable,
     selectable_values: Vec<T>,

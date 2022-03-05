@@ -8,7 +8,9 @@ use std::cell::Cell;
 const INITIAL_ID: SbrdInt = 1;
 const DEFAULT_STEP: SbrdInt = 1;
 
-/// The generator with generate integer value with the initial value and the step value.
+/// The generator with generate [`DataValue::Int`] value with the initial value and the step value.
+///
+/// [`DataValue::Int`]: ../../value/enum.DataValue.html#variant.Int
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct IncrementIdGenerator {
     nullable: Nullable,

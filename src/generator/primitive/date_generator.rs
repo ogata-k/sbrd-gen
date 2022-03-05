@@ -5,13 +5,15 @@ use crate::value::{DataValue, DataValueMap, SbrdDate, DATE_DEFAULT_FORMAT};
 use crate::GeneratorType;
 use chrono::Datelike;
 
-/// The generator with generate date value with the format
+/// The generator with generate [`SbrdDate`] value as [`DataValue::String`] with the format
 ///
 /// See [`format::strftime` module] for more information on `format` option.
 /// The default for `format` and the format when parsing is [`DATE_DEFAULT_FORMAT`].
 ///
+/// [`SbrdDate`]: ../../value/type.SbrdDate.html
+/// [`DataValue::String`]: ../../value/enum.DataValue.html#variant.String
 /// [`format::strftime` module]: https://docs.rs/chrono/0.4.19/chrono/format/strftime/index.html#specifiers
-/// [`DATE_DEFAULT_FORMAT`]: ../value/constant.DATE_DEFAULT_FORMAT.html
+/// [`DATE_DEFAULT_FORMAT`]: ../../value/constant.DATE_DEFAULT_FORMAT.html
 #[derive(Debug, PartialEq, Clone)]
 pub struct DateGenerator {
     nullable: Nullable,

@@ -5,7 +5,10 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
-/// The generator with string formatted by specified format
+/// The generator with [`DataValue::String`] formatted by specified `format` with evaluating by [`Evaluator`]
+///
+/// [`DataValue::String`]: ../../value/enum.DataValue.html#variant.String
+/// [`Evaluator`]: ../../eval/struct.Evaluator.html
 #[derive(Debug, PartialEq, Clone)]
 pub struct FormatGenerator {
     nullable: Nullable,

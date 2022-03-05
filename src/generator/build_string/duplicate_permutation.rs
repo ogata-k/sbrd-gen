@@ -4,7 +4,9 @@ use crate::generator::{Generator, RandomValueChildGenerator, Randomizer, Weighte
 use crate::value::{DataValue, DataValueMap, SbrdInt};
 use crate::GeneratorType;
 
-/// The generator with permuting string joined by separator
+/// The generator with permuting [`DataValue::String`] joined by separator
+///
+/// [`DataValue::String`]: ../../value/enum.DataValue.html#variant.String
 pub struct DuplicatePermutationGenerator<R: Randomizer + ?Sized> {
     nullable: Nullable,
     count_range: ValueBound<SbrdInt>,

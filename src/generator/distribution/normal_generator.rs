@@ -6,7 +6,9 @@ use crate::GeneratorType;
 use rand::distributions::Distribution;
 use rand_distr::Normal;
 
-/// The generator with generate from normal distribution
+/// The generator with generate [`DataValue::Real`] from normal distribution
+///
+/// [`DataValue::Real`]: ../../value/enum.DataValue.html#variant.Real
 #[derive(Debug, Clone, Copy)]
 pub struct NormalGenerator {
     nullable: Nullable,

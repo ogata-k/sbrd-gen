@@ -204,6 +204,21 @@ impl GeneratorBuilder {
     /// Build generator as the type
     pub fn build<R: Randomizer + ?Sized>(self) -> Result<Box<dyn Generator<R>>, BuildError> {
         match self.generator_type {
+            // build string
+            GeneratorType::DuplicatePermutation => {
+                build_generator!(self, R, DuplicatePermutationGenerator<R>)
+            }
+            GeneratorType::Format => build_generator!(self, R, FormatGenerator),
+
+            // distribution
+            GeneratorType::DistNormal => build_generator!(self, R, NormalGenerator),
+
+            // evaluate
+            GeneratorType::EvalInt => build_generator!(self, R, EvalGenerator<SbrdInt>),
+            GeneratorType::EvalReal => build_generator!(self, R, EvalGenerator<SbrdReal>),
+            GeneratorType::EvalBool => build_generator!(self, R, EvalGenerator<SbrdBool>),
+
+            // primitive
             GeneratorType::Int => build_generator!(self, R, IntGenerator),
             GeneratorType::Real => build_generator!(self, R, RealGenerator),
             GeneratorType::Bool => build_generator!(self, R, BoolGenerator),
@@ -212,19 +227,17 @@ impl GeneratorBuilder {
             GeneratorType::Time => build_generator!(self, R, TimeGenerator),
             GeneratorType::AlwaysNull => build_generator!(self, R, AlwaysNullGenerator),
             GeneratorType::IncrementId => build_generator!(self, R, IncrementIdGenerator),
-            GeneratorType::EvalInt => build_generator!(self, R, EvalGenerator<SbrdInt>),
-            GeneratorType::EvalReal => build_generator!(self, R, EvalGenerator<SbrdReal>),
-            GeneratorType::EvalBool => build_generator!(self, R, EvalGenerator<SbrdBool>),
-            GeneratorType::Format => build_generator!(self, R, FormatGenerator),
-            GeneratorType::Randomize => build_generator!(self, R, RandomizeGenerator<R>),
-            GeneratorType::DuplicatePermutation => {
-                build_generator!(self, R, DuplicatePermutationGenerator<R>)
-            }
+
+            // randomize children
             GeneratorType::CaseWhen => build_generator!(self, R, CaseWhenGenerator<R>),
+
+            // randomize values
             GeneratorType::SelectInt => build_generator!(self, R, SelectGenerator<SbrdInt>),
             GeneratorType::SelectReal => build_generator!(self, R, SelectGenerator<SbrdReal>),
             GeneratorType::SelectString => build_generator!(self, R, SelectGenerator<SbrdString>),
-            GeneratorType::DistNormal => build_generator!(self, R, NormalGenerator),
+
+            // random values and children
+            GeneratorType::Randomize => build_generator!(self, R, RandomizeGenerator<R>),
         }
     }
 
@@ -263,6 +276,136 @@ impl GeneratorBuilder {
             children: None,
         }
     }
+
+    //
+    // build string
+    //
+
+    /// Create builder for [`DuplicatePermutationGenerator`]
+    ///
+    /// [`DuplicatePermutationGenerator`]: ../generator/build_string/duplicate_permutation/struct.DuplicatePermutationGenerator.html
+    fn new_duplicate_permutation<S>(range: Option<ValueBound<SbrdInt>>, separator: S) -> Self
+    where
+        S: Into<String>,
+    {
+        let mut this = Self::new(GeneratorType::DuplicatePermutation).separator(separator);
+        if let Some(range) = range {
+            this = this.range(range.convert_into());
+        }
+
+        this
+    }
+
+    /// Create builder for [`DuplicatePermutationGenerator`] as generator with generate from children
+    ///
+    /// [`DuplicatePermutationGenerator`]: ../generator/build_string/duplicate_permutation/struct.DuplicatePermutationGenerator.html
+    pub fn new_duplicate_permutation_with_children<S>(
+        range: Option<ValueBound<SbrdInt>>,
+        separator: S,
+        children: Vec<ChildGeneratorBuilder>,
+    ) -> Self
+    where
+        S: Into<String>,
+    {
+        Self::new_duplicate_permutation(range, separator).children(children)
+    }
+
+    /// Create builder for [`DuplicatePermutationGenerator`] as generator with generate from chars, values, file
+    ///
+    /// [`DuplicatePermutationGenerator`]: ../generator/build_string/duplicate_permutation/struct.DuplicatePermutationGenerator.html
+    pub fn new_duplicate_permutation_with_select_list<S>(
+        range: Option<ValueBound<SbrdInt>>,
+        separator: S,
+        chars: Option<String>,
+        values: Option<Vec<String>>,
+        filepath: Option<PathBuf>,
+    ) -> Self
+    where
+        S: Into<String>,
+    {
+        let mut this = Self::new_duplicate_permutation(range, separator);
+        if chars.is_none() && values.is_none() && filepath.is_none() {
+            // default setting
+            this = this.values(Vec::new());
+        } else {
+            if let Some(chars) = chars {
+                this = this.chars(chars);
+            }
+            if let Some(values) = values {
+                this = this.values(values.into_iter().map(|v| v.into()).collect());
+            }
+            if let Some(filepath) = filepath {
+                this = this.filepath(filepath);
+            }
+        }
+
+        this
+    }
+
+    /// Create builder for [`FormatGenerator`]
+    ///
+    /// [`FormatGenerator`]: ../generator/build_string/format_generator/struct.FormatGenerator.html
+    pub fn new_format<S>(format: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self::new(GeneratorType::Format).format(format)
+    }
+
+    //
+    // distribution
+    //
+
+    /// Create builder for [`NormalGenerator`]
+    ///
+    /// [`NormalGenerator`]: ../generator/distribution/normal_generator/struct.NormalGenerator.html
+    pub fn new_dist_normal(mean: SbrdReal, std_dev: SbrdReal) -> Self {
+        let mut parameters = DataValueMap::new();
+        parameters.insert(NormalGenerator::MEAN.to_string(), mean.into());
+        parameters.insert(NormalGenerator::STD_DEV.to_string(), std_dev.into());
+        Self::new(GeneratorType::DistNormal).parameters(parameters)
+    }
+
+    //
+    // evaluate
+    //
+
+    /// Create builder for [`EvalGenerator`] with type [`SbrdInt`]
+    ///
+    /// [`EvalGenerator`]: ../generator/evaluate/eval_generator/struct.EvalGenerator.html
+    /// [`SbrdInt`]: ../value/type.SbrdInt.html
+    pub fn new_eval_int<S>(script: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self::new(GeneratorType::EvalInt).script(script)
+    }
+
+    /// Create builder for [`EvalGenerator`] with type [`SbrdReal`]
+    ///
+    /// [`EvalGenerator`]: ../generator/evaluate/eval_generator/struct.EvalGenerator.html
+    /// [`SbrdReal`]: ../value/type.SbrdReal.html
+    pub fn new_eval_real<S>(script: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self::new(GeneratorType::EvalReal).script(script)
+    }
+
+    /// Create builder for [`EvalGenerator`] with type [`SbrdBool`]
+    ///
+    /// [`EvalGenerator`]: ../generator/evaluate/eval_generator/struct.EvalGenerator.html
+    /// [`SbrdBool`]: ../value/type.SbrdBool.html
+    pub fn new_eval_bool<S>(script: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self::new(GeneratorType::EvalBool).script(script)
+    }
+
+    //
+    // primitive
+    //
 
     /// Create builder for [`IntGenerator`]
     ///
@@ -390,150 +533,9 @@ impl GeneratorBuilder {
         this
     }
 
-    /// Create builder for [`EvalGenerator`] with type [`SbrdInt`]
-    ///
-    /// [`EvalGenerator`]: ../generator/evaluate/eval_generator/struct.EvalGenerator.html
-    /// [`SbrdInt`]: ../value/type.SbrdInt.html
-    pub fn new_eval_int<S>(script: S) -> Self
-    where
-        S: Into<String>,
-    {
-        Self::new(GeneratorType::EvalInt).script(script)
-    }
-
-    /// Create builder for [`EvalGenerator`] with type [`SbrdReal`]
-    ///
-    /// [`EvalGenerator`]: ../generator/evaluate/eval_generator/struct.EvalGenerator.html
-    /// [`SbrdReal`]: ../value/type.SbrdReal.html
-    pub fn new_eval_real<S>(script: S) -> Self
-    where
-        S: Into<String>,
-    {
-        Self::new(GeneratorType::EvalReal).script(script)
-    }
-
-    /// Create builder for [`EvalGenerator`] with type [`SbrdBool`]
-    ///
-    /// [`EvalGenerator`]: ../generator/evaluate/eval_generator/struct.EvalGenerator.html
-    /// [`SbrdBool`]: ../value/type.SbrdBool.html
-    pub fn new_eval_bool<S>(script: S) -> Self
-    where
-        S: Into<String>,
-    {
-        Self::new(GeneratorType::EvalBool).script(script)
-    }
-
-    /// Create builder for [`FormatGenerator`]
-    ///
-    /// [`FormatGenerator`]: ../generator/build_string/format_generator/struct.FormatGenerator.html
-    pub fn new_format<S>(format: S) -> Self
-    where
-        S: Into<String>,
-    {
-        Self::new(GeneratorType::Format).format(format)
-    }
-
-    /// Create builder for [`RandomizeGenerator`]
-    ///
-    /// [`RandomizeGenerator`]: ../generator/random_values_children/randomize_generator/struct.RandomizeGenerator.html
-    fn new_randomize() -> Self {
-        Self::new(GeneratorType::Randomize)
-    }
-
-    /// Create builder for [`RandomizeGenerator`] as generator with generate from children
-    ///
-    /// [`RandomizeGenerator`]: ../generator/random_values_children/randomize_generator/struct.RandomizeGenerator.html
-    pub fn new_randomize_with_children(children: Vec<ChildGeneratorBuilder>) -> Self {
-        Self::new_randomize().children(children)
-    }
-
-    /// Create builder for [`RandomizeGenerator`] as generator with generate from chars, values, file
-    ///
-    /// [`RandomizeGenerator`]: ../generator/random_values_children/randomize_generator/struct.RandomizeGenerator.html
-    pub fn new_randomize_with_select_list(
-        chars: Option<String>,
-        values: Option<Vec<String>>,
-        filepath: Option<PathBuf>,
-    ) -> Self {
-        let mut this = Self::new_randomize();
-        if chars.is_none() && values.is_none() && filepath.is_none() {
-            // default setting
-            this = this.values(Vec::new());
-        } else {
-            if let Some(chars) = chars {
-                this = this.chars(chars);
-            }
-            if let Some(values) = values {
-                this = this.values(values.into_iter().map(|v| v.into()).collect());
-            }
-            if let Some(filepath) = filepath {
-                this = this.filepath(filepath);
-            }
-        }
-
-        this
-    }
-
-    /// Create builder for [`DuplicatePermutationGenerator`]
-    ///
-    /// [`DuplicatePermutationGenerator`]: ../generator/build_string/duplicate_permutation/struct.DuplicatePermutationGenerator.html
-    fn new_duplicate_permutation<S>(range: Option<ValueBound<SbrdInt>>, separator: S) -> Self
-    where
-        S: Into<String>,
-    {
-        let mut this = Self::new(GeneratorType::DuplicatePermutation).separator(separator);
-        if let Some(range) = range {
-            this = this.range(range.convert_into());
-        }
-
-        this
-    }
-
-    /// Create builder for [`DuplicatePermutationGenerator`] as generator with generate from children
-    ///
-    /// [`DuplicatePermutationGenerator`]: ../generator/build_string/duplicate_permutation/struct.DuplicatePermutationGenerator.html
-    pub fn new_duplicate_permutation_with_children<S>(
-        range: Option<ValueBound<SbrdInt>>,
-        separator: S,
-        children: Vec<ChildGeneratorBuilder>,
-    ) -> Self
-    where
-        S: Into<String>,
-    {
-        Self::new_duplicate_permutation(range, separator).children(children)
-    }
-
-    /// Create builder for [`DuplicatePermutationGenerator`] as generator with generate from chars, values, file
-    ///
-    /// [`DuplicatePermutationGenerator`]: ../generator/build_string/duplicate_permutation/struct.DuplicatePermutationGenerator.html
-    pub fn new_duplicate_permutation_with_select_list<S>(
-        range: Option<ValueBound<SbrdInt>>,
-        separator: S,
-        chars: Option<String>,
-        values: Option<Vec<String>>,
-        filepath: Option<PathBuf>,
-    ) -> Self
-    where
-        S: Into<String>,
-    {
-        let mut this = Self::new_duplicate_permutation(range, separator);
-        if chars.is_none() && values.is_none() && filepath.is_none() {
-            // default setting
-            this = this.values(Vec::new());
-        } else {
-            if let Some(chars) = chars {
-                this = this.chars(chars);
-            }
-            if let Some(values) = values {
-                this = this.values(values.into_iter().map(|v| v.into()).collect());
-            }
-            if let Some(filepath) = filepath {
-                this = this.filepath(filepath);
-            }
-        }
-
-        this
-    }
+    //
+    // randomize children
+    //
 
     /// Create builder for [`CaseWhenGenerator`] as generator with generate from children
     ///
@@ -541,6 +543,10 @@ impl GeneratorBuilder {
     pub fn new_case_when(children: Vec<ChildGeneratorBuilder>) -> Self {
         Self::new(GeneratorType::CaseWhen).children(children)
     }
+
+    //
+    // randomize values
+    //
 
     /// Create builder for [`SelectGenerator`] with type [`SbrdInt`]
     ///
@@ -626,14 +632,49 @@ impl GeneratorBuilder {
         this
     }
 
-    /// Create builder for [`NormalGenerator`]
+    //
+    // random values and children
+    //
+
+    /// Create builder for [`RandomizeGenerator`]
     ///
-    /// [`NormalGenerator`]: ../generator/distribution/normal_generator/struct.NormalGenerator.html
-    pub fn new_dist_normal(mean: SbrdReal, std_dev: SbrdReal) -> Self {
-        let mut parameters = DataValueMap::new();
-        parameters.insert(NormalGenerator::MEAN.to_string(), mean.into());
-        parameters.insert(NormalGenerator::STD_DEV.to_string(), std_dev.into());
-        Self::new(GeneratorType::DistNormal).parameters(parameters)
+    /// [`RandomizeGenerator`]: ../generator/random_values_children/randomize_generator/struct.RandomizeGenerator.html
+    fn new_randomize() -> Self {
+        Self::new(GeneratorType::Randomize)
+    }
+
+    /// Create builder for [`RandomizeGenerator`] as generator with generate from children
+    ///
+    /// [`RandomizeGenerator`]: ../generator/random_values_children/randomize_generator/struct.RandomizeGenerator.html
+    pub fn new_randomize_with_children(children: Vec<ChildGeneratorBuilder>) -> Self {
+        Self::new_randomize().children(children)
+    }
+
+    /// Create builder for [`RandomizeGenerator`] as generator with generate from chars, values, file
+    ///
+    /// [`RandomizeGenerator`]: ../generator/random_values_children/randomize_generator/struct.RandomizeGenerator.html
+    pub fn new_randomize_with_select_list(
+        chars: Option<String>,
+        values: Option<Vec<String>>,
+        filepath: Option<PathBuf>,
+    ) -> Self {
+        let mut this = Self::new_randomize();
+        if chars.is_none() && values.is_none() && filepath.is_none() {
+            // default setting
+            this = this.values(Vec::new());
+        } else {
+            if let Some(chars) = chars {
+                this = this.chars(chars);
+            }
+            if let Some(values) = values {
+                this = this.values(values.into_iter().map(|v| v.into()).collect());
+            }
+            if let Some(filepath) = filepath {
+                this = this.filepath(filepath);
+            }
+        }
+
+        this
     }
 }
 

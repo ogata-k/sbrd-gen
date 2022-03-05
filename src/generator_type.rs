@@ -5,32 +5,52 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Clone, Copy)]
 #[serde(rename_all = "kebab-case")]
 pub enum GeneratorType {
+    //
+    // build string
+    //
+    DuplicatePermutation,
+    Format,
+
+    //
+    // distribution
+    //
+    DistNormal,
+
+    //
+    // evaluate
+    //
+    EvalInt,
+    EvalReal,
+    EvalBool,
+
+    //
     // primitive
+    //
     Int,
     Real,
     Bool,
     DateTime,
     Date,
     Time,
-    // special primitive
     AlwaysNull,
     IncrementId,
-    // evaluate
-    EvalInt,
-    EvalReal,
-    EvalBool,
-    // join
-    Format,
-    // randomize child generator
-    Randomize,
-    DuplicatePermutation,
-    // random select
+
+    //
+    // randomize children
+    //
     CaseWhen,
+
+    //
+    // randomize values
+    //
     SelectInt,
     SelectReal,
     SelectString,
-    // distribution
-    DistNormal,
+
+    //
+    // random values and children
+    //
+    Randomize,
 }
 
 impl std::fmt::Display for GeneratorType {

@@ -1,0 +1,183 @@
+keys:
+  - duplicate-permutation-with-children-key
+  - duplicate-permutation-with-select-list-key
+  - format-key
+  - dist-normal-key
+  - eval-int-key
+  - eval-real-key
+  - eval-bool-key
+  - int-key
+  - real-key
+  - bool-key
+  - date-time-key
+  - date-key
+  - time-key
+  - always-null-key
+  - increment-id-key
+  - case-when-key
+  - select-int-key
+  - select-real-key
+  - select-string-key
+  - randomize-with-children-key
+  - randomize-with-select-list-key
+generators:
+  - key: duplicate-permutation-with-children-key
+    type: duplicate-permutation
+    range:
+      start: 3
+      end: 5
+    children:
+      - weight: 3
+        type: int
+      - type: real
+      - weight: 3
+        type: bool
+      - type: date-time
+      - weight: 3
+        type: date
+      - type: time
+    separator: " "
+  - key: duplicate-permutation-with-select-list-key
+    type: duplicate-permutation
+    chars: ABC
+    values:
+      - "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+      - "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+      - "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+      - "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    filepath: "./list/list-up.txt"
+    separator: " "
+  - key: format-key
+    type: format
+    format: "Lorem ipsum: \"{duplicate-permutation-with-select-list-key}\""
+  - key: dist-normal-key
+    type: dist-normal
+    parameters:
+      mean: 50.0
+      std_dev: 10.0
+  - key: eval-int-key
+    type: eval-int
+    script: 10 * 10
+  - key: eval-real-key
+    type: eval-real
+    script: "({dist-normal-key}-50)/10"
+  - key: eval-bool-key
+    type: eval-bool
+    script: "{dist-normal-key} < 50"
+  - key: int-key
+    type: int
+    range:
+      start: 1
+      end: 100
+  - key: real-key
+    type: real
+    range:
+      start: 0.0
+      end: 1.0
+  - key: bool-key
+    type: bool
+  - key: date-time-key
+    type: date-time
+    nullable:
+      use_null: true
+    range:
+      start: "2022-03-05 13:41:30"
+      include_end: false
+      end: "2022-03-06 13:41:30"
+    format: "%H:%M %Y/%m/%d"
+  - key: date-key
+    type: date
+    nullable:
+      use_null: true
+    range:
+      start: 2021-03-06
+      include_end: false
+      end: 2022-03-06
+    format: "%Y/%m/%d"
+  - key: time-key
+    type: time
+    nullable:
+      use_null: true
+    range:
+      start: "00:00:00"
+      end: "13:41:30"
+    format: "%H:%M"
+  - key: always-null-key
+    type: always-null
+  - key: increment-id-key
+    type: increment-id
+    increment:
+      initial: 100
+      step: 10
+  - key: case-when-key
+    type: case-when
+    children:
+      - case: "{int-key} < 0"
+        type: int
+      - case: "0 <= {int-key} && {int-key} < 10"
+        type: real
+      - case: "10 <= {int-key} && {int-key} < 25"
+        type: bool
+      - case: "25 <= {int-key} && {int-key} < 50"
+        type: date-time
+      - case: "50 <= {int-key} && {int-key} < 75"
+        type: date
+      - type: time
+  - key: select-int-key
+    type: select-int
+    chars: "0123456789"
+    values:
+      - 10
+      - 20
+      - 30
+      - 40
+      - 50
+      - 60
+      - 70
+      - 80
+      - 90
+      - 100
+  - key: select-real-key
+    type: select-real
+    chars: "0123456789"
+    values:
+      - 10.5
+      - 20.5
+      - 30.5
+      - 40.5
+      - 50.5
+      - 60.5
+      - 70.5
+      - 80.5
+      - 90.5
+      - 100.5
+  - key: select-string-key
+    type: select-string
+    chars: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+    values:
+      - "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+      - "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+      - "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+      - "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    filepath: "./list/list-up.txt"
+  - key: randomize-with-children-key
+    type: randomize
+    children:
+      - weight: 3
+        type: int
+      - type: real
+      - weight: 3
+        type: bool
+      - type: date-time
+      - weight: 3
+        type: date
+      - type: time
+  - key: randomize-with-select-list-key
+    type: randomize
+    chars: ABC
+    values:
+      - "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+      - "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+      - "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+      - "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    filepath: "./list/list-up.txt"

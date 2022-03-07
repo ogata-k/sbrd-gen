@@ -6,6 +6,9 @@ use evalexpr::{eval_boolean, eval_float, eval_int, EvalexprError};
 
 /// Evaluator for `script` and `format`
 /// Script and format is processed by replacing "{key}" with value based on each entry `(key, value)` of context.
+/// If you'll know syntax and available functions more, you can see [`this document`]
+///
+/// [`this document`]: https://docs.rs/evalexpr/7.0.1/evalexpr/index.html#features
 #[derive(Debug, PartialEq, Clone)]
 pub struct Evaluator<'a> {
     script: &'a str,

@@ -1,15 +1,14 @@
 //! Example for all builder from json
 
-use std::fs::File;
-use std::io::stdout;
-use std::path::PathBuf;
 use rand::thread_rng;
 use sbrd_gen::file::set_schema_file_path;
 use sbrd_gen::parser::{JsonParser, SchemaParser};
 use sbrd_gen::writer::{GeneratedValueWriter, PrettyJsonWriter};
+use std::fs::File;
+use std::io::stdout;
+use std::path::PathBuf;
 
-fn main()
-{
+fn main() {
     let schema_dir = get_schema_dir();
     let schema_file_path = schema_dir.join("all.json");
 
@@ -29,18 +28,23 @@ fn main()
 
     let count = 10;
     let mut writer = PrettyJsonWriter::from_writer(stdout());
-    writer.write_with_generate(true, &schema, &mut rng, count).unwrap();
+    writer
+        .write_with_generate(true, &schema, &mut rng, count)
+        .unwrap();
     writer.flush().unwrap();
 }
 
-fn get_schema_dir()->PathBuf
-{
+fn get_schema_dir() -> PathBuf {
     let schema_dir = std::env::current_exe().unwrap();
     schema_dir
-        .parent().unwrap()
-        .parent().unwrap()
-        .parent().unwrap()
-        .parent().unwrap()
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
         .join("examples")
         .join("schema")
 }

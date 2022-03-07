@@ -1,16 +1,15 @@
 //! Example for all builder's helper
 
-use std::io::stdout;
-use std::ops::Sub;
-use std::path::PathBuf;
 use chrono::{Duration, Local, NaiveTime};
 use rand::thread_rng;
 use sbrd_gen::builder::{GeneratorBuilder, ParentGeneratorBuilder, ValueBound, ValueStep};
-use sbrd_gen::SchemaBuilder;
 use sbrd_gen::writer::{GeneratedValueWriter, PrettyJsonWriter};
+use sbrd_gen::SchemaBuilder;
+use std::io::stdout;
+use std::ops::Sub;
+use std::path::PathBuf;
 
-fn main()
-{
+fn main() {
     let schema_builder = SchemaBuilder::new(output_list(), builder_list());
     let schema = schema_builder.build().unwrap();
 
@@ -22,24 +21,28 @@ fn main()
 
     let count = 10;
     let mut writer = PrettyJsonWriter::from_writer(stdout());
-    writer.write_with_generate(true, &schema, &mut rng, count).unwrap();
+    writer
+        .write_with_generate(true, &schema, &mut rng, count)
+        .unwrap();
     writer.flush().unwrap();
 }
 
-fn get_schema_dir()->PathBuf
-{
+fn get_schema_dir() -> PathBuf {
     let schema_dir = std::env::current_exe().unwrap();
-   schema_dir
-        .parent().unwrap()
-        .parent().unwrap()
-        .parent().unwrap()
-        .parent().unwrap()
+    schema_dir
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
         .join("examples")
         .join("schema")
 }
 
-fn output_list() -> Vec<String>
-{
+fn output_list() -> Vec<String> {
     vec![
         "duplicate-permutation-with-children-key".to_string(),
         "duplicate-permutation-with-select-list-key".to_string(),
@@ -60,19 +63,26 @@ fn output_list() -> Vec<String>
         "select-int-key".to_string(),
         "select-real-key".to_string(),
         "select-string-key".to_string(),
+        "get-int-value-at-from-chars-key".to_string(),
+        "get-int-value-at-from-values-key".to_string(),
+        "get-int-value-at-from-file-key".to_string(),
+        "get-real-value-at-from-chars-key".to_string(),
+        "get-real-value-at-from-values-key".to_string(),
+        "get-real-value-at-from-file-key".to_string(),
+        "get-string-value-at-from-chars-key".to_string(),
+        "get-string-value-at-from-values-key".to_string(),
+        "get-string-value-at-from-file-key".to_string(),
         "randomize-with-children-key".to_string(),
         "randomize-with-select-list-key".to_string(),
     ]
 }
 
-fn builder_list() -> Vec<ParentGeneratorBuilder>
-{
+fn builder_list() -> Vec<ParentGeneratorBuilder> {
     let scheme_dir = get_schema_dir();
-    let dummy_list_up_filepath = scheme_dir
-        .join("list")
-        .join("list-up.txt");
+    let dummy_list_up_filepath = scheme_dir.join("list").join("list-up.txt");
+    let dummy_num_filepath = scheme_dir.join("list").join("num.txt");
 
-     let now = Local::now();
+    let now = Local::now();
 
     vec![
         GeneratorBuilder::new_duplicate_permutation_with_children(Some(ValueBound::new(Some(3), Some((true, 5)))),
@@ -137,6 +147,48 @@ fn builder_list() -> Vec<ParentGeneratorBuilder>
             ]),
             Some(dummy_list_up_filepath.clone())
         ).into_parent("select-string-key"),
+        GeneratorBuilder::new_int(Some((0..10).into())).into_parent("int-index"),
+        GeneratorBuilder::new_get_int_value_at_from_chars(
+            "{int-index}",
+            "0123456789"
+        ).into_parent("get-int-value-at-from-chars-key"),
+        GeneratorBuilder::new_get_int_value_at_from_values("{int-index}",
+                                                           vec![0,10,20,30,40,50,60,70,80,90],
+        ).into_parent("get-int-value-at-from-values-key"),
+        GeneratorBuilder::new_get_int_value_at_from_file("{int-index}",dummy_num_filepath.clone()
+        ).into_parent("get-int-value-at-from-file-key"),
+        GeneratorBuilder::new_int(Some((0..10).into())).into_parent("real-index"),
+        GeneratorBuilder::new_get_real_value_at_from_chars(
+            "{real-index}",
+            "0123456789"
+        ).into_parent("get-real-value-at-from-chars-key"),
+        GeneratorBuilder::new_get_real_value_at_from_values("{real-index}",
+                                                            vec![0.0, 10.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0],
+        ).into_parent("get-real-value-at-from-values-key"),
+        GeneratorBuilder::new_get_real_value_at_from_file("{real-index}",dummy_num_filepath.clone()
+        ).into_parent("get-real-value-at-from-file-key"),
+        GeneratorBuilder::new_int(Some((0..10).into())).into_parent("string-index"),
+        GeneratorBuilder::new_get_string_value_at_from_chars(
+            "{string-index}",
+            "0123456789"
+        ).into_parent("get-string-value-at-from-chars-key"),
+        GeneratorBuilder::new_get_string_value_at_from_values(
+            "{string-index}",
+            vec![
+                "0".to_string(),
+                "1".to_string(),
+                "2".to_string(),
+                "3".to_string(),
+                "4".to_string(),
+                "5".to_string(),
+                "6".to_string(),
+                "7".to_string(),
+                "8".to_string(),
+                "9".to_string(),
+            ],
+        ).into_parent("get-string-value-at-from-values-key"),
+        GeneratorBuilder::new_get_string_value_at_from_file("{string-index}",dummy_num_filepath.clone()
+        ).into_parent("get-string-value-at-from-file-key"),
         GeneratorBuilder::new_randomize_with_children(vec![
             GeneratorBuilder::new_int(None).into_child().weight(3),
             GeneratorBuilder::new_real(None).into_child(),

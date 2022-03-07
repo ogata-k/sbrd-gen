@@ -18,6 +18,15 @@ keys:
   - select-int-key
   - select-real-key
   - select-string-key
+  - get-int-value-at-from-chars-key
+  - get-int-value-at-from-values-key
+  - get-int-value-at-from-file-key
+  - get-real-value-at-from-chars-key
+  - get-real-value-at-from-values-key
+  - get-real-value-at-from-file-key
+  - get-string-value-at-from-chars-key
+  - get-string-value-at-from-values-key
+  - get-string-value-at-from-file-key
   - randomize-with-children-key
   - randomize-with-select-list-key
 generators:
@@ -160,6 +169,91 @@ generators:
       - "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
       - "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     filepath: "./list/list-up.txt"
+  - key: int-index
+    type: int
+    range:
+      start: 0
+      include_end: false
+      end: 10
+  - key: get-int-value-at-from-chars-key
+    type: get-int-value-at
+    chars: "0123456789"
+    script: "{int-index}"
+  - key: get-int-value-at-from-values-key
+    type: get-int-value-at
+    values:
+      - 0
+      - 10
+      - 20
+      - 30
+      - 40
+      - 50
+      - 60
+      - 70
+      - 80
+      - 90
+    script: "{int-index}"
+  - key: get-int-value-at-from-file-key
+    type: get-int-value-at
+    filepath: "./list/num.txt"
+    script: "{int-index}"
+  - key: real-index
+    type: int
+    range:
+      start: 0
+      include_end: false
+      end: 10
+  - key: get-real-value-at-from-chars-key
+    type: get-real-value-at
+    chars: "0123456789"
+    script: "{real-index}"
+  - key: get-real-value-at-from-values-key
+    type: get-real-value-at
+    values:
+      - 0.0
+      - 10.0
+      - 20.0
+      - 30.0
+      - 40.0
+      - 50.0
+      - 60.0
+      - 70.0
+      - 80.0
+      - 90.0
+    script: "{real-index}"
+  - key: get-real-value-at-from-file-key
+    type: get-real-value-at
+    filepath: "./list/num.txt"
+    script: "{real-index}"
+  - key: string-index
+    type: int
+    range:
+      start: 0
+      include_end: false
+      end: 10
+  - key: get-string-value-at-from-chars-key
+    type: get-string-value-at
+    chars: "0123456789"
+    script: "{string-index}"
+  - key: get-string-value-at-from-values-key
+    type: get-string-value-at
+    values:
+      - "0"
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+      - "8"
+      - "9"
+    script: "{string-index}"
+  - key: get-string-value-at-from-file-key
+    type: get-string-value-at
+    filepath: "./list/num.txt"
+    script: "{string-index}"
+
   - key: randomize-with-children-key
     type: randomize
     children:

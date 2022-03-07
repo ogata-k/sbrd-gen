@@ -108,6 +108,21 @@ pub enum GeneratorType {
     /// [`SelectGenerator`]: ../generator/random_values/struct.SelectGenerator.html
     /// [`DataValue::String`]: ../value/enum.DataValue.html#variant.String
     SelectString,
+    /// Type for [`GetValueAtGenerator`] as  [`DataValue::Int`]
+    ///
+    /// [`GetValueAtGenerator`]: ../generator/random_values/struct.GetValueAtGenerator.html
+    /// [`DataValue::Int`]: ../value/enum.DataValue.html#variant.Int
+    GetIntValueAt,
+    /// Type for [`GetValueAtGenerator`] as  [`DataValue::Real`]
+    ///
+    /// [`GetValueAtGenerator`]: ../generator/random_values/struct.GetValueAtGenerator.html
+    /// [`DataValue::Real`]: ../value/enum.DataValue.html#variant.Real
+    GetRealValueAt,
+    /// Type for [`GetValueAtGenerator`] as  [`DataValue::String`]
+    ///
+    /// [`GetValueAtGenerator`]: ../generator/random_values/struct.GetValueAtGenerator.html
+    /// [`DataValue::String`]: ../value/enum.DataValue.html#variant.String
+    GetStringValueAt,
 
     //
     // random values and children

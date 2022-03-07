@@ -251,3 +251,78 @@ pub trait RandomValueChildGenerator<R: Randomizer + ?Sized> {
             })
     }
 }
+
+/// Base trait for a generator with get at the index from input values
+pub trait GetValueAtTheIndexGenerator<R: Randomizer + ?Sized, T> {
+    /// Function of parser the input value
+    fn parse(input: &str) -> Result<T, BuildError>;
+
+    /// Build selectable value
+    fn build_selectable(
+        chars: Option<String>,
+        values: Option<Vec<DataValue>>,
+        filepath: Option<PathBuf>,
+    ) -> Result<Vec<T>, BuildError> {
+        let mut some_count = 0;
+        if chars.is_some() {
+            some_count += 1;
+        }
+        if values.is_some() {
+            some_count += 1;
+        }
+        if filepath.is_some() {
+            some_count += 1;
+        }
+        if some_count == 0 || some_count > 1 {
+            return Err(BuildError::OnlyOneOptionSpecifiedNot(vec![
+                "chars".to_string(),
+                "values".to_string(),
+                "filepath".to_string(),
+            ]));
+        }
+
+        let mut selectable_values: Vec<T> = Vec::new();
+
+        if let Some(chars) = chars {
+            for c in chars.chars() {
+                selectable_values.push(Self::parse(&c.to_string())?);
+            }
+        }
+
+        if let Some(values) = values {
+            for value in values.into_iter() {
+                selectable_values.push(Self::parse(&value.to_parse_string())?);
+            }
+        }
+
+        if let Some(filepath) = filepath {
+            let file = open_sbrd_file(filepath.as_path())
+                .map_err(|e| BuildError::FileError(e, filepath.clone()))?;
+            let reader = BufReader::new(file);
+            for line in reader.lines() {
+                let line = line.map_err(|e| BuildError::FileError(e, filepath.clone()))?;
+                selectable_values.push(Self::parse(&line)?);
+            }
+        }
+
+        if selectable_values.is_empty() {
+            return Err(BuildError::EmptySelectValues);
+        }
+
+        Ok(selectable_values)
+    }
+
+    /// Get available values
+    fn get_values(&self) -> &[T];
+
+    /// Get value at the index as 0-origin
+    fn get_value_at(&self, index: usize) -> Result<&T, GenerateError> {
+        match self.get_values().get(index) {
+            None => Err(GenerateError::FailGenerate(format!(
+                "Not found value at index {}",
+                index
+            ))),
+            Some(v) => Ok(v),
+        }
+    }
+}

@@ -6,7 +6,7 @@ use crate::value::{DataValue, DataValueMap, SbrdInt, SbrdReal, SbrdString};
 use crate::GeneratorType;
 use std::str::FromStr;
 
-/// The generator with generate value as the type T from value's list as the type
+/// The generator that gets a T value from the values with the value evaluated by `script` as the index of 0-index.
 pub struct GetValueAtGenerator<T> {
     nullable: Nullable,
     script: String,

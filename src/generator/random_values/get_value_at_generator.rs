@@ -1,7 +1,7 @@
 use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
-use crate::generator::{Generator, GetValueAtTheIndexGenerator, Randomizer};
+use crate::generator::{Generator, Randomizer, SingleValueOptionGenerator};
 use crate::value::{DataValue, DataValueMap, SbrdInt, SbrdReal, SbrdString};
 use crate::GeneratorType;
 use std::str::FromStr;
@@ -13,15 +13,11 @@ pub struct GetValueAtGenerator<T> {
     selectable_values: Vec<T>,
 }
 
-impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> GetValueAtTheIndexGenerator<R, T>
+impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> SingleValueOptionGenerator<R, T>
     for GetValueAtGenerator<T>
 {
     fn parse(input: &str) -> Result<T, BuildError> {
         T::parse(input)
-    }
-
-    fn get_values(&self) -> &[T] {
-        self.selectable_values.as_slice()
     }
 }
 
@@ -47,7 +43,7 @@ impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> Generator<R>
         }
 
         let selectable_values =
-            <Self as GetValueAtTheIndexGenerator<R, T>>::build_selectable(chars, values, filepath)?;
+            <Self as SingleValueOptionGenerator<R, T>>::build_selectable(chars, values, filepath)?;
 
         match script {
             None => Err(BuildError::NotExistValueOf("script".to_string())),
@@ -80,7 +76,13 @@ impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> Generator<R>
             )
         })?;
 
-        GetValueAtTheIndexGenerator::<R, T>::get_value_at(self, index).map(|v| v.to_data_value())
+        match self.selectable_values.get(index) {
+            None => Err(GenerateError::FailGenerate(format!(
+                "Not found value at index {}",
+                index
+            ))),
+            Some(v) => Ok(v.to_data_value()),
+        }
     }
 }
 

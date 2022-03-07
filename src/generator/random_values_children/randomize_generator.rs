@@ -1,6 +1,6 @@
 use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
-use crate::generator::{Generator, RandomValueChildGenerator, Randomizer, WeightedValueChild};
+use crate::generator::{Generator, MultiOptionsValueChildGenerator, Randomizer, WeightedValueChild};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
@@ -10,7 +10,7 @@ pub struct RandomizeGenerator<R: Randomizer + ?Sized> {
     selectable_values: Vec<WeightedValueChild<R>>,
 }
 
-impl<R: Randomizer + ?Sized> RandomValueChildGenerator<R> for RandomizeGenerator<R> {
+impl<R: Randomizer + ?Sized> MultiOptionsValueChildGenerator<R> for RandomizeGenerator<R> {
     fn get_selectable(&self) -> &[WeightedValueChild<R>] {
         &self.selectable_values
     }

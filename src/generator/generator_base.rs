@@ -62,7 +62,7 @@ pub type CasedChild<R> = (Option<String>, Box<dyn Generator<R>>);
 ///
 /// [`Option::Some`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.Some
 /// [`Option::None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None
-pub trait RandomCasedChildGenerator<R: Randomizer + ?Sized> {
+pub trait CasedChildGenerator<R: Randomizer + ?Sized> {
     /// Build selectable child generator list
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,
@@ -133,7 +133,7 @@ pub trait RandomCasedChildGenerator<R: Randomizer + ?Sized> {
 }
 
 /// Base trait for a generator from input values with many options
-pub trait MultiValueOptionsGenerator<R: Randomizer + ?Sized, T> {
+pub trait MultiOptionsValueGenerator<R: Randomizer + ?Sized, T> {
     /// Function of parser the input value
     fn parse(input: &str) -> Result<T, BuildError>;
 
@@ -173,9 +173,8 @@ pub trait MultiValueOptionsGenerator<R: Randomizer + ?Sized, T> {
         Ok(selectable_values)
     }
 }
-
 /// Base trait for a generator from input values with only one option
-pub trait SingleValueOptionGenerator<R: Randomizer + ?Sized, T> {
+pub trait SingleOptionValueGenerator<R: Randomizer + ?Sized, T> {
     /// Function of parser the input value
     fn parse(input: &str) -> Result<T, BuildError>;
 
@@ -204,7 +203,6 @@ pub trait SingleValueOptionGenerator<R: Randomizer + ?Sized, T> {
         }
 
         let mut selectable_values: Vec<T> = Vec::new();
-
         if let Some(chars) = chars {
             for c in chars.chars() {
                 selectable_values.push(Self::parse(&c.to_string())?);
@@ -237,8 +235,8 @@ pub trait SingleValueOptionGenerator<R: Randomizer + ?Sized, T> {
 
 /// Value or Child generator with weight
 pub type WeightedValueChild<R> = (Weight, Either<String, Box<dyn Generator<R>>>);
-/// Base trait for a generator use picked out value from input values or generated value picked out child generator
-pub trait RandomValueChildGenerator<R: Randomizer + ?Sized> {
+/// Base trait for a generator use picked out value from input values or generated value picked out child generator with many options
+pub trait MultiOptionsValueChildGenerator<R: Randomizer + ?Sized> {
     /// Build selectable value and child generator with weight list
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,
@@ -253,6 +251,94 @@ pub trait RandomValueChildGenerator<R: Randomizer + ?Sized> {
             return Err(BuildError::NotExistValueOf(
                 "children xor (chars, values, file)".to_string(),
             ));
+        }
+
+        let mut select_values = Vec::new();
+        if let Some(children) = children {
+            for child_builder in children.into_iter() {
+                let ChildGeneratorBuilder {
+                    weight, builder, ..
+                } = child_builder;
+                select_values.push((weight.unwrap_or(1), Either::Right(builder.build()?)));
+            }
+        }
+
+        if let Some(chars) = chars {
+            select_values.extend(chars.chars().map(|c| (1, Either::Left(c.to_string()))));
+        }
+
+        if let Some(values) = values {
+            select_values.extend(values.into_iter().map(|v| (1, Either::Left(v.to_string()))));
+        }
+
+        if let Some(filepath) = filepath {
+            let file = open_sbrd_file(filepath.as_path())
+                .map_err(|e| BuildError::FileError(e, filepath.clone()))?;
+            let reader = BufReader::new(file);
+            for line in reader.lines() {
+                let line = line.map_err(|e| BuildError::FileError(e, filepath.clone()))?;
+                select_values.push((1, Either::Left(line)));
+            }
+        }
+
+        if select_values.is_empty() {
+            return Err(BuildError::EmptyRandomize);
+        }
+
+        if select_values.iter().fold(0, |acc, item| acc + item.0) == 0 {
+            return Err(BuildError::AllWeightsZero);
+        }
+
+        Ok(select_values)
+    }
+
+    /// Get selectable list
+    fn get_selectable(&self) -> &[WeightedValueChild<R>];
+
+    /// Pick out value from input values or generated value picked out child generator
+    fn choose(
+        &self,
+        rng: &mut R,
+        value_map: &DataValueMap<&str>,
+    ) -> Result<DataValue, GenerateError> {
+        self.get_selectable()
+            .choose_weighted(rng, |item| item.0)
+            .map_err(|err| GenerateError::FailGenerate(err.to_string()))
+            .and_then(|(_, either)| match either {
+                Either::Left(item) => Ok(item.clone().into()),
+                Either::Right(item) => item.generate(rng, value_map),
+            })
+    }
+}
+/// Base trait for a generator use picked out value from input values or generated value picked out child generator with only one option
+pub trait SingleOptionValueChildGenerator<R: Randomizer + ?Sized> {
+    /// Build selectable value and child generator with weight list
+    fn build_selectable(
+        children: Option<Vec<ChildGeneratorBuilder>>,
+        chars: Option<String>,
+        values: Option<Vec<DataValue>>,
+        filepath: Option<PathBuf>,
+    ) -> Result<Vec<WeightedValueChild<R>>, BuildError> {
+        let mut some_count = 0;
+        if children.is_some() {
+            some_count += 1;
+        }
+        if chars.is_some() {
+            some_count += 1;
+        }
+        if values.is_some() {
+            some_count += 1;
+        }
+        if filepath.is_some() {
+            some_count += 1;
+        }
+        if some_count == 0 || some_count > 1 {
+            return Err(BuildError::OnlyOneOptionSpecifiedNot(vec![
+                "children".to_string(),
+                "chars".to_string(),
+                "values".to_string(),
+                "filepath".to_string(),
+            ]));
         }
 
         let mut select_values = Vec::new();

@@ -1,6 +1,6 @@
 use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
-use crate::generator::{CasedChild, Generator, RandomCasedChildGenerator, Randomizer};
+use crate::generator::{CasedChild, Generator, CasedChildGenerator, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
@@ -15,7 +15,7 @@ pub struct CaseWhenGenerator<R: Randomizer + ?Sized> {
     children: Vec<CasedChild<R>>,
 }
 
-impl<R: Randomizer + ?Sized> RandomCasedChildGenerator<R> for CaseWhenGenerator<R> {
+impl<R: Randomizer + ?Sized> CasedChildGenerator<R> for CaseWhenGenerator<R> {
     fn get_children(&self) -> &[CasedChild<R>] {
         self.children.as_slice()
     }

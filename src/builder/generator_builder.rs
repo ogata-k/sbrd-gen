@@ -219,6 +219,7 @@ impl GeneratorBuilder {
             GeneratorType::EvalInt => build_generator!(self, R, EvalGenerator<SbrdInt>),
             GeneratorType::EvalReal => build_generator!(self, R, EvalGenerator<SbrdReal>),
             GeneratorType::EvalBool => build_generator!(self, R, EvalGenerator<SbrdBool>),
+            GeneratorType::EvalString => build_generator!(self, R, EvalGenerator<SbrdString>),
 
             // primitive
             GeneratorType::Int => build_generator!(self, R, IntGenerator),
@@ -413,6 +414,17 @@ impl GeneratorBuilder {
         S: Into<String>,
     {
         Self::new(GeneratorType::EvalBool).script(script)
+    }
+
+    /// Create builder for [`EvalGenerator`] with type [`SbrdString`]
+    ///
+    /// [`EvalGenerator`]: ../generator/evaluate/eval_generator/struct.EvalGenerator.html
+    /// [`SbrdString`]: ../value/type.SbrdString.html
+    pub fn new_eval_string<S>(script: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self::new(GeneratorType::EvalString).script(script)
     }
 
     //

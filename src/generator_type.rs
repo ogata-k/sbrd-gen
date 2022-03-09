@@ -45,6 +45,11 @@ pub enum GeneratorType {
     /// [`EvalGenerator`]: ../generator/evaluate/struct.EvalGenerator.html
     /// [`DataValue::Bool`]: ../value/enum.DataValue.html#variant.Bool
     EvalBool,
+    /// Type for [`EvalGenerator`] as  [`DataValue::String`]
+    ///
+    /// [`EvalGenerator`]: ../generator/evaluate/struct.EvalGenerator.html
+    /// [`DataValue::String`]: ../value/enum.DataValue.html#variant.String
+    EvalString,
 
     //
     // primitive

@@ -6,6 +6,7 @@ keys:
   - eval-int-key
   - eval-real-key
   - eval-bool-key
+  - eval-string-key
   - int-key
   - real-key
   - bool-key
@@ -76,6 +77,9 @@ generators:
   - key: eval-bool-key
     type: eval-bool
     script: "{dist-normal-key} < 50"
+  - key: eval-string-key
+    type: eval-string
+    script: "\"string: {dist-normal-key}\""
   - key: int-key
     type: int
     range:

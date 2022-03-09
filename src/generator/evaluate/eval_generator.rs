@@ -2,7 +2,7 @@ use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::{EvalResult, Evaluator};
 use crate::generator::{Generator, Randomizer};
-use crate::value::{DataValue, DataValueMap, SbrdBool, SbrdInt, SbrdReal};
+use crate::value::{DataValue, DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
 use crate::GeneratorType;
 use std::marker::PhantomData;
 
@@ -101,5 +101,15 @@ impl ForEvalGeneratorType for SbrdBool {
     fn eval_script<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
         let evaluator = Evaluator::new(script, context);
         evaluator.eval_bool().map(|v| v.into())
+    }
+}
+impl ForEvalGeneratorType for SbrdString {
+    fn get_generator_type() -> GeneratorType {
+        GeneratorType::EvalString
+    }
+
+    fn eval_script<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
+        let evaluator = Evaluator::new(script, context);
+        evaluator.eval_string().map(|v| v.into())
     }
 }

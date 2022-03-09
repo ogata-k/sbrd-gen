@@ -2,7 +2,7 @@
 //! Module for evaluator for `script` and `format`
 
 use crate::value::{DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
-use evalexpr::{eval_boolean, eval_float, eval_int, EvalexprError};
+use evalexpr::{eval_boolean, eval_float, eval_int, eval_string, EvalexprError};
 
 /// Evaluator for `script` and `format`
 /// Script and format is processed by replacing "{key}" with value based on each entry `(key, value)` of context.
@@ -62,5 +62,12 @@ impl<'a> Evaluator<'a> {
     /// [`SbrdBool`]: ../value/type.SbrdBool.html
     pub fn eval_bool(&self) -> EvalResult<SbrdBool> {
         eval_boolean(&self.format_script()?).map(|v| v as SbrdBool)
+    }
+
+    /// Evaluate the script applied the context, as [`SbrdString`]
+    ///
+    /// [`SbrdString`]: ../value/type.SbrdString.html
+    pub fn eval_string(&self) -> EvalResult<SbrdString> {
+        eval_string(&self.format_script()?)
     }
 }

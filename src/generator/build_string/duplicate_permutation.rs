@@ -87,13 +87,13 @@ impl<R: Randomizer + ?Sized> Generator<R> for DuplicatePermutationGenerator<R> {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         let mut result: String = String::new();
         let mut is_first = true;
         let count = rng.gen_range(self.count_range);
         for _ in 0..count {
-            let value_string = self.choose(rng, value_map)?.to_permutation_string();
+            let value_string = self.choose(rng, context)?.to_permutation_string();
             if value_string.is_empty() {
                 continue;
             }

@@ -52,8 +52,8 @@ impl<R: Randomizer + ?Sized> Generator<R> for CaseWhenGenerator<R> {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
-        self.generate_from_children(rng, value_map)
+        self.generate_from_children(rng, context)
     }
 }

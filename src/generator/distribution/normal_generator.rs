@@ -85,7 +85,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for NormalGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _value_map: &DataValueMap<&str>,
+        _context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         Ok(DataValue::Real(self.distribution.sample(rng)))
     }

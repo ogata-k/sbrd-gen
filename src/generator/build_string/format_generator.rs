@@ -47,16 +47,16 @@ impl<R: Randomizer + ?Sized> Generator<R> for FormatGenerator {
     fn generate_without_null(
         &self,
         _rng: &mut R,
-        value_map: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         Ok(DataValue::String(
-            Evaluator::new(&self.format, value_map)
+            Evaluator::new(&self.format, context)
                 .format_script()
                 .map_err(|e| {
                     GenerateError::FailEval(
                         e,
                         self.format.to_string(),
-                        value_map
+                        context
                             .clone()
                             .into_iter()
                             .map(|(k, v)| (k.to_string(), v))

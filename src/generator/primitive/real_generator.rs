@@ -64,7 +64,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for RealGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _value_map: &DataValueMap<&str>,
+        _context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         let real = rng.gen_range(self.range);
 

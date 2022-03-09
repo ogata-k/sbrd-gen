@@ -62,14 +62,14 @@ impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> Generator<R>
     fn generate_without_null(
         &self,
         _rng: &mut R,
-        value_map: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
-        let evaluator = Evaluator::new(&self.script, value_map);
+        let evaluator = Evaluator::new(&self.script, context);
         let index: usize = evaluator.eval_int().map(|v| v as usize).map_err(|e| {
             GenerateError::FailEval(
                 e,
                 self.script.clone(),
-                value_map
+                context
                     .iter()
                     .map(|(k, v)| (k.to_string(), v.clone()))
                     .collect::<DataValueMap<String>>(),

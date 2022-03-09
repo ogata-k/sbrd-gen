@@ -49,13 +49,13 @@ impl<R: Randomizer + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGener
     fn generate_without_null(
         &self,
         _rng: &mut R,
-        value_map: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
-        F::eval_script(&self.script, value_map).map_err(|e| {
+        F::eval_script(&self.script, context).map_err(|e| {
             GenerateError::FailEval(
                 e,
                 self.script.clone(),
-                value_map
+                context
                     .iter()
                     .map(|(k, v)| (k.to_string(), v.clone()))
                     .collect::<DataValueMap<String>>(),

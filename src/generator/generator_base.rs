@@ -32,16 +32,16 @@ pub trait Generator<R: Randomizer + ?Sized> {
     fn generate(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         if self.is_required() {
-            self.generate_without_null(rng, value_map)
+            self.generate_without_null(rng, context)
         } else {
             if rng.gen_bool(0.1) {
                 return Ok(DataValue::Null);
             }
 
-            self.generate_without_null(rng, value_map)
+            self.generate_without_null(rng, context)
         }
     }
 
@@ -49,7 +49,7 @@ pub trait Generator<R: Randomizer + ?Sized> {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError>;
 }
 
@@ -100,18 +100,18 @@ pub trait CasedChildGenerator<R: Randomizer + ?Sized> {
     fn generate_from_children(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         for (condition, generator) in self.get_children().iter() {
             return match condition {
-                None => generator.generate(rng, value_map),
+                None => generator.generate(rng, context),
                 Some(_condition) => {
-                    let evaluator = Evaluator::new(_condition, value_map);
+                    let evaluator = Evaluator::new(_condition, context);
                     let is_satisfy = evaluator.eval_bool().map_err(|e| {
                         GenerateError::FailEval(
                             e,
                             _condition.clone(),
-                            value_map
+                            context
                                 .iter()
                                 .map(|(k, v)| (k.to_string(), v.clone()))
                                 .collect::<DataValueMap<String>>(),
@@ -121,7 +121,7 @@ pub trait CasedChildGenerator<R: Randomizer + ?Sized> {
                         continue;
                     }
 
-                    generator.generate(rng, value_map)
+                    generator.generate(rng, context)
                 }
             };
         }
@@ -299,14 +299,14 @@ pub trait MultiOptionsValueChildGenerator<R: Randomizer + ?Sized> {
     fn choose(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         self.get_selectable()
             .choose_weighted(rng, |item| item.0)
             .map_err(|err| GenerateError::FailGenerate(err.to_string()))
             .and_then(|(_, either)| match either {
                 Either::Left(item) => Ok(item.clone().into()),
-                Either::Right(item) => item.generate(rng, value_map),
+                Either::Right(item) => item.generate(rng, context),
             })
     }
 }
@@ -387,14 +387,14 @@ pub trait SingleOptionValueChildGenerator<R: Randomizer + ?Sized> {
     fn choose(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         self.get_selectable()
             .choose_weighted(rng, |item| item.0)
             .map_err(|err| GenerateError::FailGenerate(err.to_string()))
             .and_then(|(_, either)| match either {
                 Either::Left(item) => Ok(item.clone().into()),
-                Either::Right(item) => item.generate(rng, value_map),
+                Either::Right(item) => item.generate(rng, context),
             })
     }
 }

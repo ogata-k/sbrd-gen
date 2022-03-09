@@ -50,7 +50,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for GetValueIndexGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _value_map: &DataValueMap<&str>,
+        _context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         let gen_value = rng.gen_range(0..self.values_count);
         if gen_value <= SbrdInt::MAX as usize {

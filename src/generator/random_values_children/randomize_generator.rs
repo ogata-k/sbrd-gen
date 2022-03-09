@@ -52,8 +52,8 @@ impl<R: Randomizer + ?Sized> Generator<R> for RandomizeGenerator<R> {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        value_map: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
-        self.choose(rng, value_map)
+        self.choose(rng, context)
     }
 }

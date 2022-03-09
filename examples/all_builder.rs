@@ -72,6 +72,9 @@ fn output_list() -> Vec<String> {
         "get-string-value-at-from-chars-key".to_string(),
         "get-string-value-at-from-values-key".to_string(),
         "get-string-value-at-from-file-key".to_string(),
+        "get-value-index-from-chars-key".to_string(),
+        "get-value-index-from-values-key".to_string(),
+        "get-value-index-from-file-key".to_string(),
         "randomize-with-children-key".to_string(),
         "randomize-with-select-list-key".to_string(),
     ]
@@ -189,6 +192,15 @@ fn builder_list() -> Vec<ParentGeneratorBuilder> {
         ).into_parent("get-string-value-at-from-values-key"),
         GeneratorBuilder::new_get_string_value_at_from_file("{string-index}",dummy_num_filepath.clone()
         ).into_parent("get-string-value-at-from-file-key"),
+        GeneratorBuilder::new_get_value_index_from_chars(
+            "0123456789"
+        ).into_parent("get-value-index-from-chars-key"),
+        GeneratorBuilder::new_get_value_index_from_values(
+            vec![0.into(),10.into(),20.into(),30.into(),40.into(),50.into(),60.into(),70.into(),80.into(),90.into()],
+        ).into_parent("get-value-index-from-values-key"),
+        GeneratorBuilder::new_get_value_index_from_file(
+           dummy_num_filepath.clone()
+        ).into_parent("get-value-index-from-file-key"),
         GeneratorBuilder::new_randomize_with_children(vec![
             GeneratorBuilder::new_int(None).into_child().weight(3),
             GeneratorBuilder::new_real(None).into_child(),

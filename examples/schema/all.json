@@ -28,6 +28,9 @@
     "get-string-value-at-from-chars-key",
     "get-string-value-at-from-values-key",
     "get-string-value-at-from-file-key",
+    "get-value-index-from-chars-key",
+    "get-value-index-from-values-key",
+    "get-value-index-from-file-key",
     "randomize-with-children-key",
     "randomize-with-select-list-key"
   ],
@@ -363,6 +366,32 @@
       "type": "get-string-value-at",
       "filepath": "./list/num.txt",
       "script": "{string-index}"
+    },
+    {
+      "key": "get-value-index-from-chars-key",
+      "type": "get-value-index",
+      "chars": "0123456789"
+    },
+    {
+      "key": "get-value-index-from-values-key",
+      "type": "get-value-index",
+      "values": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90
+      ]
+    },
+    {
+      "key": "get-value-index-from-file-key",
+      "type": "get-value-index",
+      "filepath": "./list/num.txt"
     },
     {
       "key": "randomize-with-children-key",

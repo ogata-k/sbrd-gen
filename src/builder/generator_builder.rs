@@ -13,7 +13,9 @@ use crate::generator::primitive::{
     IntGenerator, RealGenerator, TimeGenerator,
 };
 use crate::generator::random_children::CaseWhenGenerator;
-use crate::generator::random_values::{GetValueAtGenerator, SelectGenerator};
+use crate::generator::random_values::{
+    GetValueAtGenerator, GetValueIndexGenerator, SelectGenerator,
+};
 use crate::generator::random_values_children::RandomizeGenerator;
 use crate::generator::{Generator, Randomizer};
 use crate::generator_type::GeneratorType;
@@ -241,6 +243,9 @@ impl GeneratorBuilder {
             }
             GeneratorType::GetStringValueAt => {
                 build_generator!(self, R, GetValueAtGenerator<SbrdString>)
+            }
+            GeneratorType::GetValueIndex => {
+                build_generator!(self, R, GetValueIndexGenerator)
             }
 
             // random values and children
@@ -775,6 +780,40 @@ impl GeneratorBuilder {
         P: Into<PathBuf>,
     {
         Self::new_get_string_value_at(script).filepath(filepath)
+    }
+
+    /// Create builder for [`GetValueIndexGenerator`]
+    ///
+    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndex.html
+    fn new_get_value_index() -> Self {
+        Self::new(GeneratorType::GetValueIndex)
+    }
+
+    /// Create builder for [`GetValueIndexGenerator`]
+    ///
+    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndex.html
+    pub fn new_get_value_index_from_chars<S>(chars: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self::new_get_value_index().chars(chars)
+    }
+
+    /// Create builder for [`GetValueIndexGenerator`]
+    ///
+    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndex.html
+    pub fn new_get_value_index_from_values(values: Vec<DataValue>) -> Self {
+        Self::new_get_value_index().values(values)
+    }
+
+    /// Create builder for [`GetValueIndexGenerator`]
+    ///
+    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndex.html
+    pub fn new_get_value_index_from_file<P>(filepath: P) -> Self
+    where
+        P: Into<PathBuf>,
+    {
+        Self::new_get_value_index().filepath(filepath)
     }
 
     //

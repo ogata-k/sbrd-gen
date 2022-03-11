@@ -128,7 +128,7 @@ pub enum GeneratorType {
     /// [`GetValueAtGenerator`]: ../generator/random_values/struct.GetValueAtGenerator.html
     /// [`DataValue::String`]: ../value/enum.DataValue.html#variant.String
     GetStringValueAt,
-    /// Type for [`GetValueIndexGenerator`] as  [`DataValue::String`]
+    /// Type for [`GetValueIndexGenerator`]
     ///
     /// [`GetValueIndexGenerator`]: ../generator/random_values/struct.GetValueIndexGenerator.html
     GetValueIndex,

@@ -283,42 +283,34 @@ pub trait SingleOptionValueGenerator<R: Randomizer + ?Sized, T> {
     }
 }
 
-/// Value or Child generator with weight
-pub type WeightedValueChild<R> = (Weight, Either<String, Box<dyn Generator<R>>>);
+/// Value as String or Child for a generator.
+///
+/// Usually, this structure is used by a generator which generate value as string,
+/// because input value's type is unknown and a type of the generated value by child generator is also unknown.
+pub type ValueOrChild<R> = Either<String, Box<dyn Generator<R>>>;
 /// Base trait for a generator use picked out value from input values or generated value picked out child generator with many options
 pub trait MultiOptionsValueChildGenerator<R: Randomizer + ?Sized> {
-    /// Build selectable value and child generator with weight list
+    /// Build selectable value and child generator
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,
         chars: Option<String>,
         values: Option<Vec<DataValue>>,
         filepath: Option<PathBuf>,
-    ) -> Result<Vec<WeightedValueChild<R>>, BuildError> {
-        // children xor (chars, values, file)
-        if !((children.is_some() && (chars.is_none() || values.is_none() || filepath.is_none()))
-            || (children.is_none() && (chars.is_some() || values.is_some() || filepath.is_some())))
-        {
-            return Err(BuildError::NotExistValueOf(
-                "children xor (chars, values, file)".to_string(),
-            ));
-        }
-
+    ) -> Result<Vec<ValueOrChild<R>>, BuildError> {
         let mut select_values = Vec::new();
         if let Some(children) = children {
             for child_builder in children.into_iter() {
-                let ChildGeneratorBuilder {
-                    weight, builder, ..
-                } = child_builder;
-                select_values.push((weight.unwrap_or(1), Either::Right(builder.build()?)));
+                let ChildGeneratorBuilder { builder, .. } = child_builder;
+                select_values.push(Either::Right(builder.build()?));
             }
         }
 
         if let Some(chars) = chars {
-            select_values.extend(chars.chars().map(|c| (1, Either::Left(c.to_string()))));
+            select_values.extend(chars.chars().map(|c| Either::Left(c.to_string())));
         }
 
         if let Some(values) = values {
-            select_values.extend(values.into_iter().map(|v| (1, Either::Left(v.to_string()))));
+            select_values.extend(values.into_iter().map(|v| Either::Left(v.to_string())));
         }
 
         if let Some(filepath) = filepath {
@@ -327,7 +319,7 @@ pub trait MultiOptionsValueChildGenerator<R: Randomizer + ?Sized> {
             let reader = BufReader::new(file);
             for line in reader.lines() {
                 let line = line.map_err(|e| BuildError::FileError(e, filepath.clone()))?;
-                select_values.push((1, Either::Left(line)));
+                select_values.push(Either::Left(line));
             }
         }
 
@@ -335,15 +327,11 @@ pub trait MultiOptionsValueChildGenerator<R: Randomizer + ?Sized> {
             return Err(BuildError::EmptySelectable);
         }
 
-        if select_values.iter().fold(0, |acc, item| acc + item.0) == 0 {
-            return Err(BuildError::AllWeightsZero);
-        }
-
         Ok(select_values)
     }
 
     /// Get selectable list
-    fn get_selectable(&self) -> &[WeightedValueChild<R>];
+    fn get_selectable(&self) -> &[ValueOrChild<R>];
 
     /// Pick out value from input values or generated value picked out child generator
     fn choose(
@@ -352,9 +340,9 @@ pub trait MultiOptionsValueChildGenerator<R: Randomizer + ?Sized> {
         context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         self.get_selectable()
-            .choose_weighted(rng, |item| item.0)
+            .choose_weighted(rng, |_| 1)
             .map_err(|err| GenerateError::FailGenerate(err.to_string()))
-            .and_then(|(_, either)| match either {
+            .and_then(|either| match either {
                 Either::Left(item) => Ok(item.clone().into()),
                 Either::Right(item) => item.generate(rng, context),
             })
@@ -362,13 +350,13 @@ pub trait MultiOptionsValueChildGenerator<R: Randomizer + ?Sized> {
 }
 /// Base trait for a generator use picked out value from input values or generated value picked out child generator with only one option
 pub trait SingleOptionValueChildGenerator<R: Randomizer + ?Sized> {
-    /// Build selectable value and child generator with weight list
+    /// Build selectable value and child generator
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,
         chars: Option<String>,
         values: Option<Vec<DataValue>>,
         filepath: Option<PathBuf>,
-    ) -> Result<Vec<WeightedValueChild<R>>, BuildError> {
+    ) -> Result<Vec<ValueOrChild<R>>, BuildError> {
         let mut some_count = 0;
         if children.is_some() {
             some_count += 1;
@@ -394,19 +382,17 @@ pub trait SingleOptionValueChildGenerator<R: Randomizer + ?Sized> {
         let mut select_values = Vec::new();
         if let Some(children) = children {
             for child_builder in children.into_iter() {
-                let ChildGeneratorBuilder {
-                    weight, builder, ..
-                } = child_builder;
-                select_values.push((weight.unwrap_or(1), Either::Right(builder.build()?)));
+                let ChildGeneratorBuilder { builder, .. } = child_builder;
+                select_values.push(Either::Right(builder.build()?));
             }
         }
 
         if let Some(chars) = chars {
-            select_values.extend(chars.chars().map(|c| (1, Either::Left(c.to_string()))));
+            select_values.extend(chars.chars().map(|c| Either::Left(c.to_string())));
         }
 
         if let Some(values) = values {
-            select_values.extend(values.into_iter().map(|v| (1, Either::Left(v.to_string()))));
+            select_values.extend(values.into_iter().map(|v| Either::Left(v.to_string())));
         }
 
         if let Some(filepath) = filepath {
@@ -415,7 +401,7 @@ pub trait SingleOptionValueChildGenerator<R: Randomizer + ?Sized> {
             let reader = BufReader::new(file);
             for line in reader.lines() {
                 let line = line.map_err(|e| BuildError::FileError(e, filepath.clone()))?;
-                select_values.push((1, Either::Left(line)));
+                select_values.push(Either::Left(line));
             }
         }
 
@@ -423,15 +409,11 @@ pub trait SingleOptionValueChildGenerator<R: Randomizer + ?Sized> {
             return Err(BuildError::EmptySelectable);
         }
 
-        if select_values.iter().fold(0, |acc, item| acc + item.0) == 0 {
-            return Err(BuildError::AllWeightsZero);
-        }
-
         Ok(select_values)
     }
 
     /// Get selectable list
-    fn get_selectable(&self) -> &[WeightedValueChild<R>];
+    fn get_selectable(&self) -> &[ValueOrChild<R>];
 
     /// Pick out value from input values or generated value picked out child generator
     fn choose(
@@ -440,9 +422,9 @@ pub trait SingleOptionValueChildGenerator<R: Randomizer + ?Sized> {
         context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         self.get_selectable()
-            .choose_weighted(rng, |item| item.0)
+            .choose_weighted(rng, |_| 1)
             .map_err(|err| GenerateError::FailGenerate(err.to_string()))
-            .and_then(|(_, either)| match either {
+            .and_then(|either| match either {
                 Either::Left(item) => Ok(item.clone().into()),
                 Either::Right(item) => item.generate(rng, context),
             })

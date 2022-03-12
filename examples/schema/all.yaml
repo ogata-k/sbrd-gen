@@ -1,6 +1,5 @@
 keys:
-  - duplicate-permutation-with-children-key
-  - duplicate-permutation-with-select-list-key
+  - duplicate-permutation-key
   - format-key
   - dist-normal-key
   - eval-int-key
@@ -33,24 +32,18 @@ keys:
   - get-value-index-from-values-key
   - get-value-index-from-file-key
 generators:
-  - key: duplicate-permutation-with-children-key
+  - key: duplicate-permutation-key
     type: duplicate-permutation
     range:
       start: 3
       end: 5
     children:
-      - weight: 3
-        type: int
+      - type: int
       - type: real
-      - weight: 3
-        type: bool
+      - type: bool
       - type: date-time
-      - weight: 3
-        type: date
+      - type: date
       - type: time
-    separator: " "
-  - key: duplicate-permutation-with-select-list-key
-    type: duplicate-permutation
     chars: ABC
     values:
       - "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
@@ -61,7 +54,7 @@ generators:
     separator: " "
   - key: format-key
     type: format
-    format: "Lorem ipsum: \"{duplicate-permutation-with-select-list-key}\""
+    format: "Lorem ipsum: \"{duplicate-permutation-key}\""
   - key: dist-normal-key
     type: dist-normal
     parameters:

@@ -1,8 +1,6 @@
 use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
 use crate::error::{BuildError, GenerateError};
-use crate::generator::{
-    Generator, MultiOptionsValueChildGenerator, Randomizer, WeightedValueChild,
-};
+use crate::generator::{Generator, MultiOptionsValueChildGenerator, Randomizer, ValueOrChild};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
 use crate::GeneratorType;
 
@@ -13,13 +11,13 @@ pub struct DuplicatePermutationGenerator<R: Randomizer + ?Sized> {
     nullable: Nullable,
     count_range: ValueBound<SbrdInt>,
     separator: String,
-    selectable_values: Vec<WeightedValueChild<R>>,
+    selectable_values: Vec<ValueOrChild<R>>,
 }
 
 impl<R: Randomizer + ?Sized> MultiOptionsValueChildGenerator<R>
     for DuplicatePermutationGenerator<R>
 {
-    fn get_selectable(&self) -> &[WeightedValueChild<R>] {
+    fn get_selectable(&self) -> &[ValueOrChild<R>] {
         &self.selectable_values
     }
 }
@@ -94,13 +92,10 @@ impl<R: Randomizer + ?Sized> Generator<R> for DuplicatePermutationGenerator<R> {
         let count = rng.gen_range(self.count_range);
         for _ in 0..count {
             let value_string = self.choose(rng, context)?.to_permutation_string();
-            if value_string.is_empty() {
-                continue;
-            }
 
             if is_first {
-                result += &value_string;
                 is_first = false;
+                result += &value_string;
             } else {
                 result.push_str(&self.separator);
                 result += &value_string;

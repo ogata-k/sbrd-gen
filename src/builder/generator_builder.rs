@@ -291,10 +291,17 @@ impl GeneratorBuilder {
     // build string
     //
 
-    /// Create builder for [`DuplicatePermutationGenerator`]
+    /// Create builder for [`DuplicatePermutationGenerator`] as generator
     ///
     /// [`DuplicatePermutationGenerator`]: ../generator/build_string/duplicate_permutation/struct.DuplicatePermutationGenerator.html
-    fn new_duplicate_permutation<S>(range: Option<ValueBound<SbrdInt>>, separator: S) -> Self
+    pub fn new_duplicate_permutation<S>(
+        range: Option<ValueBound<SbrdInt>>,
+        separator: S,
+        children: Option<Vec<ChildGeneratorBuilder>>,
+        chars: Option<String>,
+        values: Option<Vec<String>>,
+        filepath: Option<PathBuf>,
+    ) -> Self
     where
         S: Into<String>,
     {
@@ -303,50 +310,17 @@ impl GeneratorBuilder {
             this = this.range(range.convert_into());
         }
 
-        this
-    }
-
-    /// Create builder for [`DuplicatePermutationGenerator`] as generator with generate from children
-    ///
-    /// [`DuplicatePermutationGenerator`]: ../generator/build_string/duplicate_permutation/struct.DuplicatePermutationGenerator.html
-    pub fn new_duplicate_permutation_with_children<S>(
-        range: Option<ValueBound<SbrdInt>>,
-        separator: S,
-        children: Vec<ChildGeneratorBuilder>,
-    ) -> Self
-    where
-        S: Into<String>,
-    {
-        Self::new_duplicate_permutation(range, separator).children(children)
-    }
-
-    /// Create builder for [`DuplicatePermutationGenerator`] as generator with generate from chars, values, file
-    ///
-    /// [`DuplicatePermutationGenerator`]: ../generator/build_string/duplicate_permutation/struct.DuplicatePermutationGenerator.html
-    pub fn new_duplicate_permutation_with_select_list<S>(
-        range: Option<ValueBound<SbrdInt>>,
-        separator: S,
-        chars: Option<String>,
-        values: Option<Vec<String>>,
-        filepath: Option<PathBuf>,
-    ) -> Self
-    where
-        S: Into<String>,
-    {
-        let mut this = Self::new_duplicate_permutation(range, separator);
-        if chars.is_none() && values.is_none() && filepath.is_none() {
-            // default setting
-            this = this.values(Vec::new());
-        } else {
-            if let Some(chars) = chars {
-                this = this.chars(chars);
-            }
-            if let Some(values) = values {
-                this = this.values(values.into_iter().map(|v| v.into()).collect());
-            }
-            if let Some(filepath) = filepath {
-                this = this.filepath(filepath);
-            }
+        if let Some(children) = children {
+            this = this.children(children);
+        }
+        if let Some(chars) = chars {
+            this = this.chars(chars);
+        }
+        if let Some(values) = values {
+            this = this.values(values.into_iter().map(|v| v.into()).collect());
+        }
+        if let Some(filepath) = filepath {
+            this = this.filepath(filepath);
         }
 
         this
@@ -586,19 +560,14 @@ impl GeneratorBuilder {
         filepath: Option<PathBuf>,
     ) -> Self {
         let mut this = Self::new(GeneratorType::SelectInt);
-        if chars.is_none() && values.is_none() && filepath.is_none() {
-            // default setting
-            this = this.values(Vec::new());
-        } else {
-            if let Some(chars) = chars {
-                this = this.chars(chars);
-            }
-            if let Some(values) = values {
-                this = this.values(values.into_iter().map(|v| v.into()).collect());
-            }
-            if let Some(filepath) = filepath {
-                this = this.filepath(filepath);
-            }
+        if let Some(chars) = chars {
+            this = this.chars(chars);
+        }
+        if let Some(values) = values {
+            this = this.values(values.into_iter().map(|v| v.into()).collect());
+        }
+        if let Some(filepath) = filepath {
+            this = this.filepath(filepath);
         }
 
         this
@@ -614,19 +583,14 @@ impl GeneratorBuilder {
         filepath: Option<PathBuf>,
     ) -> Self {
         let mut this = Self::new(GeneratorType::SelectReal);
-        if chars.is_none() && values.is_none() && filepath.is_none() {
-            // default setting
-            this = this.values(Vec::new());
-        } else {
-            if let Some(chars) = chars {
-                this = this.chars(chars);
-            }
-            if let Some(values) = values {
-                this = this.values(values.into_iter().map(|v| v.into()).collect());
-            }
-            if let Some(filepath) = filepath {
-                this = this.filepath(filepath);
-            }
+        if let Some(chars) = chars {
+            this = this.chars(chars);
+        }
+        if let Some(values) = values {
+            this = this.values(values.into_iter().map(|v| v.into()).collect());
+        }
+        if let Some(filepath) = filepath {
+            this = this.filepath(filepath);
         }
 
         this
@@ -642,19 +606,14 @@ impl GeneratorBuilder {
         filepath: Option<PathBuf>,
     ) -> Self {
         let mut this = Self::new(GeneratorType::SelectString);
-        if chars.is_none() && values.is_none() && filepath.is_none() {
-            // default setting
-            this = this.values(Vec::new());
-        } else {
-            if let Some(chars) = chars {
-                this = this.chars(chars);
-            }
-            if let Some(values) = values {
-                this = this.values(values.into_iter().map(|v| v.into()).collect());
-            }
-            if let Some(filepath) = filepath {
-                this = this.filepath(filepath);
-            }
+        if let Some(chars) = chars {
+            this = this.chars(chars);
+        }
+        if let Some(values) = values {
+            this = this.values(values.into_iter().map(|v| v.into()).collect());
+        }
+        if let Some(filepath) = filepath {
+            this = this.filepath(filepath);
         }
 
         this

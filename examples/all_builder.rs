@@ -44,8 +44,7 @@ fn get_schema_dir() -> PathBuf {
 
 fn output_list() -> Vec<String> {
     vec![
-        "duplicate-permutation-with-children-key".to_string(),
-        "duplicate-permutation-with-select-list-key".to_string(),
+        "duplicate-permutation-key".to_string(),
         "format-key".to_string(),
         "dist-normal-key".to_string(),
         "eval-int-key".to_string(),
@@ -88,24 +87,23 @@ fn builder_list() -> Vec<ParentGeneratorBuilder> {
     let now = Local::now();
 
     vec![
-        GeneratorBuilder::new_duplicate_permutation_with_children(Some(ValueBound::new(Some(3), Some((true, 5)))),
-        " ", vec![
-                GeneratorBuilder::new_int(None).into_child().weight(3),
+        GeneratorBuilder::new_duplicate_permutation(Some(ValueBound::new(Some(3), Some((true, 5)))),
+        " ", Some(vec![
+                GeneratorBuilder::new_int(None).into_child(),
                 GeneratorBuilder::new_real(None).into_child(),
-                GeneratorBuilder::new_bool().into_child().weight(3),
+                GeneratorBuilder::new_bool().into_child(),
                 GeneratorBuilder::new_date_time(None, None).into_child(),
-                GeneratorBuilder::new_date(None, None).into_child().weight(3),
+                GeneratorBuilder::new_date(None, None).into_child(),
                 GeneratorBuilder::new_time(None, None).into_child(),
-            ]).into_parent("duplicate-permutation-with-children-key"),
-        GeneratorBuilder::new_duplicate_permutation_with_select_list(None, " ",
+            ]),
         Some("ABC".to_string()), Some(vec![
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_string(),
                 "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.".to_string(),
                 "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.".to_string(),
                 "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string(),
             ]), Some(dummy_list_up_filepath.clone())
-        ).into_parent("duplicate-permutation-with-select-list-key"),
-        GeneratorBuilder::new_format("Lorem ipsum: \"{duplicate-permutation-with-select-list-key}\"")
+        ).into_parent("duplicate-permutation-key"),
+        GeneratorBuilder::new_format("Lorem ipsum: \"{duplicate-permutation-key}\"")
             .into_parent("format-key"),
         GeneratorBuilder::new_dist_normal(50.0, 10.0).into_parent("dist-normal-key"),
         GeneratorBuilder::new_eval_int("10 * 10").into_parent("eval-int-key"),

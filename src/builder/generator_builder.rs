@@ -9,9 +9,10 @@ use crate::generator::build_string::{DuplicatePermutationGenerator, FormatGenera
 use crate::generator::distribution::NormalGenerator;
 use crate::generator::evaluate::EvalGenerator;
 use crate::generator::primitive::{
-    AlwaysNullGenerator, BoolGenerator, DateGenerator, DateTimeGenerator, IncrementIdGenerator,
+    AlwaysNullGenerator, BoolGenerator, DateGenerator, DateTimeGenerator,
     IntGenerator, RealGenerator, TimeGenerator,
 };
+use crate::generator::incremental::IncrementIdGenerator;
 use crate::generator::random_children::{CaseWhenGenerator, RandomChildGenerator};
 use crate::generator::random_values::{
     GetValueAtGenerator, GetValueIndexGenerator, SelectGenerator,
@@ -220,6 +221,9 @@ impl GeneratorBuilder {
             GeneratorType::EvalBool => build_generator!(self, R, EvalGenerator<SbrdBool>),
             GeneratorType::EvalString => build_generator!(self, R, EvalGenerator<SbrdString>),
 
+            // incremental
+            GeneratorType::IncrementId => build_generator!(self, R, IncrementIdGenerator),
+
             // primitive
             GeneratorType::Int => build_generator!(self, R, IntGenerator),
             GeneratorType::Real => build_generator!(self, R, RealGenerator),
@@ -228,7 +232,6 @@ impl GeneratorBuilder {
             GeneratorType::Date => build_generator!(self, R, DateGenerator),
             GeneratorType::Time => build_generator!(self, R, TimeGenerator),
             GeneratorType::AlwaysNull => build_generator!(self, R, AlwaysNullGenerator),
-            GeneratorType::IncrementId => build_generator!(self, R, IncrementIdGenerator),
 
             // randomize children
             GeneratorType::CaseWhen => build_generator!(self, R, CaseWhenGenerator<R>),
@@ -399,6 +402,23 @@ impl GeneratorBuilder {
     }
 
     //
+    // incremental
+    //
+
+    /// Create builder for [`IncrementIdGenerator`]
+    ///
+    /// [`IncrementIdGenerator`]: ../generator/incremental/increment_id_generator/struct.IncrementIdGenerator.html
+    pub fn new_increment_id(increment: Option<ValueStep<SbrdInt>>) -> Self {
+        let mut this = Self::new(GeneratorType::IncrementId);
+
+        if let Some(_increment) = increment {
+            this = this.increment(_increment.convert_with(DataValue::from))
+        }
+
+        this
+    }
+
+    //
     // primitive
     //
 
@@ -513,19 +533,6 @@ impl GeneratorBuilder {
     /// [`AlwaysNullGenerator`]: ../generator/primitive/always_null_generator/struct.AlwaysNullGenerator.html
     pub fn new_always_null() -> Self {
         Self::new(GeneratorType::AlwaysNull)
-    }
-
-    /// Create builder for [`IncrementIdGenerator`]
-    ///
-    /// [`IncrementIdGenerator`]: ../generator/primitive/increment_id_generator/struct.IncrementIdGenerator.html
-    pub fn new_increment_id(increment: Option<ValueStep<SbrdInt>>) -> Self {
-        let mut this = Self::new(GeneratorType::IncrementId);
-
-        if let Some(_increment) = increment {
-            this = this.increment(_increment.convert_with(DataValue::from))
-        }
-
-        this
     }
 
     //

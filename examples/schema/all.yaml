@@ -6,6 +6,7 @@ keys:
   - eval-real-key
   - eval-bool-key
   - eval-string-key
+  - increment-id-key
   - int-key
   - real-key
   - bool-key
@@ -13,7 +14,6 @@ keys:
   - date-key
   - time-key
   - always-null-key
-  - increment-id-key
   - case-when-key
   - random-child-key
   - select-int-key
@@ -72,6 +72,11 @@ generators:
   - key: eval-string-key
     type: eval-string
     script: "\"string: {dist-normal-key}\""
+  - key: increment-id-key
+    type: increment-id
+    increment:
+      initial: 100
+      step: 10
   - key: int-key
     type: int
     range:
@@ -112,11 +117,6 @@ generators:
     format: "%H:%M"
   - key: always-null-key
     type: always-null
-  - key: increment-id-key
-    type: increment-id
-    increment:
-      initial: 100
-      step: 10
   - key: case-when-key
     type: case-when
     children:

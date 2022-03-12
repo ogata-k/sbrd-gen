@@ -628,7 +628,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdInt`]
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdInt`]: ../value/type.SbrdInt.html
     fn new_get_int_value_at<S>(script: S) -> Self
     where
@@ -639,7 +639,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdInt`] from chars
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdInt`]: ../value/type.SbrdInt.html
     pub fn new_get_int_value_at_from_chars<S1, S2>(script: S1, chars: S2) -> Self
     where
@@ -651,7 +651,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdInt`] from values
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdInt`]: ../value/type.SbrdInt.html
     pub fn new_get_int_value_at_from_values<S>(script: S, values: Vec<SbrdInt>) -> Self
     where
@@ -662,7 +662,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdInt`] from file
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdInt`]: ../value/type.SbrdInt.html
     pub fn new_get_int_value_at_from_file<S, P>(script: S, filepath: P) -> Self
     where
@@ -674,7 +674,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdReal`]
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdReal`]: ../value/type.SbrdReal.html
     fn new_get_real_value_at<S>(script: S) -> Self
     where
@@ -685,7 +685,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdReal`] from chars
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdReal`]: ../value/type.SbrdReal.html
     pub fn new_get_real_value_at_from_chars<S1, S2>(script: S1, chars: S2) -> Self
     where
@@ -697,7 +697,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdReal`] from values
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdReal`]: ../value/type.SbrdReal.html
     pub fn new_get_real_value_at_from_values<S>(script: S, values: Vec<SbrdReal>) -> Self
     where
@@ -708,7 +708,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdReal`] from file
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdReal`]: ../value/type.SbrdReal.html
     pub fn new_get_real_value_at_from_file<S, P>(script: S, filepath: P) -> Self
     where
@@ -720,7 +720,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdString`]
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdString`]: ../value/type.SbrdString.html
     fn new_get_string_value_at<S>(script: S) -> Self
     where
@@ -731,7 +731,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdString`] from chars
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdString`]: ../value/type.SbrdString.html
     pub fn new_get_string_value_at_from_chars<S1, S2>(script: S1, chars: S2) -> Self
     where
@@ -743,7 +743,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdString`] from values
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdString`]: ../value/type.SbrdString.html
     pub fn new_get_string_value_at_from_values<S>(script: S, values: Vec<SbrdString>) -> Self
     where
@@ -754,7 +754,7 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdString`] from file
     ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/select_generator/struct.GetValueAtGenerator.html
+    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdString`]: ../value/type.SbrdString.html
     pub fn new_get_string_value_at_from_file<S, P>(script: S, filepath: P) -> Self
     where
@@ -766,14 +766,14 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueIndexGenerator`]
     ///
-    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndex.html
+    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndexGenerator.html
     fn new_get_value_index() -> Self {
         Self::new(GeneratorType::GetValueIndex)
     }
 
     /// Create builder for [`GetValueIndexGenerator`]
     ///
-    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndex.html
+    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndexGenerator.html
     pub fn new_get_value_index_from_chars<S>(chars: S) -> Self
     where
         S: Into<String>,
@@ -783,14 +783,14 @@ impl GeneratorBuilder {
 
     /// Create builder for [`GetValueIndexGenerator`]
     ///
-    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndex.html
+    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndexGenerator.html
     pub fn new_get_value_index_from_values(values: Vec<DataValue>) -> Self {
         Self::new_get_value_index().values(values)
     }
 
     /// Create builder for [`GetValueIndexGenerator`]
     ///
-    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndex.html
+    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndexGenerator.html
     pub fn new_get_value_index_from_file<P>(filepath: P) -> Self
     where
         P: Into<PathBuf>,

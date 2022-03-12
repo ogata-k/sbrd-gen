@@ -4,6 +4,7 @@ use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdDate, DATE_DEFAULT_FORMAT};
 use crate::GeneratorType;
 use chrono::Datelike;
+use crate::eval::Evaluator;
 
 /// The generator with generate [`SbrdDate`] value as [`DataValue::String`] with the format
 ///
@@ -76,7 +77,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _context: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         let num_days_range = self.range.convert_with(|date| date.num_days_from_ce());
         let num_days_value = rng.gen_range(num_days_range);
@@ -87,8 +88,22 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateGenerator {
             ))
         })?;
 
+        let evaluator = Evaluator::new(&self.format, context);
+        let format = evaluator.format_script()
+            .map_err(|e| {
+                GenerateError::FailEval(
+                    e,
+                    self.format.to_string(),
+                    context
+                        .clone()
+                        .into_iter()
+                        .map(|(k, v)| (k.to_string(), v))
+                        .collect::<DataValueMap<String>>(),
+                )
+            })?;
+
         Ok(DataValue::String(
-            date_value.format(&self.format).to_string(),
+            date_value.format(&format).to_string(),
         ))
     }
 }

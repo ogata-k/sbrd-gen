@@ -5,6 +5,7 @@ use crate::value::{DataValue, DataValueMap, SbrdTime, TIME_DEFAULT_FORMAT};
 use crate::GeneratorType;
 use chrono::Duration;
 use std::ops::AddAssign;
+use crate::eval::Evaluator;
 
 /// The generator with generate [`SbrdTime`] value as [`DataValue::String`] with the format
 ///
@@ -77,7 +78,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for TimeGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _context: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         let upper_bound = self
             .range
@@ -95,8 +96,22 @@ impl<R: Randomizer + ?Sized> Generator<R> for TimeGenerator {
         let mut time_value = lower_bound;
         time_value.add_assign(Duration::seconds(diff_seconds));
 
+        let evaluator = Evaluator::new(&self.format, context);
+        let format = evaluator.format_script()
+            .map_err(|e| {
+                GenerateError::FailEval(
+                    e,
+                    self.format.to_string(),
+                    context
+                        .clone()
+                        .into_iter()
+                        .map(|(k, v)| (k.to_string(), v))
+                        .collect::<DataValueMap<String>>(),
+                )
+            })?;
+
         Ok(DataValue::String(
-            time_value.format(&self.format).to_string(),
+            time_value.format(&format).to_string(),
         ))
     }
 }

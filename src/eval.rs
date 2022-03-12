@@ -66,8 +66,8 @@ impl<'a> Evaluator<'a> {
         Ok(context)
     }
 
-    /// Apply context to the script
-    pub fn format_script(&self) -> EvalResult<SbrdString> {
+    /// Apply value-context to the script
+    pub fn format_script(&self) -> EvalResult<String> {
         // @todo スクリプトのフォーマットの正当性を判定できるようにしたい
         let mut replaced_script = self.script.to_string();
         for (key, value) in self.script_context.iter() {

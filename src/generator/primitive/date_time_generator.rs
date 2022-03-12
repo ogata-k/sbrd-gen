@@ -1,5 +1,6 @@
 use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
 use crate::error::{BuildError, GenerateError};
+use crate::eval::Evaluator;
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdDate, SbrdDateTime, DATE_TIME_DEFAULT_FORMAT};
 use crate::GeneratorType;
@@ -74,7 +75,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateTimeGenerator {
     fn generate_without_null(
         &self,
         rng: &mut R,
-        _context: &DataValueMap<&str>,
+        context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
         let timestamp_range = self.range.convert_with(|date_time| date_time.timestamp());
         let timestamp_value = rng.gen_range(timestamp_range);
@@ -86,8 +87,22 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateTimeGenerator {
                 ))
             })?;
 
+        let evaluator = Evaluator::new(&self.format, context);
+        let format = evaluator.format_script()
+            .map_err(|e| {
+                GenerateError::FailEval(
+                    e,
+                    self.format.to_string(),
+                    context
+                        .clone()
+                        .into_iter()
+                        .map(|(k, v)| (k.to_string(), v))
+                        .collect::<DataValueMap<String>>(),
+                )
+            })?;
+        
         Ok(DataValue::String(
-            date_time_value.format(&self.format).to_string(),
+            date_time_value.format(&format).to_string(),
         ))
     }
 }

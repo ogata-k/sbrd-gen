@@ -2,7 +2,7 @@ use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
 use crate::generator::{Generator, Randomizer};
-use crate::value::{DataValue, DataValueMap};
+use crate::value::{DataValue, DataValueMap, SbrdString};
 use crate::GeneratorType;
 
 /// The generator with [`DataValue::String`] formatted by specified `format` with evaluating by [`Evaluator`]
@@ -49,9 +49,9 @@ impl<R: Randomizer + ?Sized> Generator<R> for FormatGenerator {
         _rng: &mut R,
         context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
-        Ok(DataValue::String(
             Evaluator::new(&self.format, context)
                 .format_script()
+                .map(DataValue::String)
                 .map_err(|e| {
                     GenerateError::FailEval(
                         e,
@@ -62,7 +62,6 @@ impl<R: Randomizer + ?Sized> Generator<R> for FormatGenerator {
                             .map(|(k, v)| (k.to_string(), v))
                             .collect::<DataValueMap<String>>(),
                     )
-                })?,
-        ))
+                })
     }
 }

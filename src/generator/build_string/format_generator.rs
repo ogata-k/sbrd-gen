@@ -2,7 +2,7 @@ use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
 use crate::generator::{Generator, Randomizer};
-use crate::value::{DataValue, DataValueMap, SbrdString};
+use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
 /// The generator with [`DataValue::String`] formatted by specified `format` with evaluating by [`Evaluator`]

@@ -52,6 +52,14 @@ pub enum GeneratorType {
     EvalString,
 
     //
+    // incremental
+    //
+    /// Type for [`IncrementIdGenerator`]
+    ///
+    /// [`IncrementIdGenerator`]: ../generator/incremental/struct.IncrementIdGenerator.html
+    IncrementId,
+
+    //
     // primitive
     //
     /// Type for [`IntGenerator`]
@@ -82,10 +90,6 @@ pub enum GeneratorType {
     ///
     /// [`AlwaysNullGenerator`]: ../generator/primitive/struct.AlwaysNullGenerator.html
     AlwaysNull,
-    /// Type for [`IncrementIdGenerator`]
-    ///
-    /// [`IncrementIdGenerator`]: ../generator/primitive/struct.IncrementIdGenerator.html
-    IncrementId,
 
     //
     // randomize children

@@ -32,7 +32,10 @@ pub type EvalResult<T> = Result<T, EvalError>;
 impl<'a> Evaluator<'a> {
     /// Create from script and context
     pub fn new(script: &'a str, context: &'a DataValueMap<&str>) -> Self {
-        Self { script, script_context: context }
+        Self {
+            script,
+            script_context: context,
+        }
     }
 
     /// Create context when use evaluate

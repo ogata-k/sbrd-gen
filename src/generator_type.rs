@@ -92,8 +92,12 @@ pub enum GeneratorType {
     //
     /// Type for [`CaseWhenGenerator`]
     ///
-    /// [`CaseWhenGenerator`]: ../generator/random_child/struct.CaseWhenGenerator.html
+    /// [`CaseWhenGenerator`]: ../generator/random_children/struct.CaseWhenGenerator.html
     CaseWhen,
+    /// Type for [`RandomChildGenerator`]
+    ///
+    /// [`RandomChildGenerator`]: ../generator/random_children/struct.RandomChildGenerator.html
+    RandomChild,
 
     //
     // randomize values
@@ -132,14 +136,6 @@ pub enum GeneratorType {
     ///
     /// [`GetValueIndexGenerator`]: ../generator/random_values/struct.GetValueIndexGenerator.html
     GetValueIndex,
-
-    //
-    // random values and children
-    //
-    /// Type for [`RandomizeGenerator`]
-    ///
-    /// [`RandomizeGenerator`]: ../generator/random_values_children/struct.RandomizeGenerator.html
-    Randomize,
 }
 
 impl std::fmt::Display for GeneratorType {

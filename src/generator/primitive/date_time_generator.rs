@@ -88,19 +88,18 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateTimeGenerator {
             })?;
 
         let evaluator = Evaluator::new(&self.format, context);
-        let format = evaluator.format_script()
-            .map_err(|e| {
-                GenerateError::FailEval(
-                    e,
-                    self.format.to_string(),
-                    context
-                        .clone()
-                        .into_iter()
-                        .map(|(k, v)| (k.to_string(), v))
-                        .collect::<DataValueMap<String>>(),
-                )
-            })?;
-        
+        let format = evaluator.format_script().map_err(|e| {
+            GenerateError::FailEval(
+                e,
+                self.format.to_string(),
+                context
+                    .clone()
+                    .into_iter()
+                    .map(|(k, v)| (k.to_string(), v))
+                    .collect::<DataValueMap<String>>(),
+            )
+        })?;
+
         Ok(DataValue::String(
             date_time_value.format(&format).to_string(),
         ))

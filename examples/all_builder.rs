@@ -61,6 +61,7 @@ fn output_list() -> Vec<String> {
         "always-null-key".to_string(),
         "increment-id-key".to_string(),
         "case-when-key".to_string(),
+        "random-child-key".to_string(),
         "select-int-key".to_string(),
         "select-real-key".to_string(),
         "select-string-key".to_string(),
@@ -76,8 +77,6 @@ fn output_list() -> Vec<String> {
         "get-value-index-from-chars-key".to_string(),
         "get-value-index-from-values-key".to_string(),
         "get-value-index-from-file-key".to_string(),
-        "randomize-with-children-key".to_string(),
-        "randomize-with-select-list-key".to_string(),
     ]
 }
 
@@ -133,6 +132,14 @@ fn builder_list() -> Vec<ParentGeneratorBuilder> {
             // default case
             GeneratorBuilder::new_time(None, None).into_child(),
         ]).into_parent("case-when-key"),
+        GeneratorBuilder::new_random_child(vec![
+            GeneratorBuilder::new_int(None).into_child().weight(3),
+            GeneratorBuilder::new_real(None).into_child(),
+            GeneratorBuilder::new_bool().into_child().weight(3),
+            GeneratorBuilder::new_date_time(None, None).into_child(),
+            GeneratorBuilder::new_date(None, None).into_child().weight(3),
+            GeneratorBuilder::new_time(None, None).into_child(),
+        ]).into_parent("random-child-key"),
         GeneratorBuilder::new_select_int(
             Some("0123456789".to_string()),
             Some(vec![10,20,30,40,50,60,70,80,90,100]),
@@ -203,20 +210,5 @@ fn builder_list() -> Vec<ParentGeneratorBuilder> {
         GeneratorBuilder::new_get_value_index_from_file(
            dummy_num_filepath.clone()
         ).into_parent("get-value-index-from-file-key"),
-        GeneratorBuilder::new_randomize_with_children(vec![
-            GeneratorBuilder::new_int(None).into_child().weight(3),
-            GeneratorBuilder::new_real(None).into_child(),
-            GeneratorBuilder::new_bool().into_child().weight(3),
-            GeneratorBuilder::new_date_time(None, None).into_child(),
-            GeneratorBuilder::new_date(None, None).into_child().weight(3),
-            GeneratorBuilder::new_time(None, None).into_child(),
-        ]).into_parent("randomize-with-children-key"),
-        GeneratorBuilder::new_randomize_with_select_list(
-            Some("ABC".to_string()), Some(vec![
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_string(),
-            "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.".to_string(),
-            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.".to_string(),
-            "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string(),
-        ]), Some(dummy_list_up_filepath.clone())).into_parent("randomize-with-select-list-key"),
     ]
 }

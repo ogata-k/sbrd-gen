@@ -1,10 +1,10 @@
 use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
 use crate::error::{BuildError, GenerateError};
+use crate::eval::Evaluator;
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdDate, DATE_DEFAULT_FORMAT};
 use crate::GeneratorType;
 use chrono::Datelike;
-use crate::eval::Evaluator;
 
 /// The generator with generate [`SbrdDate`] value as [`DataValue::String`] with the format
 ///
@@ -89,22 +89,19 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateGenerator {
         })?;
 
         let evaluator = Evaluator::new(&self.format, context);
-        let format = evaluator.format_script()
-            .map_err(|e| {
-                GenerateError::FailEval(
-                    e,
-                    self.format.to_string(),
-                    context
-                        .clone()
-                        .into_iter()
-                        .map(|(k, v)| (k.to_string(), v))
-                        .collect::<DataValueMap<String>>(),
-                )
-            })?;
+        let format = evaluator.format_script().map_err(|e| {
+            GenerateError::FailEval(
+                e,
+                self.format.to_string(),
+                context
+                    .clone()
+                    .into_iter()
+                    .map(|(k, v)| (k.to_string(), v))
+                    .collect::<DataValueMap<String>>(),
+            )
+        })?;
 
-        Ok(DataValue::String(
-            date_value.format(&format).to_string(),
-        ))
+        Ok(DataValue::String(date_value.format(&format).to_string()))
     }
 }
 

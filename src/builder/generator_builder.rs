@@ -12,11 +12,10 @@ use crate::generator::primitive::{
     AlwaysNullGenerator, BoolGenerator, DateGenerator, DateTimeGenerator, IncrementIdGenerator,
     IntGenerator, RealGenerator, TimeGenerator,
 };
-use crate::generator::random_children::CaseWhenGenerator;
+use crate::generator::random_children::{CaseWhenGenerator, RandomChildGenerator};
 use crate::generator::random_values::{
     GetValueAtGenerator, GetValueIndexGenerator, SelectGenerator,
 };
-use crate::generator::random_values_children::RandomizeGenerator;
 use crate::generator::{Generator, Randomizer};
 use crate::generator_type::GeneratorType;
 use crate::value::{
@@ -233,6 +232,7 @@ impl GeneratorBuilder {
 
             // randomize children
             GeneratorType::CaseWhen => build_generator!(self, R, CaseWhenGenerator<R>),
+            GeneratorType::RandomChild => build_generator!(self, R, RandomChildGenerator<R>),
 
             // randomize values
             GeneratorType::SelectInt => build_generator!(self, R, SelectGenerator<SbrdInt>),
@@ -248,9 +248,6 @@ impl GeneratorBuilder {
             GeneratorType::GetValueIndex => {
                 build_generator!(self, R, GetValueIndexGenerator)
             }
-
-            // random values and children
-            GeneratorType::Randomize => build_generator!(self, R, RandomizeGenerator<R>),
         }
     }
 
@@ -568,6 +565,13 @@ impl GeneratorBuilder {
         Self::new(GeneratorType::CaseWhen).children(children)
     }
 
+    /// Create builder for [`RandomChildGenerator`] as generator with generate from children
+    ///
+    /// [`RandomChildGenerator`]: ../generator/random_children/random_child_generator/struct.RandomChildGenerator.html
+    pub fn new_random_child(children: Vec<ChildGeneratorBuilder>) -> Self {
+        Self::new(GeneratorType::RandomChild).children(children)
+    }
+
     //
     // randomize values
     //
@@ -826,51 +830,6 @@ impl GeneratorBuilder {
         P: Into<PathBuf>,
     {
         Self::new_get_value_index().filepath(filepath)
-    }
-
-    //
-    // random values and children
-    //
-
-    /// Create builder for [`RandomizeGenerator`]
-    ///
-    /// [`RandomizeGenerator`]: ../generator/random_values_children/randomize_generator/struct.RandomizeGenerator.html
-    fn new_randomize() -> Self {
-        Self::new(GeneratorType::Randomize)
-    }
-
-    /// Create builder for [`RandomizeGenerator`] as generator with generate from children
-    ///
-    /// [`RandomizeGenerator`]: ../generator/random_values_children/randomize_generator/struct.RandomizeGenerator.html
-    pub fn new_randomize_with_children(children: Vec<ChildGeneratorBuilder>) -> Self {
-        Self::new_randomize().children(children)
-    }
-
-    /// Create builder for [`RandomizeGenerator`] as generator with generate from chars, values, file
-    ///
-    /// [`RandomizeGenerator`]: ../generator/random_values_children/randomize_generator/struct.RandomizeGenerator.html
-    pub fn new_randomize_with_select_list(
-        chars: Option<String>,
-        values: Option<Vec<String>>,
-        filepath: Option<PathBuf>,
-    ) -> Self {
-        let mut this = Self::new_randomize();
-        if chars.is_none() && values.is_none() && filepath.is_none() {
-            // default setting
-            this = this.values(Vec::new());
-        } else {
-            if let Some(chars) = chars {
-                this = this.chars(chars);
-            }
-            if let Some(values) = values {
-                this = this.values(values.into_iter().map(|v| v.into()).collect());
-            }
-            if let Some(filepath) = filepath {
-                this = this.filepath(filepath);
-            }
-        }
-
-        this
     }
 }
 

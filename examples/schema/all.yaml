@@ -16,6 +16,7 @@ keys:
   - always-null-key
   - increment-id-key
   - case-when-key
+  - random-child-key
   - select-int-key
   - select-real-key
   - select-string-key
@@ -31,8 +32,6 @@ keys:
   - get-value-index-from-chars-key
   - get-value-index-from-values-key
   - get-value-index-from-file-key
-  - randomize-with-children-key
-  - randomize-with-select-list-key
 generators:
   - key: duplicate-permutation-with-children-key
     type: duplicate-permutation
@@ -137,6 +136,18 @@ generators:
       - case: "25 <= {int-key} && {int-key} < 50"
         type: date-time
       - case: "50 <= {int-key} && {int-key} < 75"
+        type: date
+      - type: time
+  - key: random-child-key
+    type: random-child
+    children:
+      - weight: 3
+        type: int
+      - type: real
+      - weight: 3
+        type: bool
+      - type: date-time
+      - weight: 3
         type: date
       - type: time
   - key: select-int-key
@@ -279,24 +290,3 @@ generators:
   - key: get-value-index-from-file-key
     type: get-value-index
     filepath: "./list/num.txt"
-  - key: randomize-with-children-key
-    type: randomize
-    children:
-      - weight: 3
-        type: int
-      - type: real
-      - weight: 3
-        type: bool
-      - type: date-time
-      - weight: 3
-        type: date
-      - type: time
-  - key: randomize-with-select-list-key
-    type: randomize
-    chars: ABC
-    values:
-      - "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-      - "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-      - "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-      - "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    filepath: "./list/list-up.txt"

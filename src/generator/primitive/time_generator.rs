@@ -1,11 +1,11 @@
 use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
 use crate::error::{BuildError, GenerateError};
+use crate::eval::Evaluator;
 use crate::generator::{Generator, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdTime, TIME_DEFAULT_FORMAT};
 use crate::GeneratorType;
 use chrono::Duration;
 use std::ops::AddAssign;
-use crate::eval::Evaluator;
 
 /// The generator with generate [`SbrdTime`] value as [`DataValue::String`] with the format
 ///
@@ -97,22 +97,19 @@ impl<R: Randomizer + ?Sized> Generator<R> for TimeGenerator {
         time_value.add_assign(Duration::seconds(diff_seconds));
 
         let evaluator = Evaluator::new(&self.format, context);
-        let format = evaluator.format_script()
-            .map_err(|e| {
-                GenerateError::FailEval(
-                    e,
-                    self.format.to_string(),
-                    context
-                        .clone()
-                        .into_iter()
-                        .map(|(k, v)| (k.to_string(), v))
-                        .collect::<DataValueMap<String>>(),
-                )
-            })?;
+        let format = evaluator.format_script().map_err(|e| {
+            GenerateError::FailEval(
+                e,
+                self.format.to_string(),
+                context
+                    .clone()
+                    .into_iter()
+                    .map(|(k, v)| (k.to_string(), v))
+                    .collect::<DataValueMap<String>>(),
+            )
+        })?;
 
-        Ok(DataValue::String(
-            time_value.format(&format).to_string(),
-        ))
+        Ok(DataValue::String(time_value.format(&format).to_string()))
     }
 }
 

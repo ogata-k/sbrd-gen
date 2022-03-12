@@ -81,7 +81,7 @@ pub trait CasedChildGenerator<R: Randomizer + ?Sized> {
                 }
 
                 if _children.is_empty() {
-                    return Err(BuildError::EmptyChildren);
+                    return Err(BuildError::EmptySelectableChildren);
                 }
 
                 if !has_default_case {
@@ -132,6 +132,56 @@ pub trait CasedChildGenerator<R: Randomizer + ?Sized> {
     }
 }
 
+/// Child generator with weight
+pub type WeightedChild<R> = (Weight, Box<dyn Generator<R>>);
+/// Base trait for a generator use child generator with weight
+pub trait WeightedChildGenerator<R: Randomizer + ?Sized> {
+    /// Build selectable child generator with weight
+    fn build_selectable(
+        children: Option<Vec<ChildGeneratorBuilder>>,
+    ) -> Result<Vec<WeightedChild<R>>, BuildError> {
+        match children {
+            None => Err(BuildError::NotExistValueOf("children".to_string())),
+            Some(children) => {
+                let mut select_values = Vec::new();
+                for child_builder in children.into_iter() {
+                    let ChildGeneratorBuilder {
+                        weight, builder, ..
+                    } = child_builder;
+                    select_values.push((weight.unwrap_or(1), builder.build()?));
+                }
+
+                if select_values.is_empty() {
+                    return Err(BuildError::EmptySelectableChildren);
+                }
+
+                if select_values.iter().fold(0, |acc, item| acc + item.0) == 0 {
+                    return Err(BuildError::AllWeightsZero);
+                }
+
+                Ok(select_values)
+            }
+        }
+    }
+
+    /// Get selectable list
+    fn get_selectable(&self) -> &[WeightedChild<R>];
+
+    /// Pick out value from input values or generated value picked out child generator
+    fn choose(
+        &self,
+        rng: &mut R,
+        context: &DataValueMap<&str>,
+    ) -> Result<DataValue, GenerateError> {
+        let item = self
+            .get_selectable()
+            .choose_weighted(rng, |item| item.0)
+            .map_err(|err| GenerateError::FailGenerate(err.to_string()))?;
+
+        item.1.generate(rng, context)
+    }
+}
+
 /// Base trait for a generator from input values with many options
 pub trait MultiOptionsValueGenerator<R: Randomizer + ?Sized, T> {
     /// Function of parser the input value
@@ -167,7 +217,7 @@ pub trait MultiOptionsValueGenerator<R: Randomizer + ?Sized, T> {
         }
 
         if selectable_values.is_empty() {
-            return Err(BuildError::EmptySelectValues);
+            return Err(BuildError::EmptySelectableChildren);
         }
 
         Ok(selectable_values)
@@ -282,7 +332,7 @@ pub trait MultiOptionsValueChildGenerator<R: Randomizer + ?Sized> {
         }
 
         if select_values.is_empty() {
-            return Err(BuildError::EmptyRandomize);
+            return Err(BuildError::EmptySelectable);
         }
 
         if select_values.iter().fold(0, |acc, item| acc + item.0) == 0 {
@@ -370,7 +420,7 @@ pub trait SingleOptionValueChildGenerator<R: Randomizer + ?Sized> {
         }
 
         if select_values.is_empty() {
-            return Err(BuildError::EmptyRandomize);
+            return Err(BuildError::EmptySelectable);
         }
 
         if select_values.iter().fold(0, |acc, item| acc + item.0) == 0 {

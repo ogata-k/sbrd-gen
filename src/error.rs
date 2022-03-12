@@ -156,13 +156,13 @@ pub enum BuildError {
     OnlyOneOptionSpecifiedNot(Vec<String>),
 
     /// Specified `children` in the Schema does not exist or does not have child.
-    EmptyChildren,
+    EmptySelectableChildren,
 
     /// Specified `values` in the Schema does not exist or does not have value.
     EmptySelectValues,
 
     /// Specified randomize values at the keys: `children`, `chars`, `values`, `filepath` is empty.
-    EmptyRandomize,
+    EmptySelectable,
 
     /// Specified default case at the key `case` in the Schema at a child generator does not exist
     NotExistDefaultCase,
@@ -205,10 +205,10 @@ impl std::fmt::Display for BuildError {
             BuildError::OnlyOneOptionSpecifiedNot(options) => {
                 write!(f, "Available option is only one in {:?}", options)
             }
-            BuildError::EmptyChildren => write!(f, "Not Exist selectable children"),
-            BuildError::EmptySelectValues => write!(f, "Not Exist selectable values"),
-            BuildError::EmptyRandomize => {
-                write!(f, "Not Exist selectable children xor (chars, values, file)")
+            BuildError::EmptySelectableChildren => write!(f, "Selectable children is empty"),
+            BuildError::EmptySelectValues => write!(f, "Selectable values is empty"),
+            BuildError::EmptySelectable => {
+                write!(f, "Selectable children or values is empty")
             }
             BuildError::NotExistDefaultCase => write!(f, "Not Exist default case condition"),
             BuildError::AllWeightsZero => write!(f, "All weights are zero"),

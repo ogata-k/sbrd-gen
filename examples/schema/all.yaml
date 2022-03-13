@@ -26,6 +26,7 @@ keys:
 generators:
   - key: duplicate-permutation-key
     type: duplicate-permutation
+    separator: " "
     range:
       start: 3
       end: 5
@@ -43,7 +44,6 @@ generators:
       - "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
       - "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     filepath: "./list/list-up.txt"
-    separator: " "
   - key: format-key
     type: format
     format: "Lorem ipsum: \"{duplicate-permutation-key}\""
@@ -85,28 +85,28 @@ generators:
     type: date-time
     nullable:
       use_null: true
+    format: "%H:%M %Y/%m/%d"
     range:
       start: "2022-03-05 13:41:30"
       include_end: false
       end: "2022-03-06 13:41:30"
-    format: "%H:%M %Y/%m/%d"
   - key: date-key
     type: date
     nullable:
       use_null: true
+    format: "%Y/%m/%d"
     range:
       start: 2021-03-06
       include_end: false
       end: 2022-03-06
-    format: "%Y/%m/%d"
   - key: time-key
     type: time
     nullable:
       use_null: true
+    format: "%H:%M"
     range:
       start: "00:00:00"
       end: "13:41:30"
-    format: "%H:%M"
   - key: always-null-key
     type: always-null
   - key: case-when-key
@@ -180,6 +180,7 @@ generators:
       end: 30
   - key: get-int-value-at-key
     type: get-int-value-at
+    script: "{int-index}"
     chars: "0123456789"
     values:
       - 0
@@ -193,7 +194,6 @@ generators:
       - 80
       - 90
     filepath: "./list/num.txt"
-    script: "{int-index}"
   - key: real-index
     type: int
     range:
@@ -202,6 +202,7 @@ generators:
       end: 10
   - key: get-real-value-at-key
     type: get-real-value-at
+    script: "{real-index}"
     chars: "0123456789"
     values:
       - 0.0
@@ -215,7 +216,6 @@ generators:
       - 80.0
       - 90.0
     filepath: "./list/num.txt"
-    script: "{real-index}"
   - key: string-index
     type: int
     range:
@@ -224,6 +224,7 @@ generators:
       end: 10
   - key: get-string-value-at-key
     type: get-string-value-at
+    script: "{string-index}"
     chars: "0123456789"
     values:
       - "0"
@@ -237,7 +238,6 @@ generators:
       - "80"
       - "90"
     filepath: "./list/num.txt"
-    script: "{string-index}"
   - key: get-value-index-key
     type: get-value-index
     chars: "0123456789"

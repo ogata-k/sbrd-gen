@@ -31,10 +31,10 @@ impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> GeneratorBase<R>
         let GeneratorBuilder {
             generator_type,
             nullable,
+            script,
             chars,
             values,
             filepath,
-            script,
             ..
         } = builder;
 

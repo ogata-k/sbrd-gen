@@ -28,12 +28,12 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for DuplicatePermutationGenerator<
         let GeneratorBuilder {
             generator_type,
             nullable,
+            separator,
             range,
             children,
             chars,
             values,
             filepath,
-            separator,
             ..
         } = builder;
 

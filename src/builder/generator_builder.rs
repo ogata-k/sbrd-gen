@@ -124,6 +124,30 @@ pub struct GeneratorBuilder {
     /// This is a nullable flag for the generator.
     pub(crate) nullable: Nullable,
 
+    /// Generator's `format` option
+    ///
+    /// This is a format for the generated value.
+    /// Evaluate by [`Evaluator`] as String.
+    ///
+    /// [`Evaluator`]: ../eval/struct.Evaluator.html
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) format: Option<String>,
+
+    /// Generator's `script` option
+    ///
+    /// This is a script for the generated value.
+    /// Evaluate by [`Evaluator`] as not String.
+    ///
+    /// [`Evaluator`]: ../eval/struct.Evaluator.html
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) script: Option<String>,
+
+    /// Generator's `separator` option
+    ///
+    /// This separator use as glue to join the generated values.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) separator: Option<String>,
+
     /// Generator's `range` option
     ///
     /// This is a range for the generated value.
@@ -159,30 +183,6 @@ pub struct GeneratorBuilder {
     /// The generator pick out the value from the lines in the file at the filepath.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) filepath: Option<PathBuf>,
-
-    /// Generator's `separator` option
-    ///
-    /// This separator use as glue to join the generated values.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) separator: Option<String>,
-
-    /// Generator's `format` option
-    ///
-    /// This is a format for the generated value.
-    /// Evaluate by [`Evaluator`] as String.
-    ///
-    /// [`Evaluator`]: ../eval/struct.Evaluator.html
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) format: Option<String>,
-
-    /// Generator's `script` option
-    ///
-    /// This is a script for the generated value.
-    /// Evaluate by [`Evaluator`] as not String.
-    ///
-    /// [`Evaluator`]: ../eval/struct.Evaluator.html
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) script: Option<String>,
 
     /// Generator's `parameters` option
     ///
@@ -277,16 +277,16 @@ impl GeneratorBuilder {
         Self {
             generator_type,
             nullable: Nullable::new_required(),
-            range: None,
-            increment: None,
-            filepath: None,
-            separator: None,
-            values: None,
             format: None,
             script: None,
-            chars: None,
-            parameters: None,
+            separator: None,
+            range: None,
+            increment: None,
             children: None,
+            chars: None,
+            values: None,
+            filepath: None,
+            parameters: None,
         }
     }
 
@@ -748,6 +748,33 @@ impl GeneratorBuilder {
     // setter
     //
 
+    /// Set `format` option
+    fn format<S>(mut self, format: S) -> Self
+        where
+            S: Into<String>,
+    {
+        self.format = Some(format.into());
+        self
+    }
+
+    /// Set `script` option
+    fn script<S>(mut self, script: S) -> Self
+        where
+            S: Into<String>,
+    {
+        self.script = Some(script.into());
+        self
+    }
+
+    /// Set `separator` option
+    fn separator<S>(mut self, separator: S) -> Self
+        where
+            S: Into<String>,
+    {
+        self.separator = Some(separator.into());
+        self
+    }
+
     /// Set `range` option
     fn range(mut self, range: ValueBound<DataValue>) -> Self {
         self.range = Some(range);
@@ -787,33 +814,6 @@ impl GeneratorBuilder {
         P: Into<PathBuf>,
     {
         self.filepath = Some(filepath.into());
-        self
-    }
-
-    /// Set `separator` option
-    fn separator<S>(mut self, separator: S) -> Self
-    where
-        S: Into<String>,
-    {
-        self.separator = Some(separator.into());
-        self
-    }
-
-    /// Set `format` option
-    fn format<S>(mut self, format: S) -> Self
-    where
-        S: Into<String>,
-    {
-        self.format = Some(format.into());
-        self
-    }
-
-    /// Set `script` option
-    fn script<S>(mut self, script: S) -> Self
-    where
-        S: Into<String>,
-    {
-        self.script = Some(script.into());
         self
     }
 

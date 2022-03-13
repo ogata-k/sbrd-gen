@@ -49,6 +49,6 @@ impl<R: Randomizer + ?Sized> Generator<R> for RandomChildGenerator<R> {
         rng: &mut R,
         context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
-        self.choose(rng, context)
+        self.generate_from_children(rng, context)
     }
 }

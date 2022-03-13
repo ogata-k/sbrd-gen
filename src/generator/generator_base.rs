@@ -167,8 +167,8 @@ pub trait WeightedChildGenerator<R: Randomizer + ?Sized> {
     /// Get selectable list
     fn get_selectable(&self) -> &[WeightedChild<R>];
 
-    /// Pick out value from input values or generated value picked out child generator
-    fn choose(
+    /// Generate value from picked out child generator
+    fn generate_from_children(
         &self,
         rng: &mut R,
         context: &DataValueMap<&str>,

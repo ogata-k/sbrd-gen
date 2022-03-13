@@ -112,14 +112,14 @@ impl DateTimeGenerator {
         SbrdDate::from_ymd(1900, 1, 1).and_hms(0, 0, 0)
     }
     #[inline]
-    fn max_date_time() -> SbrdDateTime {
+    fn upper_limit_date_time() -> SbrdDateTime {
         SbrdDate::from_ymd(2151, 1, 1).and_hms(0, 0, 0)
     }
 
     fn default_range() -> ValueBound<SbrdDateTime> {
         ValueBound::new(
             Some(Self::min_date_time()),
-            Some((false, Self::max_date_time())),
+            Some((false, Self::upper_limit_date_time())),
         )
     }
 }

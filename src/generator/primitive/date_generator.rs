@@ -108,16 +108,14 @@ impl<R: Randomizer + ?Sized> Generator<R> for DateGenerator {
 impl DateGenerator {
     #[inline]
     fn min_date() -> SbrdDate {
-        // 1900/1/1
-        SbrdDate::from_num_days_from_ce(693596)
+        SbrdDate::from_ymd(1900, 1, 1)
     }
     #[inline]
-    fn max_date() -> SbrdDate {
-        // 2151/1/1
-        SbrdDate::from_num_days_from_ce(785272)
+    fn upper_limit_date() -> SbrdDate {
+        SbrdDate::from_ymd(2151, 1, 1)
     }
 
     fn default_range() -> ValueBound<SbrdDate> {
-        ValueBound::new(Some(Self::min_date()), Some((false, Self::max_date())))
+        ValueBound::new(Some(Self::min_date()), Some((false, Self::upper_limit_date())))
     }
 }

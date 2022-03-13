@@ -330,7 +330,7 @@ impl GeneratorBuilder {
             this = this.chars(chars);
         }
         if let Some(values) = values {
-            this = this.values(values.into_iter().map(|v| v.into()).collect());
+            this = this.values(values);
         }
         if let Some(filepath) = filepath {
             this = this.filepath(filepath);

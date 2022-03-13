@@ -89,7 +89,7 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for DuplicatePermutationGenerator<
         let mut is_first = true;
         let count = rng.gen_range(self.count_range);
         for _ in 0..count {
-            let value_string = self.choose(rng, context)?.to_permutation_string();
+            let value_string = self.generate_from_values_or_children(rng, context)?.to_permutation_string();
 
             if is_first {
                 is_first = false;

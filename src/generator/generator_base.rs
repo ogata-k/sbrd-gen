@@ -275,7 +275,7 @@ pub trait ValueChildGeneratorBase<R: Randomizer + ?Sized> {
     fn get_selectable(&self) -> &[ValueOrChild<R>];
 
     /// Pick out value from input values or generated value picked out child generator
-    fn choose(
+    fn generate_from_values_or_children(
         &self,
         rng: &mut R,
         context: &DataValueMap<&str>,

@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder, Nullable};
+use crate::builder::{GeneratorBuilder};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::{EvalResult, Evaluator};
 use crate::generator::{GeneratorBase, Randomizer};
@@ -11,7 +11,7 @@ use std::marker::PhantomData;
 /// [`Evaluator`]: ../../eval/struct.Evaluator.html
 #[derive(Debug, PartialEq, Clone)]
 pub struct EvalGenerator<T> {
-    nullable: Nullable,
+    nullable: bool,
     script: String,
     _calculated_type: PhantomData<T>,
 }
@@ -43,7 +43,7 @@ impl<R: Randomizer + ?Sized, F: ForEvalGeneratorType> GeneratorBase<R> for EvalG
     }
 
     fn is_nullable(&self) -> bool {
-        self.nullable.is_nullable()
+        self.nullable
     }
 
     fn generate_without_null(

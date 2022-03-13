@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder, Nullable};
+use crate::builder::{GeneratorBuilder};
 use crate::error::{BuildError, GenerateError};
 use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap};
@@ -9,7 +9,7 @@ use crate::GeneratorType;
 /// [`DataValue::Bool`]: ../../value/enum.DataValue.html#variant.Bool
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct BoolGenerator {
-    nullable: Nullable,
+    nullable: bool,
 }
 
 impl<R: Randomizer + ?Sized> GeneratorBase<R> for BoolGenerator {
@@ -31,7 +31,7 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for BoolGenerator {
     }
 
     fn is_nullable(&self) -> bool {
-        self.nullable.is_nullable()
+        self.nullable
     }
 
     fn generate_without_null(

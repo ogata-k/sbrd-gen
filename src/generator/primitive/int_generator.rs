@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
+use crate::builder::{GeneratorBuilder, ValueBound};
 use crate::error::{BuildError, GenerateError};
 use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
@@ -9,7 +9,7 @@ use crate::GeneratorType;
 /// [`DataValue::Int`]: ../../value/enum.DataValue.html#variant.Int
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct IntGenerator {
-    nullable: Nullable,
+    nullable: bool,
     range: ValueBound<SbrdInt>,
 }
 
@@ -53,7 +53,7 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for IntGenerator {
     }
 
     fn is_nullable(&self) -> bool {
-        self.nullable.is_nullable()
+        self.nullable
     }
 
     fn generate_without_null(

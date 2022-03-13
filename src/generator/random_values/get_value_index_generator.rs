@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder, Nullable};
+use crate::builder::{GeneratorBuilder};
 use crate::error::{BuildError, GenerateError};
 use crate::generator::{GeneratorBase, Randomizer, ValueGeneratorBase};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
@@ -6,7 +6,7 @@ use crate::GeneratorType;
 
 /// The generator that get available index  of 0-index for value from the values.
 pub struct GetValueIndexGenerator {
-    nullable: Nullable,
+    nullable: bool,
     values_count: usize,
 }
 
@@ -44,7 +44,7 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for GetValueIndexGenerator {
     }
 
     fn is_nullable(&self) -> bool {
-        self.nullable.is_nullable()
+        self.nullable
     }
 
     fn generate_without_null(

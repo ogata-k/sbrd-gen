@@ -127,9 +127,7 @@
     {
       "key": "date-time-key",
       "type": "date-time",
-      "nullable": {
-        "use_null": true
-      },
+      "nullable": true,
       "format": "%H:%M %Y/%m/%d",
       "range": {
         "start": "2022-03-05 13:41:30",
@@ -140,9 +138,7 @@
     {
       "key": "date-key",
       "type": "date",
-      "nullable": {
-        "use_null": true
-      },
+      "nullable":  true,
       "format": "%Y/%m/%d",
       "range": {
         "start": "2021-03-06",
@@ -153,9 +149,7 @@
     {
       "key": "time-key",
       "type": "time",
-      "nullable": {
-        "use_null": true
-      },
+      "nullable": true,
       "format": "%H:%M",
       "range": {
         "start": "00:00:00",

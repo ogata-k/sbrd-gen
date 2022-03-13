@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder, Nullable};
+use crate::builder::{GeneratorBuilder};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
 use crate::generator::{GeneratorBase, Randomizer, ValueGeneratorBase};
@@ -8,7 +8,7 @@ use std::str::FromStr;
 
 /// The generator that gets a T value from the values with the value evaluated by `script` as the index of 0-index.
 pub struct GetValueAtGenerator<T> {
-    nullable: Nullable,
+    nullable: bool,
     script: String,
     selectable_values: Vec<T>,
 }
@@ -56,7 +56,7 @@ impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> GeneratorBase<R>
     }
 
     fn is_nullable(&self) -> bool {
-        self.nullable.is_nullable()
+        self.nullable
     }
 
     fn generate_without_null(

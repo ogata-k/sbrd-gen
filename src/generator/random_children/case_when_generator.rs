@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder, Nullable};
+use crate::builder::{GeneratorBuilder};
 use crate::error::{BuildError, GenerateError};
 use crate::generator::{CasedChild, CasedChildGeneratorBase, GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap};
@@ -11,7 +11,7 @@ use crate::GeneratorType;
 /// [`Option::Some`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.Some
 /// [`Option::None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None
 pub struct CaseWhenGenerator<R: Randomizer + ?Sized> {
-    nullable: Nullable,
+    nullable: bool,
     children: Vec<CasedChild<R>>,
 }
 
@@ -46,7 +46,7 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for CaseWhenGenerator<R> {
     }
 
     fn is_nullable(&self) -> bool {
-        self.nullable.is_nullable()
+        self.nullable
     }
 
     fn generate_without_null(

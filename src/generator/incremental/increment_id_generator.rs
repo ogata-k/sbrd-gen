@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder, Nullable};
+use crate::builder::{GeneratorBuilder};
 use crate::error::{BuildError, GenerateError};
 use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
@@ -13,7 +13,7 @@ const DEFAULT_STEP: SbrdInt = 1;
 /// [`DataValue::Int`]: ../../value/enum.DataValue.html#variant.Int
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct IncrementIdGenerator {
-    nullable: Nullable,
+    nullable: bool,
     current_id: Cell<SbrdInt>,
     step: SbrdInt,
 }
@@ -74,7 +74,7 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for IncrementIdGenerator {
     }
 
     fn is_nullable(&self) -> bool {
-        self.nullable.is_nullable()
+        self.nullable
     }
 
     fn generate_without_null(

@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder, Nullable};
+use crate::builder::{GeneratorBuilder};
 use crate::error::{BuildError, GenerateError};
 use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdReal};
@@ -11,7 +11,7 @@ use rand_distr::Normal;
 /// [`DataValue::Real`]: ../../value/enum.DataValue.html#variant.Real
 #[derive(Debug, Clone, Copy)]
 pub struct NormalGenerator {
-    nullable: Nullable,
+    nullable: bool,
     distribution: Normal<SbrdReal>,
 }
 
@@ -79,7 +79,7 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for NormalGenerator {
     }
 
     fn is_nullable(&self) -> bool {
-        self.nullable.is_nullable()
+        self.nullable
     }
 
     fn generate_without_null(

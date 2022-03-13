@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
+use crate::builder::{GeneratorBuilder, ValueBound};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
 use crate::generator::{GeneratorBase, Randomizer};
@@ -18,7 +18,7 @@ use std::ops::AddAssign;
 /// [`TIME_DEFAULT_FORMAT`]: ../../value/constant.TIME_DEFAULT_FORMAT.html
 #[derive(Debug, PartialEq, Clone)]
 pub struct TimeGenerator {
-    nullable: Nullable,
+    nullable: bool,
     format: String,
     range: ValueBound<SbrdTime>,
 }
@@ -72,7 +72,7 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for TimeGenerator {
     }
 
     fn is_nullable(&self) -> bool {
-        self.nullable.is_nullable()
+        self.nullable
     }
 
     fn generate_without_null(

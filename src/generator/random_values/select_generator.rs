@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder, Nullable};
+use crate::builder::{GeneratorBuilder};
 use crate::error::{BuildError, GenerateError};
 use crate::generator::{GeneratorBase, Randomizer, ValueGeneratorBase};
 use crate::value::{DataValue, DataValueMap, SbrdInt, SbrdReal, SbrdString};
@@ -8,7 +8,7 @@ use std::str::FromStr;
 
 /// The generator with generate value as the type T from value's list as the type
 pub struct SelectGenerator<T> {
-    nullable: Nullable,
+    nullable: bool,
     selectable_values: Vec<T>,
 }
 
@@ -48,7 +48,7 @@ impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> GeneratorBase<R> for Sel
     }
 
     fn is_nullable(&self) -> bool {
-        self.nullable.is_nullable()
+        self.nullable
     }
 
     fn generate_without_null(

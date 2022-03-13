@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-use crate::builder::{Nullable, ValueBound, ValueStep};
+use crate::builder::{ValueBound, ValueStep};
 use crate::error::BuildError;
 use crate::generator::build_string::{DuplicatePermutationGenerator, FormatGenerator};
 use crate::generator::distribution::NormalGenerator;
@@ -106,6 +106,16 @@ impl ChildGeneratorBuilder {
     }
 }
 
+fn is_required(use_nullable: &bool) -> bool
+{
+    use_nullable != &false
+}
+
+fn as_required() -> bool
+{
+    false
+}
+
 /// Base Generator Builder
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct GeneratorBuilder {
@@ -114,15 +124,15 @@ pub struct GeneratorBuilder {
     /// This is a type of the generator.
     #[serde(rename = "type")]
     pub(crate) generator_type: GeneratorType,
-    #[serde(
-        skip_serializing_if = "Nullable::is_required",
-        default = "Nullable::new_required"
-    )]
 
     /// Generator's `nullable` status
     ///
     /// This is a nullable flag for the generator.
-    pub(crate) nullable: Nullable,
+    #[serde(
+        skip_serializing_if = "is_required",
+        default = "as_required"
+    )]
+    pub(crate) nullable: bool,
 
     /// Generator's `format` option
     ///
@@ -276,7 +286,7 @@ impl GeneratorBuilder {
     fn new(generator_type: GeneratorType) -> Self {
         Self {
             generator_type,
-            nullable: Nullable::new_required(),
+            nullable: as_required(),
             format: None,
             script: None,
             separator: None,
@@ -740,7 +750,7 @@ impl GeneratorBuilder {
 impl GeneratorBuilder {
     /// Set `nullable` status to change to nullable
     pub fn nullable(mut self) -> Self {
-        self.nullable = Nullable::new_nullable();
+        self.nullable = true;
         self
     }
 

@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
+use crate::builder::{GeneratorBuilder, ValueBound};
 use crate::error::{BuildError, GenerateError};
 use crate::generator::{GeneratorBase, Randomizer, ValueChildGeneratorBase, ValueOrChild};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
@@ -8,7 +8,7 @@ use crate::GeneratorType;
 ///
 /// [`DataValue::String`]: ../../value/enum.DataValue.html#variant.String
 pub struct DuplicatePermutationGenerator<R: Randomizer + ?Sized> {
-    nullable: Nullable,
+    nullable: bool,
     count_range: ValueBound<SbrdInt>,
     separator: String,
     selectable_values: Vec<ValueOrChild<R>>,
@@ -77,7 +77,7 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for DuplicatePermutationGenerator<
     }
 
     fn is_nullable(&self) -> bool {
-        self.nullable.is_nullable()
+        self.nullable
     }
 
     fn generate_without_null(

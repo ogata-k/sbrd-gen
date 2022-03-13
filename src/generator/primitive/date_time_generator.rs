@@ -1,7 +1,7 @@
 use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
-use crate::generator::{Generator, Randomizer};
+use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdDate, SbrdDateTime, DATE_TIME_DEFAULT_FORMAT};
 use crate::GeneratorType;
 
@@ -21,7 +21,7 @@ pub struct DateTimeGenerator {
     range: ValueBound<SbrdDateTime>,
 }
 
-impl<R: Randomizer + ?Sized> Generator<R> for DateTimeGenerator {
+impl<R: Randomizer + ?Sized> GeneratorBase<R> for DateTimeGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,

@@ -1,6 +1,6 @@
 use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
-use crate::generator::{Generator, Randomizer};
+use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
 use crate::GeneratorType;
 use std::cell::Cell;
@@ -18,7 +18,7 @@ pub struct IncrementIdGenerator {
     step: SbrdInt,
 }
 
-impl<R: Randomizer + ?Sized> Generator<R> for IncrementIdGenerator {
+impl<R: Randomizer + ?Sized> GeneratorBase<R> for IncrementIdGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,

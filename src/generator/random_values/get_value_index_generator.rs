@@ -1,6 +1,6 @@
 use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
-use crate::generator::{Generator, Randomizer, SingleOptionValueGenerator};
+use crate::generator::{GeneratorBase, Randomizer, SingleOptionValueGeneratorBase};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
 use crate::GeneratorType;
 
@@ -10,13 +10,13 @@ pub struct GetValueIndexGenerator {
     values_count: usize,
 }
 
-impl<R: Randomizer + ?Sized> SingleOptionValueGenerator<R, ()> for GetValueIndexGenerator {
+impl<R: Randomizer + ?Sized> SingleOptionValueGeneratorBase<R, ()> for GetValueIndexGenerator {
     fn parse(_input: &str) -> Result<(), BuildError> {
         Ok(())
     }
 }
 
-impl<R: Randomizer + ?Sized> Generator<R> for GetValueIndexGenerator {
+impl<R: Randomizer + ?Sized> GeneratorBase<R> for GetValueIndexGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
@@ -35,7 +35,7 @@ impl<R: Randomizer + ?Sized> Generator<R> for GetValueIndexGenerator {
         }
 
         let selectable_values =
-            <Self as SingleOptionValueGenerator<R, ()>>::build_selectable(chars, values, filepath)?;
+            <Self as SingleOptionValueGeneratorBase<R, ()>>::build_selectable(chars, values, filepath)?;
 
         Ok(Self {
             nullable,

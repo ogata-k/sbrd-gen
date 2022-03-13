@@ -9,7 +9,7 @@ use sbrd_gen::error::{BuildError, SchemaResult};
 use sbrd_gen::file::set_schema_file_path;
 use sbrd_gen::generator::Randomizer;
 use sbrd_gen::parser::{JsonParser, SchemaParser, YamlParser};
-use sbrd_gen::writer::{CsvWriter, GeneratedValueWriter, PrettyJsonWriter, TsvWriter, YamlWriter};
+use sbrd_gen::writer::{CsvWriter, GeneratedValueWriterBase, PrettyJsonWriter, TsvWriter, YamlWriter};
 use sbrd_gen::{Schema, SchemaBuilder};
 use std::fs::File;
 use std::io;
@@ -151,7 +151,7 @@ impl SbrdGenApp {
     ) -> SchemaResult<()>
     where
         O: io::Write,
-        Writer: GeneratedValueWriter<O>,
+        Writer: GeneratedValueWriterBase<O>,
         R: Randomizer + ?Sized,
     {
         let mut writer = Writer::from_writer(output);

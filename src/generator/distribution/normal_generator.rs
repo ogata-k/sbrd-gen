@@ -1,6 +1,6 @@
 use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
-use crate::generator::{Generator, Randomizer};
+use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdReal};
 use crate::GeneratorType;
 use rand::distributions::Distribution;
@@ -15,7 +15,7 @@ pub struct NormalGenerator {
     distribution: Normal<SbrdReal>,
 }
 
-impl<R: Randomizer + ?Sized> Generator<R> for NormalGenerator {
+impl<R: Randomizer + ?Sized> GeneratorBase<R> for NormalGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,

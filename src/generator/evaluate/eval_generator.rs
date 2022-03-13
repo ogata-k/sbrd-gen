@@ -1,7 +1,7 @@
 use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::{EvalResult, Evaluator};
-use crate::generator::{Generator, Randomizer};
+use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
 use crate::GeneratorType;
 use std::marker::PhantomData;
@@ -16,7 +16,7 @@ pub struct EvalGenerator<T> {
     _calculated_type: PhantomData<T>,
 }
 
-impl<R: Randomizer + ?Sized, F: ForEvalGeneratorType> Generator<R> for EvalGenerator<F> {
+impl<R: Randomizer + ?Sized, F: ForEvalGeneratorType> GeneratorBase<R> for EvalGenerator<F> {
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,

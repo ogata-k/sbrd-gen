@@ -14,7 +14,7 @@ pub trait Randomizer: 'static + Rng {}
 impl<R: 'static + Rng> Randomizer for R {}
 
 /// Base trait for a generator
-pub trait Generator<R: Randomizer + ?Sized> {
+pub trait GeneratorBase<R: Randomizer + ?Sized> {
     /// Create generator from builder
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
@@ -54,7 +54,7 @@ pub trait Generator<R: Randomizer + ?Sized> {
 }
 
 /// Child generator with condition
-pub type CasedChild<R> = (Option<String>, Box<dyn Generator<R>>);
+pub type CasedChild<R> = (Option<String>, Box<dyn GeneratorBase<R>>);
 /// Base trait for a generator use child generators with condition.
 ///
 /// If a child generator's condition is [`Option::Some`], then evaluate it's condition.
@@ -62,7 +62,7 @@ pub type CasedChild<R> = (Option<String>, Box<dyn Generator<R>>);
 ///
 /// [`Option::Some`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.Some
 /// [`Option::None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None
-pub trait CasedChildGenerator<R: Randomizer + ?Sized> {
+pub trait CasedChildGeneratorBase<R: Randomizer + ?Sized> {
     /// Build selectable child generator list
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,
@@ -70,7 +70,7 @@ pub trait CasedChildGenerator<R: Randomizer + ?Sized> {
         match children {
             None => Err(BuildError::NotExistValueOf("children".to_string())),
             Some(children) => {
-                let mut _children: Vec<(Option<String>, Box<dyn Generator<R>>)> = Vec::new();
+                let mut _children: Vec<(Option<String>, Box<dyn GeneratorBase<R>>)> = Vec::new();
                 let mut has_default_case = false;
                 for child_builder in children.into_iter() {
                     let ChildGeneratorBuilder {
@@ -133,9 +133,9 @@ pub trait CasedChildGenerator<R: Randomizer + ?Sized> {
 }
 
 /// Child generator with weight
-pub type WeightedChild<R> = (Weight, Box<dyn Generator<R>>);
+pub type WeightedChild<R> = (Weight, Box<dyn GeneratorBase<R>>);
 /// Base trait for a generator use child generator with weight
-pub trait WeightedChildGenerator<R: Randomizer + ?Sized> {
+pub trait WeightedChildGeneratorBase<R: Randomizer + ?Sized> {
     /// Build selectable child generator with weight
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,
@@ -183,7 +183,7 @@ pub trait WeightedChildGenerator<R: Randomizer + ?Sized> {
 }
 
 /// Base trait for a generator from input values with many options
-pub trait MultiOptionsValueGenerator<R: Randomizer + ?Sized, T> {
+pub trait MultiOptionsValueGeneratorBase<R: Randomizer + ?Sized, T> {
     /// Function of parser the input value
     fn parse(input: &str) -> Result<T, BuildError>;
 
@@ -224,7 +224,7 @@ pub trait MultiOptionsValueGenerator<R: Randomizer + ?Sized, T> {
     }
 }
 /// Base trait for a generator from input values with only one option
-pub trait SingleOptionValueGenerator<R: Randomizer + ?Sized, T> {
+pub trait SingleOptionValueGeneratorBase<R: Randomizer + ?Sized, T> {
     /// Function of parser the input value
     fn parse(input: &str) -> Result<T, BuildError>;
 
@@ -287,9 +287,9 @@ pub trait SingleOptionValueGenerator<R: Randomizer + ?Sized, T> {
 ///
 /// Usually, this structure is used by a generator which generate value as string,
 /// because input value's type is unknown and a type of the generated value by child generator is also unknown.
-pub type ValueOrChild<R> = Either<String, Box<dyn Generator<R>>>;
+pub type ValueOrChild<R> = Either<String, Box<dyn GeneratorBase<R>>>;
 /// Base trait for a generator use picked out value from input values or generated value picked out child generator with many options
-pub trait MultiOptionsValueChildGenerator<R: Randomizer + ?Sized> {
+pub trait MultiOptionsValueChildGeneratorBase<R: Randomizer + ?Sized> {
     /// Build selectable value and child generator
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,
@@ -349,7 +349,7 @@ pub trait MultiOptionsValueChildGenerator<R: Randomizer + ?Sized> {
     }
 }
 /// Base trait for a generator use picked out value from input values or generated value picked out child generator with only one option
-pub trait SingleOptionValueChildGenerator<R: Randomizer + ?Sized> {
+pub trait SingleOptionValueChildGeneratorBase<R: Randomizer + ?Sized> {
     /// Build selectable value and child generator
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,

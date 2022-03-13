@@ -3,7 +3,7 @@
 use rand::thread_rng;
 use sbrd_gen::file::set_schema_file_path;
 use sbrd_gen::parser::{JsonParser, SchemaParser};
-use sbrd_gen::writer::{GeneratedValueWriter, PrettyJsonWriter};
+use sbrd_gen::writer::{GeneratedValueWriterBase, PrettyJsonWriter};
 use std::fs::File;
 use std::io::stdout;
 use std::path::PathBuf;

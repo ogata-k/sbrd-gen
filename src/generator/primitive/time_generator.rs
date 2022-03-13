@@ -1,7 +1,7 @@
 use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
-use crate::generator::{Generator, Randomizer};
+use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdTime, TIME_DEFAULT_FORMAT};
 use crate::GeneratorType;
 use chrono::Duration;
@@ -23,7 +23,7 @@ pub struct TimeGenerator {
     range: ValueBound<SbrdTime>,
 }
 
-impl<R: Randomizer + ?Sized> Generator<R> for TimeGenerator {
+impl<R: Randomizer + ?Sized> GeneratorBase<R> for TimeGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,

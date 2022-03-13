@@ -4,7 +4,7 @@ use crate::value::DataValue;
 use crate::writer::writer_base::{
     GeneratedDisplayValues, SerializeWithGenerate, DUMMY_KEYS_NAME, DUMMY_VALUES_NAME,
 };
-use crate::writer::GeneratedValueWriter;
+use crate::writer::GeneratedValueWriterBase;
 use crate::Schema;
 use serde::ser::{SerializeMap, SerializeSeq};
 use serde::Serializer;
@@ -23,7 +23,7 @@ impl<W: io::Write> YamlWriter<W> {
     }
 }
 
-impl<W: io::Write> GeneratedValueWriter<W> for YamlWriter<W> {
+impl<W: io::Write> GeneratedValueWriterBase<W> for YamlWriter<W> {
     fn from_writer(writer: W) -> Self {
         Self { writer }
     }

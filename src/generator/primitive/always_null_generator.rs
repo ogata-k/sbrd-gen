@@ -1,6 +1,6 @@
 use crate::builder::GeneratorBuilder;
 use crate::error::{BuildError, GenerateError};
-use crate::generator::{Generator, Randomizer};
+use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use crate::GeneratorType;
 
@@ -10,7 +10,7 @@ use crate::GeneratorType;
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct AlwaysNullGenerator {}
 
-impl<R: Randomizer + ?Sized> Generator<R> for AlwaysNullGenerator {
+impl<R: Randomizer + ?Sized> GeneratorBase<R> for AlwaysNullGenerator {
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,

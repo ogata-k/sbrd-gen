@@ -1,7 +1,7 @@
 use crate::error::{IntoSbrdError, SchemaErrorKind, SchemaResult};
 use crate::generator::Randomizer;
 use crate::value::DataValue;
-use crate::writer::GeneratedValueWriter;
+use crate::writer::GeneratedValueWriterBase;
 use crate::Schema;
 use csv::QuoteStyle;
 use serde::Serialize;
@@ -12,7 +12,7 @@ pub struct CsvWriter<W: io::Write> {
     xsv_writer: XsvWriter<W>,
 }
 
-impl<W: io::Write> GeneratedValueWriter<W> for CsvWriter<W> {
+impl<W: io::Write> GeneratedValueWriterBase<W> for CsvWriter<W> {
     fn from_writer(writer: W) -> Self {
         let xsv_writer = XsvWriter::from_writer(writer, b',');
 
@@ -55,7 +55,7 @@ pub struct TsvWriter<W: io::Write> {
     xsv_writer: XsvWriter<W>,
 }
 
-impl<W: io::Write> GeneratedValueWriter<W> for TsvWriter<W> {
+impl<W: io::Write> GeneratedValueWriterBase<W> for TsvWriter<W> {
     fn from_writer(writer: W) -> Self {
         let xsv_writer = XsvWriter::from_writer(writer, b'\t');
 

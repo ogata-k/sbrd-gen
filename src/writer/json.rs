@@ -4,7 +4,7 @@ use crate::value::DataValue;
 use crate::writer::writer_base::{
     GeneratedDisplayValues, SerializeWithGenerate, DUMMY_KEYS_NAME, DUMMY_VALUES_NAME,
 };
-use crate::writer::GeneratedValueWriter;
+use crate::writer::GeneratedValueWriterBase;
 use crate::Schema;
 use serde::ser::{SerializeMap, SerializeSeq};
 use serde::Serializer;
@@ -19,7 +19,7 @@ pub struct CompactJsonWriter<W: io::Write> {
     json_writer: JsonWriter<W, CompactFormatter>,
 }
 
-impl<W: io::Write> GeneratedValueWriter<W> for CompactJsonWriter<W> {
+impl<W: io::Write> GeneratedValueWriterBase<W> for CompactJsonWriter<W> {
     fn from_writer(writer: W) -> Self {
         Self {
             json_writer: JsonWriter::from_writer(writer),
@@ -62,7 +62,7 @@ pub struct PrettyJsonWriter<'a, W: io::Write> {
     json_writer: JsonWriter<W, PrettyFormatter<'a>>,
 }
 
-impl<'a, W: io::Write> GeneratedValueWriter<W> for PrettyJsonWriter<'a, W> {
+impl<'a, W: io::Write> GeneratedValueWriterBase<W> for PrettyJsonWriter<'a, W> {
     fn from_writer(writer: W) -> Self {
         Self {
             json_writer: JsonWriter::from_writer(writer),

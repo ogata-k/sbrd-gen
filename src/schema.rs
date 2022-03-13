@@ -3,7 +3,7 @@
 
 use crate::builder::ParentGeneratorBuilder;
 use crate::error::{BuildError, GenerateError, IntoSbrdError, SchemaErrorKind, SchemaResult};
-use crate::generator::{Generator, Randomizer};
+use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap};
 use serde::ser::Error;
 use serde::{Deserialize, Serialize};
@@ -74,7 +74,7 @@ impl SchemaBuilder {
 #[allow(missing_debug_implementations)]
 pub struct Schema<R: Randomizer + ?Sized> {
     keys: Vec<String>,
-    generators: Vec<(String, Box<dyn Generator<R>>)>,
+    generators: Vec<(String, Box<dyn GeneratorBase<R>>)>,
 }
 
 impl<R: Randomizer + ?Sized> Schema<R> {

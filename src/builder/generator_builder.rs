@@ -17,7 +17,7 @@ use crate::generator::random_children::{CaseWhenGenerator, RandomChildGenerator}
 use crate::generator::random_values::{
     GetValueAtGenerator, GetValueIndexGenerator, SelectGenerator,
 };
-use crate::generator::{Generator, Randomizer};
+use crate::generator::{GeneratorBase, Randomizer};
 use crate::generator_type::GeneratorType;
 use crate::value::{
     DataValue, DataValueMap, SbrdBool, SbrdDate, SbrdDateTime, SbrdInt, SbrdReal, SbrdString,
@@ -194,7 +194,7 @@ pub struct GeneratorBuilder {
 /// Helper for build generator.
 macro_rules! build_generator {
     ($builder: expr,$R:ty, $builder_type: ty) => {{
-        let generator: $builder_type = Generator::<$R>::create($builder)?;
+        let generator: $builder_type = GeneratorBase::<$R>::create($builder)?;
         Ok(Box::new(generator))
     }};
 }
@@ -204,7 +204,7 @@ macro_rules! build_generator {
 //
 impl GeneratorBuilder {
     /// Build generator as the type
-    pub fn build<R: Randomizer + ?Sized>(self) -> Result<Box<dyn Generator<R>>, BuildError> {
+    pub fn build<R: Randomizer + ?Sized>(self) -> Result<Box<dyn GeneratorBase<R>>, BuildError> {
         match self.generator_type {
             // build string
             GeneratorType::DuplicatePermutation => {

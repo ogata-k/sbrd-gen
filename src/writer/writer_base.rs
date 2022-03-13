@@ -6,7 +6,7 @@ use serde::{Serialize, Serializer};
 use std::sync::Mutex;
 
 /// Trait of Writer for keys and generated values
-pub trait GeneratedValueWriter<W: std::io::Write> {
+pub trait GeneratedValueWriterBase<W: std::io::Write> {
     /// Create from the writer
     fn from_writer(writer: W) -> Self;
 

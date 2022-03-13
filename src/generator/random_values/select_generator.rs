@@ -1,6 +1,6 @@
 use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
-use crate::generator::{Generator, MultiOptionsValueGenerator, Randomizer};
+use crate::generator::{GeneratorBase, MultiOptionsValueGeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt, SbrdReal, SbrdString};
 use crate::GeneratorType;
 use rand::seq::SliceRandom;
@@ -12,7 +12,7 @@ pub struct SelectGenerator<T> {
     selectable_values: Vec<T>,
 }
 
-impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> MultiOptionsValueGenerator<R, T>
+impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> MultiOptionsValueGeneratorBase<R, T>
     for SelectGenerator<T>
 {
     fn parse(input: &str) -> Result<T, BuildError> {
@@ -20,7 +20,7 @@ impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> MultiOptionsValueGenerat
     }
 }
 
-impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectGenerator<T> {
+impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> GeneratorBase<R> for SelectGenerator<T> {
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
     where
         Self: Sized,
@@ -39,7 +39,7 @@ impl<R: Randomizer + ?Sized, T: ForSelectGeneratorType> Generator<R> for SelectG
         }
 
         let selectable_values =
-            <Self as MultiOptionsValueGenerator<R, T>>::build_selectable(chars, values, filepath)?;
+            <Self as MultiOptionsValueGeneratorBase<R, T>>::build_selectable(chars, values, filepath)?;
 
         Ok(Self {
             nullable,

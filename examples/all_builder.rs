@@ -3,7 +3,7 @@
 use chrono::{Duration, Local, NaiveTime};
 use rand::thread_rng;
 use sbrd_gen::builder::{GeneratorBuilder, ParentGeneratorBuilder, ValueBound, ValueStep};
-use sbrd_gen::writer::{GeneratedValueWriter, PrettyJsonWriter};
+use sbrd_gen::writer::{GeneratedValueWriterBase, PrettyJsonWriter};
 use sbrd_gen::SchemaBuilder;
 use std::io::stdout;
 use std::ops::Sub;

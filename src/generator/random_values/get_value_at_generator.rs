@@ -1,7 +1,7 @@
 use crate::builder::{GeneratorBuilder, Nullable};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
-use crate::generator::{Generator, Randomizer, SingleOptionValueGenerator};
+use crate::generator::{GeneratorBase, Randomizer, SingleOptionValueGeneratorBase};
 use crate::value::{DataValue, DataValueMap, SbrdInt, SbrdReal, SbrdString};
 use crate::GeneratorType;
 use std::str::FromStr;
@@ -13,7 +13,7 @@ pub struct GetValueAtGenerator<T> {
     selectable_values: Vec<T>,
 }
 
-impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> SingleOptionValueGenerator<R, T>
+impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> SingleOptionValueGeneratorBase<R, T>
     for GetValueAtGenerator<T>
 {
     fn parse(input: &str) -> Result<T, BuildError> {
@@ -21,7 +21,7 @@ impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> SingleOptionValueGen
     }
 }
 
-impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> Generator<R>
+impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> GeneratorBase<R>
     for GetValueAtGenerator<T>
 {
     fn create(builder: GeneratorBuilder) -> Result<Self, BuildError>
@@ -43,7 +43,7 @@ impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> Generator<R>
         }
 
         let selectable_values =
-            <Self as SingleOptionValueGenerator<R, T>>::build_selectable(chars, values, filepath)?;
+            <Self as SingleOptionValueGeneratorBase<R, T>>::build_selectable(chars, values, filepath)?;
 
         match script {
             None => Err(BuildError::NotExistValueOf("script".to_string())),

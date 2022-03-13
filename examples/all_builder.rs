@@ -64,18 +64,10 @@ fn output_list() -> Vec<String> {
         "select-int-key".to_string(),
         "select-real-key".to_string(),
         "select-string-key".to_string(),
-        "get-int-value-at-from-chars-key".to_string(),
-        "get-int-value-at-from-values-key".to_string(),
-        "get-int-value-at-from-file-key".to_string(),
-        "get-real-value-at-from-chars-key".to_string(),
-        "get-real-value-at-from-values-key".to_string(),
-        "get-real-value-at-from-file-key".to_string(),
-        "get-string-value-at-from-chars-key".to_string(),
-        "get-string-value-at-from-values-key".to_string(),
-        "get-string-value-at-from-file-key".to_string(),
-        "get-value-index-from-chars-key".to_string(),
-        "get-value-index-from-values-key".to_string(),
-        "get-value-index-from-file-key".to_string(),
+        "get-int-value-at-key".to_string(),
+        "get-real-value-at-key".to_string(),
+        "get-string-value-at-key".to_string(),
+        "get-value-index-key".to_string(),
     ]
 }
 
@@ -97,10 +89,10 @@ fn builder_list() -> Vec<ParentGeneratorBuilder> {
                 GeneratorBuilder::new_time(None, None).into_child(),
             ]),
         Some("ABC".to_string()), Some(vec![
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_string(),
-                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.".to_string(),
-                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.".to_string(),
-                "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string(),
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_string().into(),
+                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.".to_string().into(),
+                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.".to_string().into(),
+                "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".to_string().into(),
             ]), Some(dummy_list_up_filepath.clone())
         ).into_parent("duplicate-permutation-key"),
         GeneratorBuilder::new_format("Lorem ipsum: \"{duplicate-permutation-key}\"")
@@ -157,34 +149,25 @@ fn builder_list() -> Vec<ParentGeneratorBuilder> {
             ]),
             Some(dummy_list_up_filepath.clone())
         ).into_parent("select-string-key"),
-        GeneratorBuilder::new_int(Some((0..10).into())).into_parent("int-index"),
-        GeneratorBuilder::new_get_int_value_at_from_chars(
+        GeneratorBuilder::new_int(Some((0..30).into())).into_parent("int-index"),
+        GeneratorBuilder::new_get_int_value_at(
             "{int-index}",
-            "0123456789"
-        ).into_parent("get-int-value-at-from-chars-key"),
-        GeneratorBuilder::new_get_int_value_at_from_values("{int-index}",
-                                                           vec![0,10,20,30,40,50,60,70,80,90],
-        ).into_parent("get-int-value-at-from-values-key"),
-        GeneratorBuilder::new_get_int_value_at_from_file("{int-index}",dummy_num_filepath.clone()
-        ).into_parent("get-int-value-at-from-file-key"),
-        GeneratorBuilder::new_int(Some((0..10).into())).into_parent("real-index"),
-        GeneratorBuilder::new_get_real_value_at_from_chars(
+          Some("0123456789".to_string()),
+           Some(vec![0,10,20,30,40,50,60,70,80,90]),
+         Some(dummy_num_filepath.clone())
+        ).into_parent("get-int-value-at-key"),
+        GeneratorBuilder::new_int(Some((0..30).into())).into_parent("real-index"),
+        GeneratorBuilder::new_get_real_value_at(
             "{real-index}",
-            "0123456789"
-        ).into_parent("get-real-value-at-from-chars-key"),
-        GeneratorBuilder::new_get_real_value_at_from_values("{real-index}",
-                                                            vec![0.0, 10.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0],
-        ).into_parent("get-real-value-at-from-values-key"),
-        GeneratorBuilder::new_get_real_value_at_from_file("{real-index}",dummy_num_filepath.clone()
-        ).into_parent("get-real-value-at-from-file-key"),
-        GeneratorBuilder::new_int(Some((0..10).into())).into_parent("string-index"),
-        GeneratorBuilder::new_get_string_value_at_from_chars(
+            Some("0123456789".to_string()),
+            Some(vec![0.0, 10.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0]),
+            Some(dummy_num_filepath.clone())
+        ).into_parent("get-real-value-at-key"),
+        GeneratorBuilder::new_int(Some((0..30).into())).into_parent("string-index"),
+        GeneratorBuilder::new_get_string_value_at(
             "{string-index}",
-            "0123456789"
-        ).into_parent("get-string-value-at-from-chars-key"),
-        GeneratorBuilder::new_get_string_value_at_from_values(
-            "{string-index}",
-            vec![
+            Some("0123456789".to_string()),
+            Some(vec![
                 "0".to_string(),
                 "10".to_string(),
                 "20".to_string(),
@@ -195,18 +178,13 @@ fn builder_list() -> Vec<ParentGeneratorBuilder> {
                 "70".to_string(),
                 "80".to_string(),
                 "90".to_string(),
-            ],
-        ).into_parent("get-string-value-at-from-values-key"),
-        GeneratorBuilder::new_get_string_value_at_from_file("{string-index}",dummy_num_filepath.clone()
-        ).into_parent("get-string-value-at-from-file-key"),
-        GeneratorBuilder::new_get_value_index_from_chars(
-            "0123456789"
-        ).into_parent("get-value-index-from-chars-key"),
-        GeneratorBuilder::new_get_value_index_from_values(
-            vec![0.into(),10.into(),20.into(),30.into(),40.into(),50.into(),60.into(),70.into(),80.into(),90.into()],
-        ).into_parent("get-value-index-from-values-key"),
-        GeneratorBuilder::new_get_value_index_from_file(
-           dummy_num_filepath.clone()
-        ).into_parent("get-value-index-from-file-key"),
+            ]),
+            Some(dummy_num_filepath.clone())
+        ).into_parent("get-string-value-at-key"),
+        GeneratorBuilder::new_get_value_index(
+            Some("0123456789".to_string()),
+            Some(vec![0.into(),10.into(),20.into(),30.into(),40.into(),50.into(),60.into(),70.into(),80.into(),90.into()]),
+           Some(dummy_num_filepath.clone())
+        ).into_parent("get-value-index-key"),
     ]
 }

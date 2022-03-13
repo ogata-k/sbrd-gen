@@ -182,8 +182,8 @@ pub trait WeightedChildGeneratorBase<R: Randomizer + ?Sized> {
     }
 }
 
-/// Base trait for a generator from input values with many options
-pub trait MultiOptionsValueGeneratorBase<R: Randomizer + ?Sized, T> {
+/// Base trait for a generator from input values
+pub trait ValueGeneratorBase<R: Randomizer + ?Sized, T> {
     /// Function of parser the input value
     fn parse(input: &str) -> Result<T, BuildError>;
 
@@ -223,73 +223,14 @@ pub trait MultiOptionsValueGeneratorBase<R: Randomizer + ?Sized, T> {
         Ok(selectable_values)
     }
 }
-/// Base trait for a generator from input values with only one option
-pub trait SingleOptionValueGeneratorBase<R: Randomizer + ?Sized, T> {
-    /// Function of parser the input value
-    fn parse(input: &str) -> Result<T, BuildError>;
-
-    /// Build selectable value
-    fn build_selectable(
-        chars: Option<String>,
-        values: Option<Vec<DataValue>>,
-        filepath: Option<PathBuf>,
-    ) -> Result<Vec<T>, BuildError> {
-        let mut some_count = 0;
-        if chars.is_some() {
-            some_count += 1;
-        }
-        if values.is_some() {
-            some_count += 1;
-        }
-        if filepath.is_some() {
-            some_count += 1;
-        }
-        if some_count == 0 || some_count > 1 {
-            return Err(BuildError::OnlyOneOptionSpecifiedNot(vec![
-                "chars".to_string(),
-                "values".to_string(),
-                "filepath".to_string(),
-            ]));
-        }
-
-        let mut selectable_values: Vec<T> = Vec::new();
-        if let Some(chars) = chars {
-            for c in chars.chars() {
-                selectable_values.push(Self::parse(&c.to_string())?);
-            }
-        }
-
-        if let Some(values) = values {
-            for value in values.into_iter() {
-                selectable_values.push(Self::parse(&value.to_parse_string())?);
-            }
-        }
-
-        if let Some(filepath) = filepath {
-            let file = open_sbrd_file(filepath.as_path())
-                .map_err(|e| BuildError::FileError(e, filepath.clone()))?;
-            let reader = BufReader::new(file);
-            for line in reader.lines() {
-                let line = line.map_err(|e| BuildError::FileError(e, filepath.clone()))?;
-                selectable_values.push(Self::parse(&line)?);
-            }
-        }
-
-        if selectable_values.is_empty() {
-            return Err(BuildError::EmptySelectValues);
-        }
-
-        Ok(selectable_values)
-    }
-}
 
 /// Value as String or Child for a generator.
 ///
 /// Usually, this structure is used by a generator which generate value as string,
 /// because input value's type is unknown and a type of the generated value by child generator is also unknown.
 pub type ValueOrChild<R> = Either<String, Box<dyn GeneratorBase<R>>>;
-/// Base trait for a generator use picked out value from input values or generated value picked out child generator with many options
-pub trait MultiOptionsValueChildGeneratorBase<R: Randomizer + ?Sized> {
+/// Base trait for a generator use picked out value from input values or generated value picked out child generator
+pub trait ValueChildGeneratorBase<R: Randomizer + ?Sized> {
     /// Build selectable value and child generator
     fn build_selectable(
         children: Option<Vec<ChildGeneratorBuilder>>,
@@ -297,88 +238,6 @@ pub trait MultiOptionsValueChildGeneratorBase<R: Randomizer + ?Sized> {
         values: Option<Vec<DataValue>>,
         filepath: Option<PathBuf>,
     ) -> Result<Vec<ValueOrChild<R>>, BuildError> {
-        let mut select_values = Vec::new();
-        if let Some(children) = children {
-            for child_builder in children.into_iter() {
-                let ChildGeneratorBuilder { builder, .. } = child_builder;
-                select_values.push(Either::Right(builder.build()?));
-            }
-        }
-
-        if let Some(chars) = chars {
-            select_values.extend(chars.chars().map(|c| Either::Left(c.to_string())));
-        }
-
-        if let Some(values) = values {
-            select_values.extend(values.into_iter().map(|v| Either::Left(v.to_string())));
-        }
-
-        if let Some(filepath) = filepath {
-            let file = open_sbrd_file(filepath.as_path())
-                .map_err(|e| BuildError::FileError(e, filepath.clone()))?;
-            let reader = BufReader::new(file);
-            for line in reader.lines() {
-                let line = line.map_err(|e| BuildError::FileError(e, filepath.clone()))?;
-                select_values.push(Either::Left(line));
-            }
-        }
-
-        if select_values.is_empty() {
-            return Err(BuildError::EmptySelectable);
-        }
-
-        Ok(select_values)
-    }
-
-    /// Get selectable list
-    fn get_selectable(&self) -> &[ValueOrChild<R>];
-
-    /// Pick out value from input values or generated value picked out child generator
-    fn choose(
-        &self,
-        rng: &mut R,
-        context: &DataValueMap<&str>,
-    ) -> Result<DataValue, GenerateError> {
-        self.get_selectable()
-            .choose_weighted(rng, |_| 1)
-            .map_err(|err| GenerateError::FailGenerate(err.to_string()))
-            .and_then(|either| match either {
-                Either::Left(item) => Ok(item.clone().into()),
-                Either::Right(item) => item.generate(rng, context),
-            })
-    }
-}
-/// Base trait for a generator use picked out value from input values or generated value picked out child generator with only one option
-pub trait SingleOptionValueChildGeneratorBase<R: Randomizer + ?Sized> {
-    /// Build selectable value and child generator
-    fn build_selectable(
-        children: Option<Vec<ChildGeneratorBuilder>>,
-        chars: Option<String>,
-        values: Option<Vec<DataValue>>,
-        filepath: Option<PathBuf>,
-    ) -> Result<Vec<ValueOrChild<R>>, BuildError> {
-        let mut some_count = 0;
-        if children.is_some() {
-            some_count += 1;
-        }
-        if chars.is_some() {
-            some_count += 1;
-        }
-        if values.is_some() {
-            some_count += 1;
-        }
-        if filepath.is_some() {
-            some_count += 1;
-        }
-        if some_count == 0 || some_count > 1 {
-            return Err(BuildError::OnlyOneOptionSpecifiedNot(vec![
-                "children".to_string(),
-                "chars".to_string(),
-                "values".to_string(),
-                "filepath".to_string(),
-            ]));
-        }
-
         let mut select_values = Vec::new();
         if let Some(children) = children {
             for child_builder in children.into_iter() {

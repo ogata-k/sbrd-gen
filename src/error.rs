@@ -149,12 +149,6 @@ pub enum BuildError {
     /// * 0: Range bound
     RangeEmpty(ValueBound<DataValue>),
 
-    /// Available option is one in the list. But none or many are specified.
-    ///
-    /// # Arguments
-    /// * 0: Available options
-    OnlyOneOptionSpecifiedNot(Vec<String>),
-
     /// Specified `children` in the Schema does not exist or does not have child.
     EmptySelectableChildren,
 
@@ -202,9 +196,6 @@ impl std::fmt::Display for BuildError {
                 write!(f, "Fail Parse {} as {} with error: {}", s, t, e)
             }
             BuildError::RangeEmpty(range) => write!(f, "Empty Range: {}", range),
-            BuildError::OnlyOneOptionSpecifiedNot(options) => {
-                write!(f, "Available option is only one in {:?}", options)
-            }
             BuildError::EmptySelectableChildren => write!(f, "Selectable children is empty"),
             BuildError::EmptySelectValues => write!(f, "Selectable values is empty"),
             BuildError::EmptySelectable => {

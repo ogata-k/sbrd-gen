@@ -8,11 +8,11 @@ use crate::error::BuildError;
 use crate::generator::build_string::{DuplicatePermutationGenerator, FormatGenerator};
 use crate::generator::distribution::NormalGenerator;
 use crate::generator::evaluate::EvalGenerator;
-use crate::generator::primitive::{
-    AlwaysNullGenerator, BoolGenerator, DateGenerator, DateTimeGenerator,
-    IntGenerator, RealGenerator, TimeGenerator,
-};
 use crate::generator::incremental::IncrementIdGenerator;
+use crate::generator::primitive::{
+    AlwaysNullGenerator, BoolGenerator, DateGenerator, DateTimeGenerator, IntGenerator,
+    RealGenerator, TimeGenerator,
+};
 use crate::generator::random_children::{CaseWhenGenerator, RandomChildGenerator};
 use crate::generator::random_values::{
     GetValueAtGenerator, GetValueIndexGenerator, SelectGenerator,
@@ -302,7 +302,7 @@ impl GeneratorBuilder {
         separator: S,
         children: Option<Vec<ChildGeneratorBuilder>>,
         chars: Option<String>,
-        values: Option<Vec<String>>,
+        values: Option<Vec<DataValue>>,
         filepath: Option<PathBuf>,
     ) -> Self
     where
@@ -630,172 +630,107 @@ impl GeneratorBuilder {
     ///
     /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdInt`]: ../value/type.SbrdInt.html
-    fn new_get_int_value_at<S>(script: S) -> Self
+    pub fn new_get_int_value_at<S>(
+        script: S,
+        chars: Option<String>,
+        values: Option<Vec<SbrdInt>>,
+        filepath: Option<PathBuf>,
+    ) -> Self
     where
         S: Into<String>,
     {
-        Self::new(GeneratorType::GetIntValueAt).script(script)
-    }
+        let mut this = Self::new(GeneratorType::GetIntValueAt).script(script);
 
-    /// Create builder for [`GetValueAtGenerator`] with type [`SbrdInt`] from chars
-    ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
-    /// [`SbrdInt`]: ../value/type.SbrdInt.html
-    pub fn new_get_int_value_at_from_chars<S1, S2>(script: S1, chars: S2) -> Self
-    where
-        S1: Into<String>,
-        S2: Into<String>,
-    {
-        Self::new_get_int_value_at(script).chars(chars)
-    }
+        if let Some(chars) = chars {
+            this = this.chars(chars);
+        }
+        if let Some(values) = values {
+            this = this.values(values.into_iter().map(|v| v.into()).collect());
+        }
+        if let Some(filepath) = filepath {
+            this = this.filepath(filepath);
+        }
 
-    /// Create builder for [`GetValueAtGenerator`] with type [`SbrdInt`] from values
-    ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
-    /// [`SbrdInt`]: ../value/type.SbrdInt.html
-    pub fn new_get_int_value_at_from_values<S>(script: S, values: Vec<SbrdInt>) -> Self
-    where
-        S: Into<String>,
-    {
-        Self::new_get_int_value_at(script).values(values.into_iter().map(|v| v.into()).collect())
-    }
-
-    /// Create builder for [`GetValueAtGenerator`] with type [`SbrdInt`] from file
-    ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
-    /// [`SbrdInt`]: ../value/type.SbrdInt.html
-    pub fn new_get_int_value_at_from_file<S, P>(script: S, filepath: P) -> Self
-    where
-        S: Into<String>,
-        P: Into<PathBuf>,
-    {
-        Self::new_get_int_value_at(script).filepath(filepath)
+        this
     }
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdReal`]
     ///
     /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdReal`]: ../value/type.SbrdReal.html
-    fn new_get_real_value_at<S>(script: S) -> Self
+    pub fn new_get_real_value_at<S>(
+        script: S,
+        chars: Option<String>,
+        values: Option<Vec<SbrdReal>>,
+        filepath: Option<PathBuf>,
+    ) -> Self
     where
         S: Into<String>,
     {
-        Self::new(GeneratorType::GetRealValueAt).script(script)
-    }
+        let mut this = Self::new(GeneratorType::GetRealValueAt).script(script);
 
-    /// Create builder for [`GetValueAtGenerator`] with type [`SbrdReal`] from chars
-    ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
-    /// [`SbrdReal`]: ../value/type.SbrdReal.html
-    pub fn new_get_real_value_at_from_chars<S1, S2>(script: S1, chars: S2) -> Self
-    where
-        S1: Into<String>,
-        S2: Into<String>,
-    {
-        Self::new_get_real_value_at(script).chars(chars)
-    }
+        if let Some(chars) = chars {
+            this = this.chars(chars);
+        }
+        if let Some(values) = values {
+            this = this.values(values.into_iter().map(|v| v.into()).collect());
+        }
+        if let Some(filepath) = filepath {
+            this = this.filepath(filepath);
+        }
 
-    /// Create builder for [`GetValueAtGenerator`] with type [`SbrdReal`] from values
-    ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
-    /// [`SbrdReal`]: ../value/type.SbrdReal.html
-    pub fn new_get_real_value_at_from_values<S>(script: S, values: Vec<SbrdReal>) -> Self
-    where
-        S: Into<String>,
-    {
-        Self::new_get_real_value_at(script).values(values.into_iter().map(|v| v.into()).collect())
-    }
-
-    /// Create builder for [`GetValueAtGenerator`] with type [`SbrdReal`] from file
-    ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
-    /// [`SbrdReal`]: ../value/type.SbrdReal.html
-    pub fn new_get_real_value_at_from_file<S, P>(script: S, filepath: P) -> Self
-    where
-        S: Into<String>,
-        P: Into<PathBuf>,
-    {
-        Self::new_get_real_value_at(script).filepath(filepath)
+        this
     }
 
     /// Create builder for [`GetValueAtGenerator`] with type [`SbrdString`]
     ///
     /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
     /// [`SbrdString`]: ../value/type.SbrdString.html
-    fn new_get_string_value_at<S>(script: S) -> Self
+    pub fn new_get_string_value_at<S>(
+        script: S,
+        chars: Option<String>,
+        values: Option<Vec<SbrdString>>,
+        filepath: Option<PathBuf>,
+    ) -> Self
     where
         S: Into<String>,
     {
-        Self::new(GeneratorType::GetStringValueAt).script(script)
-    }
+        let mut this = Self::new(GeneratorType::GetStringValueAt).script(script);
 
-    /// Create builder for [`GetValueAtGenerator`] with type [`SbrdString`] from chars
-    ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
-    /// [`SbrdString`]: ../value/type.SbrdString.html
-    pub fn new_get_string_value_at_from_chars<S1, S2>(script: S1, chars: S2) -> Self
-    where
-        S1: Into<String>,
-        S2: Into<String>,
-    {
-        Self::new_get_string_value_at(script).chars(chars)
-    }
+        if let Some(chars) = chars {
+            this = this.chars(chars);
+        }
+        if let Some(values) = values {
+            this = this.values(values.into_iter().map(|v| v.into()).collect());
+        }
+        if let Some(filepath) = filepath {
+            this = this.filepath(filepath);
+        }
 
-    /// Create builder for [`GetValueAtGenerator`] with type [`SbrdString`] from values
-    ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
-    /// [`SbrdString`]: ../value/type.SbrdString.html
-    pub fn new_get_string_value_at_from_values<S>(script: S, values: Vec<SbrdString>) -> Self
-    where
-        S: Into<String>,
-    {
-        Self::new_get_string_value_at(script).values(values.into_iter().map(|v| v.into()).collect())
-    }
-
-    /// Create builder for [`GetValueAtGenerator`] with type [`SbrdString`] from file
-    ///
-    /// [`GetValueAtGenerator`]: ../generator/random_values/get_value_at_generator/struct.GetValueAtGenerator.html
-    /// [`SbrdString`]: ../value/type.SbrdString.html
-    pub fn new_get_string_value_at_from_file<S, P>(script: S, filepath: P) -> Self
-    where
-        S: Into<String>,
-        P: Into<PathBuf>,
-    {
-        Self::new_get_string_value_at(script).filepath(filepath)
+        this
     }
 
     /// Create builder for [`GetValueIndexGenerator`]
     ///
     /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndexGenerator.html
-    fn new_get_value_index() -> Self {
-        Self::new(GeneratorType::GetValueIndex)
-    }
+    pub fn new_get_value_index(
+        chars: Option<String>,
+        values: Option<Vec<DataValue>>,
+        filepath: Option<PathBuf>,
+    ) -> Self {
+        let mut this = Self::new(GeneratorType::GetValueIndex);
 
-    /// Create builder for [`GetValueIndexGenerator`]
-    ///
-    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndexGenerator.html
-    pub fn new_get_value_index_from_chars<S>(chars: S) -> Self
-    where
-        S: Into<String>,
-    {
-        Self::new_get_value_index().chars(chars)
-    }
+        if let Some(chars) = chars {
+            this = this.chars(chars);
+        }
+        if let Some(values) = values {
+            this = this.values(values);
+        }
+        if let Some(filepath) = filepath {
+            this = this.filepath(filepath);
+        }
 
-    /// Create builder for [`GetValueIndexGenerator`]
-    ///
-    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndexGenerator.html
-    pub fn new_get_value_index_from_values(values: Vec<DataValue>) -> Self {
-        Self::new_get_value_index().values(values)
-    }
-
-    /// Create builder for [`GetValueIndexGenerator`]
-    ///
-    /// [`GetValueIndexGenerator`]: ../generator/random_values/get_value_index_generator/struct.GetValueIndexGenerator.html
-    pub fn new_get_value_index_from_file<P>(filepath: P) -> Self
-    where
-        P: Into<PathBuf>,
-    {
-        Self::new_get_value_index().filepath(filepath)
+        this
     }
 }
 

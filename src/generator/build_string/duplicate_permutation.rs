@@ -1,6 +1,6 @@
 use crate::builder::{GeneratorBuilder, Nullable, ValueBound};
 use crate::error::{BuildError, GenerateError};
-use crate::generator::{GeneratorBase, MultiOptionsValueChildGeneratorBase, Randomizer, ValueOrChild};
+use crate::generator::{GeneratorBase, Randomizer, ValueChildGeneratorBase, ValueOrChild};
 use crate::value::{DataValue, DataValueMap, SbrdInt};
 use crate::GeneratorType;
 
@@ -14,9 +14,7 @@ pub struct DuplicatePermutationGenerator<R: Randomizer + ?Sized> {
     selectable_values: Vec<ValueOrChild<R>>,
 }
 
-impl<R: Randomizer + ?Sized> MultiOptionsValueChildGeneratorBase<R>
-    for DuplicatePermutationGenerator<R>
-{
+impl<R: Randomizer + ?Sized> ValueChildGeneratorBase<R> for DuplicatePermutationGenerator<R> {
     fn get_selectable(&self) -> &[ValueOrChild<R>] {
         &self.selectable_values
     }

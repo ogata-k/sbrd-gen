@@ -116,6 +116,9 @@ impl DateGenerator {
     }
 
     fn default_range() -> ValueBound<SbrdDate> {
-        ValueBound::new(Some(Self::min_date()), Some((false, Self::upper_limit_date())))
+        ValueBound::new(
+            Some(Self::min_date()),
+            Some((false, Self::upper_limit_date())),
+        )
     }
 }

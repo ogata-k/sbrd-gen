@@ -19,18 +19,10 @@ keys:
   - select-int-key
   - select-real-key
   - select-string-key
-  - get-int-value-at-from-chars-key
-  - get-int-value-at-from-values-key
-  - get-int-value-at-from-file-key
-  - get-real-value-at-from-chars-key
-  - get-real-value-at-from-values-key
-  - get-real-value-at-from-file-key
-  - get-string-value-at-from-chars-key
-  - get-string-value-at-from-values-key
-  - get-string-value-at-from-file-key
-  - get-value-index-from-chars-key
-  - get-value-index-from-values-key
-  - get-value-index-from-file-key
+  - get-int-value-at-key
+  - get-real-value-at-key
+  - get-string-value-at-key
+  - get-value-index-key
 generators:
   - key: duplicate-permutation-key
     type: duplicate-permutation
@@ -185,13 +177,10 @@ generators:
     range:
       start: 0
       include_end: false
-      end: 10
-  - key: get-int-value-at-from-chars-key
+      end: 30
+  - key: get-int-value-at-key
     type: get-int-value-at
     chars: "0123456789"
-    script: "{int-index}"
-  - key: get-int-value-at-from-values-key
-    type: get-int-value-at
     values:
       - 0
       - 10
@@ -203,9 +192,6 @@ generators:
       - 70
       - 80
       - 90
-    script: "{int-index}"
-  - key: get-int-value-at-from-file-key
-    type: get-int-value-at
     filepath: "./list/num.txt"
     script: "{int-index}"
   - key: real-index
@@ -214,12 +200,9 @@ generators:
       start: 0
       include_end: false
       end: 10
-  - key: get-real-value-at-from-chars-key
+  - key: get-real-value-at-key
     type: get-real-value-at
     chars: "0123456789"
-    script: "{real-index}"
-  - key: get-real-value-at-from-values-key
-    type: get-real-value-at
     values:
       - 0.0
       - 10.0
@@ -231,9 +214,6 @@ generators:
       - 70.0
       - 80.0
       - 90.0
-    script: "{real-index}"
-  - key: get-real-value-at-from-file-key
-    type: get-real-value-at
     filepath: "./list/num.txt"
     script: "{real-index}"
   - key: string-index
@@ -242,12 +222,9 @@ generators:
       start: 0
       include_end: false
       end: 10
-  - key: get-string-value-at-from-chars-key
+  - key: get-string-value-at-key
     type: get-string-value-at
     chars: "0123456789"
-    script: "{string-index}"
-  - key: get-string-value-at-from-values-key
-    type: get-string-value-at
     values:
       - "0"
       - "10"
@@ -259,16 +236,11 @@ generators:
       - "70"
       - "80"
       - "90"
-    script: "{string-index}"
-  - key: get-string-value-at-from-file-key
-    type: get-string-value-at
     filepath: "./list/num.txt"
     script: "{string-index}"
-  - key: get-value-index-from-chars-key
+  - key: get-value-index-key
     type: get-value-index
     chars: "0123456789"
-  - key: get-value-index-from-values-key
-    type: get-value-index
     values:
       - 0
       - 10
@@ -280,6 +252,4 @@ generators:
       - 70
       - 80
       - 90
-  - key: get-value-index-from-file-key
-    type: get-value-index
     filepath: "./list/num.txt"

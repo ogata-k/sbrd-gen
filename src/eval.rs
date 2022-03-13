@@ -42,29 +42,23 @@ impl<'a> Evaluator<'a> {
     fn create_eval_context() -> EvalResult<EvalContext> {
         let mut context = EvalContext::new();
 
-        fn create_get_at_function(ordinal_number: usize) -> Function {
-            Function::new(move |argument| {
-                let values = argument.as_tuple()?;
-                match values.get(ordinal_number - 1) {
-                    None => Err(EvalexprError::CustomMessage(format!(
-                        "Not found value in {} at tuple index {}",
-                        argument,
-                        ordinal_number - 1
-                    ))),
-                    Some(value) => Ok(value.clone()),
-                }
-            })
-        }
-        context.set_function("first".to_string(), create_get_at_function(1))?;
-        context.set_function("second".to_string(), create_get_at_function(2))?;
-        context.set_function("third".to_string(), create_get_at_function(3))?;
-        context.set_function("fourth".to_string(), create_get_at_function(4))?;
-        context.set_function("fifth".to_string(), create_get_at_function(5))?;
-        context.set_function("sixth".to_string(), create_get_at_function(6))?;
-        context.set_function("seventh".to_string(), create_get_at_function(7))?;
-        context.set_function("eighth".to_string(), create_get_at_function(8))?;
-        context.set_function("ninth".to_string(), create_get_at_function(9))?;
-        context.set_function("tenth".to_string(), create_get_at_function(10))?;
+        // @todo replace evalexpr-crate's function for get value at the index
+        context.set_function("get".to_string(),  Function::new(move |argument| {
+            let arg_tuple = argument.as_fixed_len_tuple(2)?;
+            let (values, index) = (arg_tuple[0].as_tuple()?, arg_tuple[1].as_int()?);
+
+            if index < 0 {
+                return Err(EvalexprError::CustomMessage("Invalid index in a script.".to_string()));
+            }
+            match values.get(index as usize) {
+                None => Err(EvalexprError::CustomMessage(format!(
+                    "Not found value in {} at tuple index {}",
+                    argument,
+                    index
+                ))),
+                Some(value) => Ok(value.clone()),
+            }
+        }))?;
 
         Ok(context)
     }

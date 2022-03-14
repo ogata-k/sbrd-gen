@@ -106,13 +106,11 @@ impl ChildGeneratorBuilder {
     }
 }
 
-fn is_required(use_nullable: &bool) -> bool
-{
+fn is_required(use_nullable: &bool) -> bool {
     use_nullable != &false
 }
 
-fn as_required() -> bool
-{
+fn as_required() -> bool {
     false
 }
 
@@ -128,10 +126,7 @@ pub struct GeneratorBuilder {
     /// Generator's `nullable` status
     ///
     /// This is a nullable flag for the generator.
-    #[serde(
-        skip_serializing_if = "is_required",
-        default = "as_required"
-    )]
+    #[serde(skip_serializing_if = "is_required", default = "as_required")]
     pub(crate) nullable: bool,
 
     /// Generator's `format` option
@@ -760,8 +755,8 @@ impl GeneratorBuilder {
 
     /// Set `format` option
     fn format<S>(mut self, format: S) -> Self
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         self.format = Some(format.into());
         self
@@ -769,8 +764,8 @@ impl GeneratorBuilder {
 
     /// Set `script` option
     fn script<S>(mut self, script: S) -> Self
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         self.script = Some(script.into());
         self
@@ -778,8 +773,8 @@ impl GeneratorBuilder {
 
     /// Set `separator` option
     fn separator<S>(mut self, separator: S) -> Self
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         self.separator = Some(separator.into());
         self

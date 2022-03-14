@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder};
+use crate::builder::GeneratorBuilder;
 use crate::error::{BuildError, GenerateError};
 use crate::generator::{GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap, SbrdInt};

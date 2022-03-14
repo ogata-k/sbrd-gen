@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder,ValueBound};
+use crate::builder::{GeneratorBuilder, ValueBound};
 use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
 use crate::generator::{GeneratorBase, Randomizer};
@@ -88,8 +88,8 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for DateGenerator {
             ))
         })?;
 
-        let evaluator = Evaluator::new(&self.format, context);
-        let format = evaluator.format_script().map_err(|e| {
+        let evaluator = Evaluator::new(context);
+        let format = evaluator.format_script(&self.format).map_err(|e| {
             GenerateError::FailEval(
                 e,
                 self.format.to_string(),

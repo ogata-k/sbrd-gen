@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder};
+use crate::builder::GeneratorBuilder;
 use crate::error::{BuildError, GenerateError};
 use crate::generator::{CasedChild, CasedChildGeneratorBase, GeneratorBase, Randomizer};
 use crate::value::{DataValue, DataValueMap};

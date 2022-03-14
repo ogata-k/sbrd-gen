@@ -96,8 +96,8 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for TimeGenerator {
         let mut time_value = lower_bound;
         time_value.add_assign(Duration::seconds(diff_seconds));
 
-        let evaluator = Evaluator::new(&self.format, context);
-        let format = evaluator.format_script().map_err(|e| {
+        let evaluator = Evaluator::new(context);
+        let format = evaluator.format_script(&self.format).map_err(|e| {
             GenerateError::FailEval(
                 e,
                 self.format.to_string(),

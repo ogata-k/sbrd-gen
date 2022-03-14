@@ -106,8 +106,8 @@ pub trait CasedChildGeneratorBase<R: Randomizer + ?Sized> {
             return match condition {
                 None => generator.generate(rng, context),
                 Some(_condition) => {
-                    let evaluator = Evaluator::new(_condition, context);
-                    let is_satisfy = evaluator.eval_bool().map_err(|e| {
+                    let evaluator = Evaluator::new(context);
+                    let is_satisfy = evaluator.eval_bool(_condition).map_err(|e| {
                         GenerateError::FailEval(
                             e,
                             _condition.clone(),

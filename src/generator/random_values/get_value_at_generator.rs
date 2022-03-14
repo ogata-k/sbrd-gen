@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder};
+use crate::builder::GeneratorBuilder;
 use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
 use crate::generator::{GeneratorBase, Randomizer, ValueGeneratorBase};
@@ -64,17 +64,20 @@ impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> GeneratorBase<R>
         _rng: &mut R,
         context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
-        let evaluator = Evaluator::new(&self.script, context);
-        let index: usize = evaluator.eval_int().map(|v| v as usize).map_err(|e| {
-            GenerateError::FailEval(
-                e,
-                self.script.clone(),
-                context
-                    .iter()
-                    .map(|(k, v)| (k.to_string(), v.clone()))
-                    .collect::<DataValueMap<String>>(),
-            )
-        })?;
+        let evaluator = Evaluator::new(context);
+        let index: usize = evaluator
+            .eval_int(&self.script)
+            .map(|v| v as usize)
+            .map_err(|e| {
+                GenerateError::FailEval(
+                    e,
+                    self.script.clone(),
+                    context
+                        .iter()
+                        .map(|(k, v)| (k.to_string(), v.clone()))
+                        .collect::<DataValueMap<String>>(),
+                )
+            })?;
 
         match self.selectable_values.get(index) {
             None => Err(GenerateError::FailGenerate(format!(

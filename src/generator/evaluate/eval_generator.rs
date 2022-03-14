@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder};
+use crate::builder::GeneratorBuilder;
 use crate::error::{BuildError, GenerateError};
 use crate::eval::{EvalResult, Evaluator};
 use crate::generator::{GeneratorBase, Randomizer};
@@ -79,8 +79,8 @@ impl ForEvalGeneratorType for SbrdInt {
     }
 
     fn eval_script<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
-        let evaluator = Evaluator::new(script, context);
-        evaluator.eval_int().map(|v| v.into())
+        let evaluator = Evaluator::new(context);
+        evaluator.eval_int(script).map(|v| v.into())
     }
 }
 impl ForEvalGeneratorType for SbrdReal {
@@ -89,8 +89,8 @@ impl ForEvalGeneratorType for SbrdReal {
     }
 
     fn eval_script<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
-        let evaluator = Evaluator::new(script, context);
-        evaluator.eval_real().map(|v| v.into())
+        let evaluator = Evaluator::new(context);
+        evaluator.eval_real(script).map(|v| v.into())
     }
 }
 impl ForEvalGeneratorType for SbrdBool {
@@ -99,8 +99,8 @@ impl ForEvalGeneratorType for SbrdBool {
     }
 
     fn eval_script<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
-        let evaluator = Evaluator::new(script, context);
-        evaluator.eval_bool().map(|v| v.into())
+        let evaluator = Evaluator::new(context);
+        evaluator.eval_bool(script).map(|v| v.into())
     }
 }
 impl ForEvalGeneratorType for SbrdString {
@@ -109,7 +109,7 @@ impl ForEvalGeneratorType for SbrdString {
     }
 
     fn eval_script<'a>(script: &'a str, context: &'a DataValueMap<&str>) -> EvalResult<DataValue> {
-        let evaluator = Evaluator::new(script, context);
-        evaluator.eval_string().map(|v| v.into())
+        let evaluator = Evaluator::new(context);
+        evaluator.eval_string(script).map(|v| v.into())
     }
 }

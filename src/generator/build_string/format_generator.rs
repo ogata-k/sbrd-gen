@@ -1,4 +1,4 @@
-use crate::builder::{GeneratorBuilder};
+use crate::builder::GeneratorBuilder;
 use crate::error::{BuildError, GenerateError};
 use crate::eval::Evaluator;
 use crate::generator::{GeneratorBase, Randomizer};
@@ -49,8 +49,8 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for FormatGenerator {
         _rng: &mut R,
         context: &DataValueMap<&str>,
     ) -> Result<DataValue, GenerateError> {
-        Evaluator::new(&self.format, context)
-            .format_script()
+        Evaluator::new(context)
+            .format_script(&self.format)
             .map(DataValue::String)
             .map_err(|e| {
                 GenerateError::FailEval(

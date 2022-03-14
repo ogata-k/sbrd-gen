@@ -56,7 +56,7 @@ impl<R: Randomizer + ?Sized> GeneratorBase<R> for TimeGenerator {
                     )
                 })
                 .map(|range| {
-                    // 生成可能な範囲で生成できるように範囲指定を実装
+                    // If it is not specified so that it can be generated in an appropriate range, use the default boundary.
                     range.without_no_bound_from_other(default_range)
                 })?,
         };

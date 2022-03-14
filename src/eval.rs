@@ -8,10 +8,13 @@ use evalexpr::{
     HashMapContext,
 };
 
-/// Evaluator for `script` and `format`
+/// Evaluator for `script` and `format`.
 /// Script and format is processed by replacing "{key}" with value based on each entry `(key, value)` of context.
-/// If you'll know syntax and available functions more, you can see [`this document`]
 ///
+/// All values, variables and functions are available as described in the [`evalexpr`] except the regex functions.
+/// If you'll know syntax and available them more, you can see [`this document`].
+///
+/// [`evalexpr`]: https://crates.io/crates/evalexpr/7.0.1
 /// [`this document`]: https://docs.rs/evalexpr/7.0.1/evalexpr/index.html#features
 #[derive(Debug, PartialEq, Clone)]
 pub struct Evaluator<'a> {

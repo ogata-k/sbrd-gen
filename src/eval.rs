@@ -16,7 +16,7 @@ use evalexpr::{
 #[derive(Debug, PartialEq, Clone)]
 pub struct Evaluator<'a> {
     script: &'a str,
-    script_context: &'a DataValueMap<&'a str>,
+    value_context: &'a DataValueMap<&'a str>,
 }
 
 /// Context for evaluator
@@ -30,11 +30,11 @@ pub type EvalError = EvalexprError;
 pub type EvalResult<T> = Result<T, EvalError>;
 
 impl<'a> Evaluator<'a> {
-    /// Create from script and context
-    pub fn new(script: &'a str, context: &'a DataValueMap<&str>) -> Self {
+    /// Create from script and a value context
+    pub fn new(script: &'a str, value_context: &'a DataValueMap<&str>) -> Self {
         Self {
             script,
-            script_context: context,
+            value_context,
         }
     }
 
@@ -67,7 +67,7 @@ impl<'a> Evaluator<'a> {
     pub fn format_script(&self) -> EvalResult<String> {
         // @todo スクリプトのフォーマットの正当性を判定できるようにしたい
         let mut replaced_script = self.script.to_string();
-        for (key, value) in self.script_context.iter() {
+        for (key, value) in self.value_context.iter() {
             // formatは{key}をvalueで置換して表示する
             let format = format!("{{{}}}", key);
             let eval_value = value.to_format_value();

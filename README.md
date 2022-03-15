@@ -322,7 +322,7 @@ GitHubのリリースページからインストールする場合は、[From he
 * 値型：String
 #### Range
 * 説明：繰り返し数の範囲や生成する値の範囲の指定に利用されるオプションです。
-* 備考：範囲指定時に利用できる値型として利用可能なのは、Integer、Real-number、String、DateTime-String、Date-String、Time-Stringの６つです。日時関係の値の指定はそれぞれの[Primitive generators](#Primitive-(primitive Module))を参照してください。
+* 備考：範囲指定時に利用できる値型として利用可能なのは、Integer、Real-number、String、DateTime-String、Date-String、Time-Stringの６つです。日時関係の値の指定はそれぞれの[Primitive generators](#Primitive_primitive-Module)を参照してください。
 * 構造体：```ValueBound```
 * キー名：`range`
 * 値型：値型の値を値に持つキー`start`とキー`end`、`end`の値を含むことを表すフラグを値に持つキー`include_end`からなるMap(KVS)であり、それぞれ任意指定です。`include_end`のデフォルト値はtrueです。
@@ -357,7 +357,7 @@ GitHubのリリースページからインストールする場合は、[From he
 * キー名：`filepath`
 * 値型：String
 #### Parameters
-* 説明：分布関数を構築する際に必要なパラメーターを指定するためのオプションです。指定するキーと値については[Distribution system](#Distribution-system-(distribution-module))の各ジェネレーターを参照してください。
+* 説明：分布関数を構築する際に必要なパラメーターを指定するためのオプションです。指定するキーと値については[Distribution system](#Distribution-system_distribution-module)の各ジェネレーターを参照してください。
 * 備考：なし
 * 構造体：```DataValueMap<String>```
 * キー名：`parameters`

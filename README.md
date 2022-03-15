@@ -3,17 +3,17 @@
 
 This is a crate (Schema-Based Random Data GENerator, i.e. SBRD GEN) that can generate random dummy data based on a schema. It is available both as a library and as a CLI tool.
 
-スキーマとスキーマのジェネレーターは[About Schema](#About Schema)、ジェネレーターとそのビルダーは[List of generators that can be specified](#List of generators that can be specified)を参照してください。
+スキーマとスキーマのジェネレーターは[About Schema](#About-Schema)、ジェネレーターとそのビルダーは[List of generators that can be specified](#List-of-generators-that-can-be-specified)を参照してください。
 
 なお、このプログラムは[serde](https://serde.rs/ )を利用して、スキーマのパースと生成結果のフォーマット行っています。
 
 
 ## When used as a library
-ライブラリとして使用する場合、[How to generate with a single generator](#How to generate with a single generator)と[How to combine multiple generators with a schema](#How to combine multiple generators with a schema)があります。
+ライブラリとして使用する場合、[How to generate with a single generator](#How-to-generate-with-a-single-generator)と[How to combine multiple generators with a schema](#How-to-combine-multiple-generators-with-a-schema)があります。
 
 ### How to generate with a single generator
 生成結果を組み合わせるほどでもないときに単一のジェネレータで生成する方法を利用することができます。
-もちろん[How to combine multiple generators with a schema](#How to combine multiple generators with a schema)でも生成可能です。
+もちろん[How to combine multiple generators with a schema](#How-to-combine-multiple-generators-with-a-schema)でも生成可能です。
 
 利用方法は、次の通りです。
 1. ```GeneratorBuilder```の```new_xx```（xxは可変）でビルダーを用意します。nullを生成できるようにしたい場合は、```nullable```の指定を追加します。
@@ -55,7 +55,7 @@ CLIツールとして使用する場合、スキーマファイルのファイ�
 CLIではスキーマファイルのファイル形式や出力する個数、出力するフォーマットなどを指定することができます。詳しくはCLIのヘルプをご覧ください。
 
 ### How to install
-インストールする方法はいくつかありますが、代表なのは[Install using Cargo](#Install using Cargo)と[Install from GitHub release page](#Install from GitHub release page)です。
+インストールする方法はいくつかありますが、代表なのは[Install using Cargo](#Install-using-Cargo)と[Install from GitHub release page](#Install-from-GitHub-release-page)です。
 
 #### Install using Cargo
 ```cargo```コマンドが利用できる状態で以下のコマンドを叩いてください。
@@ -111,7 +111,7 @@ GitHubのリリースページからインストールする場合は、[From he
     * 説明：バージョンを確認したいときに指定するオプションです。
 
 ## About Schema
-スキーマは、`keys`をキーとする出力したい[Key](#Key)のシークエンスと、`generators`をキーとする[Generator Builders](#List of options for parent generator)のシークエンスからなるMap(KVS)で指定します。
+スキーマは、`keys`をキーとする出力したい[Key](#Key)のシークエンスと、`generators`をキーとする[Generator Builders](#List-of-options-for-parent-generator)のシークエンスからなるMap(KVS)で指定します。
 フォーマットは、YamlとJsonをサポートしています。
 
 記述例については、[all.yaml](https://github.com/ogata-k/sbrd-gen/blob/v0.1.x/examples/schema/all.yaml )や[all.json](https://github.com/ogata-k/sbrd-gen/blob/v0.1.x/examples/schema/all.json )をご覧ください。
@@ -131,7 +131,7 @@ GitHubのリリースページからインストールする場合は、[From he
 [Script](#Script)や[Format](#Format)を評価する際の置換キーとしても利用されます。
 
 #### Builder
-[List of generators that can be specified](#List of generators that can be specified)で列挙されているジェネレーターのオプションを指定することができます。
+[List of generators that can be specified](#List-of-generators-that-can-be-specified)で列挙されているジェネレーターのオプションを指定することができます。
 生成されるジェネレータは[Type](#Type)によって決まり、ほかのオプションも同様に解釈されます。
 
 ### List of generators that can be specified
@@ -143,8 +143,8 @@ GitHubのリリースページからインストールする場合は、[From he
     * 備考：なし
     * 構造体：```DuplicatePermutationGenerator```
     * タイプ：duplicate-permutation
-    * 必須オプション：[Type](#Type)、[Separator](#Separator)、括弧内一つ以上（[List of child generators](#List of child generators)、[Character list](#Character list)、[List of Values](#List of Values)、[External file path](#External file path)）
-    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Range (Integer)](#Range)、[Separator](#Separator)、[List of child generators](#List of child generators)、[Character list](#Character list)、[List of Values](#List of Values)、[External file path](#External file path)
+    * 必須オプション：[Type](#Type)、[Separator](#Separator)、括弧内一つ以上（[List of child generators](#List-of-child-generators)、[Character list](#Character-list)、[List of Values](#List-of-Values)、[External file path](#External-file-path)）
+    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Range (Integer)](#Range)、[Separator](#Separator)、[List of child generators](#List-of-child-generators)、[Character list](#Character-list)、[List of Values](#List-of-Values)、[External file path](#External-file-path)
     * 生成型：String
 * format generator
     * 説明：指定されたフォーマットにコンテキストを適応して文字列を構築するジェネレーターです。
@@ -243,55 +243,55 @@ GitHubのリリースページからインストールする場合は、[From he
     * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)
     * 生成型：Null
 #### Child Generator Random Selection System (random_children module)
-[List of child generators](#List of child generators)を利用して値を生成するジェネレーターです。
+[List of child generators](#List-of-child-generators)を利用して値を生成するジェネレーターです。
 * case when generator
     * 説明：宣言順に[Condition](#Condition)を評価してtrueになった子ジェネレーターを利用して生成するジェネレーターです。
     * 備考：[Condition](#Condition)に引っかからなかった場合のためにデフォルト条件（つまり、[Condition](#Condition)が未指定）の子ジェネレーターが必要です。
     * 構造体：```CaseWhenGenerator```
     * タイプ：case-when
-    * 必須オプション：[Type](#Type)、[Condition](#Condition)の指定がある[List of child generators](#List of child generators)
-    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Condition](#Condition)の指定がある[List of child generators](#List of child generators)
+    * 必須オプション：[Type](#Type)、[Condition](#Condition)の指定がある[List of child generators](#List-of-child-generators)
+    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Condition](#Condition)の指定がある[List of child generators](#List-of-child-generators)
     * 生成型：生成に利用した子ジェネレーターの生成型
 * random child generator
     * 説明：[Weight](#Weight)を考慮して乱択したジェネレーターを利用して生成するジェネレーターです。
     * 備考：なし
     * 構造体：```RandomChildGnerator```
     * タイプ：random-child
-    * 必須オプション：[Type](#Type)、[Weight](#Weight)の指定がある[List of child generators](#List of child generators)
-    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Weight](#Weight)の指定がある[List of child generators](#List of child generators)
+    * 必須オプション：[Type](#Type)、[Weight](#Weight)の指定がある[List of child generators](#List-of-child-generators)
+    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Weight](#Weight)の指定がある[List of child generators](#List-of-child-generators)
     * 生成型：生成に利用した子ジェネレーターの生成型
 #### Value alternative system (random_values module)
-[Character list](#Character list)や[List of Values](#List of Values)、[External file path](#External file path)を利用して値を生成するジェネレーターの集まりからなるモジュールです。
+[Character list](#Character-list)や[List of Values](#List-of-Values)、[External file path](#External-file-path)を利用して値を生成するジェネレーターの集まりからなるモジュールです。
 * select generator
-    * 説明：[Character list](#Character list)や[List of Values](#List of Values)、[External file path](#External file path)で指定された値を乱択するジェネレーターです。
+    * 説明：[Character list](#Character-list)や[List of Values](#List-of-Values)、[External file path](#External-file-path)で指定された値を乱択するジェネレーターです。
     * 備考：なし
     * 構造体：```SelectGenerator```
     * タイプ：select-int（Integer）、select-real（Real-number）、select-string（String）
-    * 必須オプション：[Type](#Type)、括弧内一つ以上（[Character list](#Character list)、[List of Values](#List of Values)、[External file path](#External file path)）
-    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Character list](#Character list)、[List of Values](#List of Values)、[External file path](#External file path)
+    * 必須オプション：[Type](#Type)、括弧内一つ以上（[Character list](#Character-list)、[List of Values](#List-of-Values)、[External file path](#External-file-path)）
+    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Character list](#Character-list)、[List of Values](#List-of-Values)、[External file path](#External-file-path)
     * 生成型：Integer（select-int）、Real-number（select-real）、String（select-string）
 * get value at generator
     * 説明：[Script](#Script)を評価して取得したインデックスにある値を、入力された値の一覧から取得するジェネレーターです。
     * 備考：なし
     * 構造体：```GetValueAtGenerator```
     * タイプ：get-int-value-at（Integer）、get-real-value-at（Real-number）、get-string-value（String）
-    * 必須オプション：[Type](#Type)、[Script](#Script)、括弧内一つ以上（[Character list](#Character list)、[List of Values](#List of Values)、[External file path](#External file path)）
-    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Script](#Script)、[Character list](#Character list)、[List of Values](#List of Values)、[External file path](#External file path)
+    * 必須オプション：[Type](#Type)、[Script](#Script)、括弧内一つ以上（[Character list](#Character-list)、[List of Values](#List-of-Values)、[External file path](#External-file-path)）
+    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Script](#Script)、[Character list](#Character-list)、[List of Values](#List-of-Values)、[External file path](#External-file-path)
     * 生成型：Integer（get-int-value-at）、Real-number（get-real-value-at）、String（get-string-value-at）
 * get value index generator
     * 説明：入力された値の一覧から乱択可能な範囲のインデックスを取得するジェネレーターです。
     * 備考：なし
     * 構造体：```GetValueIndexGenerator```
     * タイプ：get-value-index
-    * 必須オプション：[Type](#Type)、括弧内一つ以上（[Character list](#Character list)、[List of Values](#List of Values)、[External file path](#External file path)）
-    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Character list](#Character list)、[List of Values](#List of Values)、[External file path](#External file path)
+    * 必須オプション：[Type](#Type)、括弧内一つ以上（[Character list](#Character-list)、[List of Values](#List-of-Values)、[External file path](#External-file-path)）
+    * 指定可能オプション：[Type](#Type)、[Nullable](#Nullable)、[Character list](#Character-list)、[List of Values](#List-of-Values)、[External file path](#External-file-path)
     * 生成型：Integer(Not negative)
 
 ### List of generator options
 ジェネレーターを構築するのに指定できるオプションは次の通りです。
 指定可能なオプションはジェネレーターによって違いますが、指定可能なオプション以外は無視されます。
 #### Type
-* 説明：[List of generators that can be specified](#List of generators that can be specified)で列挙されているジェネレーターのタイプ。ジェネレーターの種類を特定するために利用される。
+* 説明：[List of generators that can be specified](#List-of-generators-that-can-be-specified)で列挙されているジェネレーターのタイプ。ジェネレーターの種類を特定するために利用される。
 * 備考：なし
 * 構造体：```GeneratorType```
 * キー名：`type`
@@ -303,13 +303,13 @@ GitHubのリリースページからインストールする場合は、[From he
 * キー名：`nulable`
 * 値型：Boolean
 #### Format
-* 説明：このフォーマットは、[Value Context](#Value Context)内のキーと値のペア（仮にそのペアを(key, value)とする。）を順番にフォーマット内の{key}（括弧とキーの間にはスペース無し）という文字列をvalueで置き換えてから文字列として評価されます。
+* 説明：このフォーマットは、[Value Context](#Value-Context)内のキーと値のペア（仮にそのペアを(key, value)とする。）を順番にフォーマット内の{key}（括弧とキーの間にはスペース無し）という文字列をvalueで置き換えてから文字列として評価されます。
 * 備考：なし
 * 構造体：```String```
 * キー名：`format`
 * 値型：String
 #### Script
-* 説明：このスクリプトは、[Value Context](#Value Context)内のキーと値のペア（仮にそのペアを(key, value)とする。）を順番にスクリプト内の{key}（括弧とキーの間にはスペース無し）という文字列をvalueで置き換えてから式として評価されます。文法や式などについて詳しくはEvaluatorのAPIドキュメントを参照してください。
+* 説明：このスクリプトは、[Value Context](#Value-Context)内のキーと値のペア（仮にそのペアを(key, value)とする。）を順番にスクリプト内の{key}（括弧とキーの間にはスペース無し）という文字列をvalueで置き換えてから式として評価されます。文法や式などについて詳しくはEvaluatorのAPIドキュメントを参照してください。
 * 備考：なし
 * 構造体：```String```
 * キー名：`script`
@@ -333,7 +333,7 @@ GitHubのリリースページからインストールする場合は、[From he
 * キー名：`increment`
 * 値型：初期値として値型の値を値に持つキー`initial`と、変化量を表す値型の値を値に持つキー`step`からなるMap(KVS)であり、`initial`は必須、`step`は任意指定です、
 #### List of child generators
-* 説明：[List of generator options](#List of generator options)で指定されるジェネレーターのシークエンスを指定するオプションです。ここで指定するのは子ジェネレーターと呼ばれ、親ジェネレーターとは違い追加で[List of options for child generator](#List of options for child generator)を指定することができます。
+* 説明：[List of generator options](#List-of-generator-options)で指定されるジェネレーターのシークエンスを指定するオプションです。ここで指定するのは子ジェネレーターと呼ばれ、親ジェネレーターとは違い追加で[List of options for child generator](#List-of-options-for-child-generator)を指定することができます。
 * 備考：なし
 * 構造体：```Vec<ChildGeneratorBuilder>>```
 * キー名：`children`
@@ -357,7 +357,7 @@ GitHubのリリースページからインストールする場合は、[From he
 * キー名：`filepath`
 * 値型：String
 #### Parameters
-* 説明：分布関数を構築する際に必要なパラメーターを指定するためのオプションです。指定するキーと値については[Distribution system](#Distribution system-(distribution module))の各ジェネレーターを参照してください。
+* 説明：分布関数を構築する際に必要なパラメーターを指定するためのオプションです。指定するキーと値については[Distribution system](#Distribution-system-(distribution-module))の各ジェネレーターを参照してください。
 * 備考：なし
 * 構造体：```DataValueMap<String>```
 * キー名：`parameters`

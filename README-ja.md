@@ -71,7 +71,7 @@ GitHubのリリースページからインストールする場合は、[こち�
 ```sbrd-gen --help```でヘルプメッセージが出力されればインストールは成功しています。
 
 ### CLIツールの使い方
-```sbrd-gen.exe```にパスを通したうえで```sbrd-gen [OPTIONS] <SCHEMA_FILE_PATH>```という文法でコマンドを実行します。
+実行ファイル（例えばWindowsなら```sbrd-gen.exe```）にパスを通したうえで```sbrd-gen [OPTIONS] <SCHEMA_FILE_PATH>```という文法でコマンドを実行します。
 以下で、指定可能な引数やオプションを説明しますが、```sbrd-gen --help```で表示されるヘルプメッセージでも閲覧可能です。
 
 #### 引数

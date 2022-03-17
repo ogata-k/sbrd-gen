@@ -72,7 +72,7 @@ After extracting the downloaded folder, make it available through the binary fil
 If you get a help message with ```sbrd-gen --help```, the installation was successful.
 
 ### How to use CLI tool
-Run the command with the syntax ```sbrd-gen [OPTIONS] <SCHEMA_FILE_PATH>``` after passing ```sbrd-gen.exe```.
+Run the command with the syntax ```sbrd-gen [OPTIONS] <SCHEMA_FILE_PATH>``` after passing executable file (e.x. ```sbrd-gen.exe``` in Windows).
 The following describes the arguments and options that can be specified, but can also be viewed in the help message displayed by ```sbrd-gen --help```.
 
 #### Arguments

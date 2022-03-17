@@ -1,4 +1,6 @@
 # クレートについて
+[crates.io](https://crates.io/crates/sbrd-gen )
+
 [In English](https://github.com/ogata-k/sbrd-gen/blob/v0.1.x/README.md)
 
 これはスキーマをベースにしてランダムにダミーデータを生成することができるクレート（Schema-Based Random Data GENerator、i.e. SBRD GEN）です。 ライブラリとしてもCLIツールとしても利用可能です。

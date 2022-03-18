@@ -1,0 +1,252 @@
+keys:
+  - duplicate-permutation-key
+  - format-key
+  - dist-normal-key
+  - eval-int-key
+  - eval-real-key
+  - eval-bool-key
+  - eval-string-key
+  - increment-id-key
+  - int-key
+  - real-key
+  - bool-key
+  - date-time-key
+  - date-key
+  - time-key
+  - always-null-key
+  - case-when-key
+  - random-child-key
+  - select-int-key
+  - select-real-key
+  - select-string-key
+  - get-int-value-at-key
+  - get-real-value-at-key
+  - get-string-value-at-key
+  - get-value-index-key
+generators:
+  - key: duplicate-permutation-key
+    type: duplicate-permutation
+    separator: " "
+    range:
+      start: 3
+      end: 5
+    children:
+      - type: int
+      - type: real
+      - type: bool
+      - type: date-time
+      - type: date
+      - type: time
+    chars: ABC
+    values:
+      - "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+      - "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+      - "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+      - "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    filepath: "./list/list-up.txt"
+  - key: format-key
+    type: format
+    format: "Lorem ipsum: \"{duplicate-permutation-key}\""
+  - key: dist-normal-key
+    type: dist-normal
+    parameters:
+      mean: 50.0
+      std_dev: 10.0
+  - key: eval-int-key
+    type: eval-int
+    script: 10 * 10
+  - key: eval-real-key
+    type: eval-real
+    script: "({dist-normal-key}-50)/10"
+  - key: eval-bool-key
+    type: eval-bool
+    script: "{dist-normal-key} < 50"
+  - key: eval-string-key
+    type: eval-string
+    script: "\"string: {dist-normal-key}\""
+  - key: increment-id-key
+    type: increment-id
+    increment:
+      initial: 100
+      step: 10
+  - key: int-key
+    type: int
+    range:
+      start: 1
+      end: 100
+  - key: real-key
+    type: real
+    range:
+      start: 0.0
+      end: 1.0
+  - key: bool-key
+    type: bool
+  - key: date-time-key
+    type: date-time
+    nullable: true
+    format: "%H:%M %Y/%m/%d"
+    range:
+      start: "2022-03-05 13:41:30"
+      include_end: false
+      end: "2022-03-06 13:41:30"
+  - key: date-key
+    type: date
+    nullable: true
+    format: "%Y/%m/%d"
+    range:
+      start: 2021-03-06
+      include_end: false
+      end: 2022-03-06
+  - key: time-key
+    type: time
+    nullable: true
+    format: "%H:%M"
+    range:
+      start: "00:00:00"
+      end: "13:41:30"
+  - key: always-null-key
+    type: always-null
+  - key: case-when-key
+    type: case-when
+    children:
+      - case: "{int-key} < 0"
+        type: int
+      - case: "0 <= {int-key} && {int-key} < 10"
+        type: real
+      - case: "10 <= {int-key} && {int-key} < 25"
+        type: bool
+      - case: "25 <= {int-key} && {int-key} < 50"
+        type: date-time
+      - case: "50 <= {int-key} && {int-key} < 75"
+        type: date
+      - type: time
+  - key: random-child-key
+    type: random-child
+    children:
+      - weight: 3
+        type: int
+      - type: real
+      - weight: 3
+        type: bool
+      - type: date-time
+      - weight: 3
+        type: date
+      - type: time
+  - key: select-int-key
+    type: select-int
+    chars: "0123456789"
+    values:
+      - 10
+      - 20
+      - 30
+      - 40
+      - 50
+      - 60
+      - 70
+      - 80
+      - 90
+      - 100
+  - key: select-real-key
+    type: select-real
+    chars: "0123456789"
+    values:
+      - 10.5
+      - 20.5
+      - 30.5
+      - 40.5
+      - 50.5
+      - 60.5
+      - 70.5
+      - 80.5
+      - 90.5
+      - 100.5
+  - key: select-string-key
+    type: select-string
+    chars: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+    values:
+      - "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+      - "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+      - "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+      - "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    filepath: "./list/list-up.txt"
+  - key: int-index
+    type: int
+    range:
+      start: 0
+      include_end: false
+      end: 30
+  - key: get-int-value-at-key
+    type: get-int-value-at
+    script: "{int-index}"
+    chars: "0123456789"
+    values:
+      - 0
+      - 10
+      - 20
+      - 30
+      - 40
+      - 50
+      - 60
+      - 70
+      - 80
+      - 90
+    filepath: "./list/num.txt"
+  - key: real-index
+    type: int
+    range:
+      start: 0
+      include_end: false
+      end: 10
+  - key: get-real-value-at-key
+    type: get-real-value-at
+    script: "{real-index}"
+    chars: "0123456789"
+    values:
+      - 0.0
+      - 10.0
+      - 20.0
+      - 30.0
+      - 40.0
+      - 50.0
+      - 60.0
+      - 70.0
+      - 80.0
+      - 90.0
+    filepath: "./list/num.txt"
+  - key: string-index
+    type: int
+    range:
+      start: 0
+      include_end: false
+      end: 10
+  - key: get-string-value-at-key
+    type: get-string-value-at
+    script: "{string-index}"
+    chars: "0123456789"
+    values:
+      - "0"
+      - "10"
+      - "20"
+      - "30"
+      - "40"
+      - "50"
+      - "60"
+      - "70"
+      - "80"
+      - "90"
+    filepath: "./list/num.txt"
+  - key: get-value-index-key
+    type: get-value-index
+    chars: "0123456789"
+    values:
+      - 0
+      - 10
+      - 20
+      - 30
+      - 40
+      - 50
+      - 60
+      - 70
+      - 80
+      - 90
+    filepath: "./list/num.txt"

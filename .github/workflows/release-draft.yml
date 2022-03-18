@@ -1,0 +1,155 @@
+name: Release-Draft
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check-and-build:
+    name: Publish for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        name:
+          - linux
+          - windows-msvc
+          - windows-gnu
+          - intel-macos
+          - apple-macos
+        include:
+          - name: linux
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            exe-file: sbrd-gen
+            archive_type: tar
+            archive_ext: tar.gz
+          - name: windows-msvc
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            exe-file: sbrd-gen.exe
+            archive_type: zip
+            archive_ext: zip
+          - name: windows-gnu
+            os: windows-latest
+            target: x86_64-pc-windows-gnu
+            exe-file: sbrd-gen.exe
+            archive_type: zip
+            archive_ext: zip
+          - name: intel-macos
+            os: macos-latest
+            target: x86_64-apple-darwin
+            exe-file: sbrd-gen
+            archive_type: zip
+            archive_ext: zip
+          - name: apple-macos
+            os: macos-latest
+            target: aarch64-apple-darwin
+            exe-file: sbrd-gen
+            archive_type: zip
+            archive_ext: zip
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: Test
+        run: cargo test --release --locked --target ${{ matrix.target }}
+
+      - name: Build
+        run: cargo build --release --locked --target ${{ matrix.target }}
+
+      - name: Export properties
+        id: properties
+        shell: bash
+        run: |
+          upload_path="${{ matrix.name }}_${{ matrix.target }}"
+          echo "::set-output name=upload_path::$UPLOAD_PATH"
+          ARCHIVE_TYPE="${{ matrix.archive_type }}"
+          echo "::set-output name=archive_type::$ARCHIVE_TYPE"
+          ARCHIVE_EXT="${{ matrix.archive_ext }}"
+          echo "::set-output name=archive_ext::$ARCHIVE_EXT"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.properties.outputs.upload_path }}
+          path: |
+              target/${{ matrix.target }}/release/${{ matrix.exe-file }}
+              README.md
+              README-ja.md
+              CHANGE_LOG.md
+              CHANGE_LOG-ja.md
+
+  draft-release:
+    name: Release Draft
+    needs: [check-and-build]
+    runs-on: ubuntu-latest
+    steps:
+      # Check out current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v2.3.4
+
+      # Remove old release drafts by using the curl request for the available releases with draft flag
+      - name: Remove Old Release Drafts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
+            | tr '\r\n' ' ' \
+            | jq '.[] | select(.draft == true) | .id' \
+            | xargs -I '{}' \
+          curl -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/$GITHUB_REPOSITORY/releases/{}
+      - name: Create a draft release
+        uses: softprops/action-gh-release@v1
+        id: createDraftRelease
+        with:
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          body: |
+            ## Changelog
+            * [ ]
+          draft: true
+          prerelease: false
+      - name: Save upload url of this draft release.
+        run: |
+          echo '${{ steps.createDraftRelease.outputs.upload_url }}' > release_upload_url.txt
+      - name: Upload `release_upload_url.txt`
+        uses: actions/upload-artifact@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: draft-release
+          path: release_upload_url.txt
+
+  attach-assets-to-release:
+    needs: [check-and-build, draft-release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v1
+        with:
+          name: draft-release
+      - id: upload-url
+        run: |
+          echo "::set-output name=url::$(cat draft-release/release_upload_url.txt)"
+      - uses: actions/download-artifact@v1
+        with:
+          name: ${{ needs.check-and-build.outputs.upload_path }}
+          path: check-and-build/
+      - name: zip the artifact
+        if: ${{ needs.check-and-build.outputs.archive_type }} == 'zip'
+        run: zip -j release/${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }} build/*
+      - name: tar the artifact
+        if: ${{ needs.check-and-build.outputs.archive_type }} == 'tar'
+        run: tar -zcvf release/${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }} build/*
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.upload-url.outputs.url }}
+          asset_path: release/${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }}
+          asset_name: ${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }}

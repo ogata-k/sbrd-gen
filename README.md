@@ -380,3 +380,6 @@ The child generator can specify the options listed below in addition to the opti
 * Struct : ```Weight```
 * Key name : `weight`
 * Value type : Integer(Not negative)
+
+## LICENSE
+MIT

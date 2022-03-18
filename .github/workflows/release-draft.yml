@@ -78,13 +78,17 @@ jobs:
           echo "::set-output name=archive_type::$ARCHIVE_TYPE"
           ARCHIVE_EXT="${{ matrix.archive_ext }}"
           echo "::set-output name=archive_ext::$ARCHIVE_EXT"
+      - name: Move executable path
+        shell: bash
+        run: |
+          cp -p target/${{ matrix.target }}/release/${{ matrix.exe-file }} ${{ matrix.exe-file }}
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           if-no-files-found: error
           name: ${{ steps.properties.outputs.upload_path }}
           path: |
-              target/${{ matrix.target }}/release/${{ matrix.exe-file }}
+              ${{ matrix.exe-file }}
               README.md
               README-ja.md
               CHANGE_LOG.md

@@ -1,4 +1,4 @@
-name: Release-Draft
+name: Create draft to release
 
 on:
   push:
@@ -135,6 +135,7 @@ jobs:
           path: release_upload_url.txt
 
   attach-assets-to-release:
+    name: Attach assets into draft release
     needs: [check-and-build, draft-release]
     runs-on: ubuntu-latest
     steps:

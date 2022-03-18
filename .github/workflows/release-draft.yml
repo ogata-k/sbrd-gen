@@ -154,10 +154,25 @@ jobs:
       - name: tar the artifact
         if: ${{ needs.check-and-build.outputs.archive_type }} == 'tar'
         run: tar -zcvf release/${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }} build/*
-      - uses: actions/upload-release-asset@v1
+      - name: Upload archived assets
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.upload-url.outputs.url }}
           asset_path: release/${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }}
           asset_name: ${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }}
+      - name: Create check sum file
+        shell: bash
+        run: |
+          cd release
+          sha256sum ${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }} > sha256sum_${{ needs.check-and-build.outputs.upload_path }}.txt
+          cd ..
+      - name: Upload check sum file
+      uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.upload-url.outputs.url }}
+          asset_path: release/sha256sum_${{ needs.check-and-build.outputs.upload_path }}.txt
+          asset_name: sha256sum_${{ needs.check-and-build.outputs.upload_path }}.txt

@@ -7,7 +7,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  ACTIONS_STEP_DEBUG: true
 
 jobs:
   check-and-build:
@@ -41,13 +40,13 @@ jobs:
             archive_type: zip
             archive_ext: zip
           - name: intel-macos
-            os: macos-latest
+            os: macos-10.15
             target: x86_64-apple-darwin
             exe-file: sbrd-gen
             archive_type: zip
             archive_ext: zip
           - name: apple-macos
-            os: macos-latest
+            os: macos-11
             target: aarch64-apple-darwin
             exe-file: sbrd-gen
             archive_type: zip
@@ -82,6 +81,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
+          if-no-files-found: error
           name: ${{ steps.properties.outputs.upload_path }}
           path: |
               target/${{ matrix.target }}/release/${{ matrix.exe-file }}

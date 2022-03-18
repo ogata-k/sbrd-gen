@@ -10,7 +10,7 @@ env:
 
 jobs:
   check-and-build:
-    name: Publish for ${{ matrix.name }}
+    name: Upload for ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

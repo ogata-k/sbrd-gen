@@ -7,6 +7,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  ACTIONS_STEP_DEBUG: true
 
 jobs:
   check-and-build:
@@ -72,7 +73,7 @@ jobs:
         id: properties
         shell: bash
         run: |
-          upload_path="${{ matrix.name }}_${{ matrix.target }}"
+          UPLOAD_PATH="${{ matrix.name }}_${{ matrix.target }}"
           echo "::set-output name=upload_path::$UPLOAD_PATH"
           ARCHIVE_TYPE="${{ matrix.archive_type }}"
           echo "::set-output name=archive_type::$ARCHIVE_TYPE"

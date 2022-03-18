@@ -10,7 +10,7 @@ env:
 
 jobs:
   check-and-build:
-    name: Publish for ${{ matrix.os }}
+    name: Publish for ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -58,6 +58,9 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
+
+      - name: Add Target
+        run: rustup target add ${{ matrix.target }}
 
       - name: Test
         run: cargo test --release --locked --target ${{ matrix.target }}

@@ -170,7 +170,7 @@ jobs:
           sha256sum ${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }} > sha256sum_${{ needs.check-and-build.outputs.upload_path }}.txt
           cd ..
       - name: Upload check sum file
-      uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

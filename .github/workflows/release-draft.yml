@@ -16,8 +16,7 @@ jobs:
       matrix:
         name:
           - linux
-          - windows-msvc
-          - windows-gnu
+          - windows
           - intel-macos
           #- apple-macos
         include:
@@ -25,13 +24,9 @@ jobs:
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             exe_file: sbrd-gen
-          - name: windows-msvc
+          - name: windows
             os: windows-latest
             target: x86_64-pc-windows-msvc
-            exe_file: sbrd-gen.exe
-          - name: windows-gnu
-            os: windows-latest
-            target: x86_64-pc-windows-gnu
             exe_file: sbrd-gen.exe
           - name: intel-macos
             os: macos-latest
@@ -120,8 +115,7 @@ jobs:
       matrix:
         name:
           - linux
-          - windows-msvc
-          - windows-gnu
+          - windows
           - intel-macos
           #- apple-macos
         include:
@@ -131,15 +125,9 @@ jobs:
             archive_type: tar
             archive_ext: tar.gz
             content_type: application/gzip
-          - name: windows-msvc
+          - name: windows
             target: x86_64-pc-windows-msvc
             exe_file: sbrd-gen.exe
-            archive_type: zip
-            archive_ext: zip
-            content_type: application/zip
-          - name: windows-gnu
-            target: x86_64-pc-windows-gnu
-            exe_file: sbrd-gen.gen
             archive_type: zip
             archive_ext: zip
             content_type: application/zip

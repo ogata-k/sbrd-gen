@@ -183,7 +183,7 @@ jobs:
         with:
           upload_url: ${{ needs.draft-release.outputs.release_upload_url }}
           asset_path: ${{ steps.properties.outputs.release_dir }}/${{ steps.properties.outputs.archive_file }}
-          asset_name: ${{ steps.properties.outputs.archive_file }}
+          asset_name: release_${{ steps.properties.outputs.archive_file }}
           asset_content_type: ${{ matrix.content_type }}
 
       - name: Create check sum file

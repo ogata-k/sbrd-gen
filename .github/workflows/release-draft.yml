@@ -24,23 +24,23 @@ jobs:
           - name: linux
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            exe-file: sbrd-gen
+            exe_file: sbrd-gen
           - name: windows-msvc
             os: windows-latest
             target: x86_64-pc-windows-msvc
-            exe-file: sbrd-gen.exe
+            exe_file: sbrd-gen.exe
           - name: windows-gnu
             os: windows-latest
             target: x86_64-pc-windows-gnu
-            exe-file: sbrd-gen.exe
+            exe_file: sbrd-gen.exe
           - name: intel-macos
             os: macos-latest
             target: x86_64-apple-darwin
-            exe-file: sbrd-gen
+            exe_file: sbrd-gen
           #- name: apple-macos
           #  os: macos-latest
           #  target: aarch64-apple-darwin
-          #  exe-file: sbrd-gen
+          #  exe_file: sbrd-gen
     steps:
       - uses: actions/checkout@v1
 
@@ -57,7 +57,7 @@ jobs:
       - name: Move executable path
         shell: bash
         run: |
-          cp -p target/${{ matrix.target }}/release/${{ matrix.exe-file }} ${{ matrix.exe-file }}
+          cp -p target/${{ matrix.target }}/release/${{ matrix.exe_file }} ${{ matrix.exe_file }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
@@ -65,7 +65,7 @@ jobs:
           if-no-files-found: error
           name: ${{ matrix.name }}_${{ matrix.target }}
           path: |
-              ${{ matrix.exe-file }}
+              ${{ matrix.exe_file }}
               README.md
               README-ja.md
               CHANGE_LOG.md
@@ -127,31 +127,31 @@ jobs:
         include:
           - name: linux
             target: x86_64-unknown-linux-gnu
-            exe-file: sbrd-gen
+            exe_file: sbrd-gen
             archive_type: tar
             archive_ext: tar.gz
             content_type: application/gzip
           - name: windows-msvc
             target: x86_64-pc-windows-msvc
-            exe-file: sbrd-gen.exe
+            exe_file: sbrd-gen.exe
             archive_type: zip
             archive_ext: zip
             content_type: application/zip
           - name: windows-gnu
             target: x86_64-pc-windows-gnu
-            exe-file: sbrd-gen
+            exe_file: sbrd-gen
             archive_type: zip
             archive_ext: zip
             content_type: application/zip
           - name: intel-macos
             target: x86_64-apple-darwin
-            exe-file: sbrd-gen
+            exe_file: sbrd-gen
             archive_type: zip
             archive_ext: zip
             content_type: application/zip
           #- name: apple-macos
           #  target: aarch64-apple-darwin
-          #  exe-file: sbrd-gen
+          #  exe_file: sbrd-gen
           #  archive_type: zip
           #  archive_ext: zip
           #  content_type: application/zip
@@ -179,7 +179,7 @@ jobs:
           path: ${{ steps.properties.outputs.build_dir }}/
 
       - name: modify executable permission
-        run: chmod 555 ${{ steps.properties.outputs.build_dir }}/${{ matrix.exe-file }}
+        run: chmod 555 ${{ steps.properties.outputs.build_dir }}/${{ matrix.exe_file }}
 
       - name: zip the artifact
         if: ${{ matrix.archive_type == 'zip' }}

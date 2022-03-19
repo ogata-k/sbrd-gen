@@ -129,22 +129,27 @@ jobs:
             target: x86_64-unknown-linux-gnu
             archive_type: tar
             archive_ext: tar.gz
+            content_type: application/gzip
           - name: windows-msvc
             target: x86_64-pc-windows-msvc
             archive_type: zip
             archive_ext: zip
+            content_type: application/zip
           - name: windows-gnu
             target: x86_64-pc-windows-gnu
             archive_type: zip
             archive_ext: zip
+            content_type: application/zip
           - name: intel-macos
             target: x86_64-apple-darwin
             archive_type: zip
             archive_ext: zip
+            content_type: application/zip
           #- name: apple-macos
           #  target: aarch64-apple-darwin
           #  archive_type: zip
           #  archive_ext: zip
+          #  content_type: application/zip
     steps:
       - name: Export properties
         id: properties
@@ -183,7 +188,7 @@ jobs:
           upload_url: ${{ needs.draft-release.outputs.release_upload_url }}
           asset_path: ${{ steps.properties.outputs.release_dir }}/${{ steps.properties.outputs.archive_file }}
           asset_name: ${{ steps.properties.outputs.archive_file }}
-          asset_content_type: application/zip
+          asset_content_type: ${{ matrix.content_type }}
 
       - name: Create check sum file
         id: create-check-sum

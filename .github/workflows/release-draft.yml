@@ -142,12 +142,10 @@ jobs:
     needs: [check-and-build, draft-release]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v1
-        with:
-          name: draft-release
-      - id: properties
+      - name: Export properties
+        id: properties
         run: |
-          # These directory's depth is 1
+          # Required: Depth of directories for build and release is 1.
           BUILD_DIR=build
           mkdir -p "$BUILD_DIR"
           echo "::set-output name=build_dir::$BUILD_DIR"

@@ -51,22 +51,12 @@ jobs:
           #  exe-file: sbrd-gen
           #  archive_type: zip
           #  archive_ext: zip
+    outputs:
+      upload_path: ${{ steps.properties.outputs.upload_path }}
+      archive_type: ${{ steps.properties.outputs.archive_type }}
+      archive_file: ${{ steps.properties.outputs.archive_file }}
     steps:
       - uses: actions/checkout@v1
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-
-      - name: Add Target
-        run: rustup target add ${{ matrix.target }}
-
-      - name: Test
-        run: cargo test --release --locked --target ${{ matrix.target }}
-
-      - name: Build
-        run: cargo build --release --locked --target ${{ matrix.target }}
 
       - name: Export properties
         id: properties
@@ -76,12 +66,24 @@ jobs:
           echo "::set-output name=upload_path::$UPLOAD_PATH"
           ARCHIVE_TYPE="${{ matrix.archive_type }}"
           echo "::set-output name=archive_type::$ARCHIVE_TYPE"
-          ARCHIVE_EXT="${{ matrix.archive_ext }}"
-          echo "::set-output name=archive_ext::$ARCHIVE_EXT"
+          ARCHIVE_FILE="$UPLOAD_PATH.$ARCHIVE_EXT"
+          echo "::set-output name=archive_file::$ARCHIVE_FILE"
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - name: Add Target
+        run: rustup target add ${{ matrix.target }}
+      - name: Test
+        run: cargo test --release --locked --target ${{ matrix.target }}
+      - name: Build
+        run: cargo build --release --locked --target ${{ matrix.target }}
       - name: Move executable path
         shell: bash
         run: |
           cp -p target/${{ matrix.target }}/release/${{ matrix.exe-file }} ${{ matrix.exe-file }}
+
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
@@ -160,23 +162,26 @@ jobs:
           path: build/
       - name: zip the artifact
         if: ${{ needs.check-and-build.outputs.archive_type }} == 'zip'
-        run: zip -j release/${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }} build/*
+        run: zip -j release/${{ needs.check-and-build.outputs.archive_file }} build/*
       - name: tar the artifact
         if: ${{ needs.check-and-build.outputs.archive_type }} == 'tar'
-        run: tar -zcvf release/${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }} build/*
+        run: tar -zcvf release/${{ needs.check-and-build.outputs.archive_file }} build/*
       - name: Upload archived assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.upload-url.outputs.url }}
-          asset_path: release/${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }}
-          asset_name: ${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }}
+          asset_path: release/${{ needs.check-and-build.outputs.archive_file }}
+          asset_name: ${{ needs.check-and-build.outputs.archive_file }}
       - name: Create check sum file
+        id: create-check-sum
         shell: bash
         run: |
           cd release
-          sha256sum ${{ needs.check-and-build.outputs.upload_path }}.${{ needs.check-and-build.outputs.archive_ext }} > sha256sum_${{ needs.check-and-build.outputs.upload_path }}.txt
+          CHECK_SUM_FILE="sha256sum_${{ needs.check-and-build.outputs.upload_path }}.txt"
+          echo "::set-output name=check_sum_file::$CHECK_SUM_FILE"
+          sha256sum ${{ needs.check-and-build.outputs.archive_file }} > "$CHECK_SUM_FILE"
           cd ..
       - name: Upload check sum file
         uses: actions/upload-release-asset@v1
@@ -184,5 +189,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.upload-url.outputs.url }}
-          asset_path: release/sha256sum_${{ needs.check-and-build.outputs.upload_path }}.txt
-          asset_name: sha256sum_${{ needs.check-and-build.outputs.upload_path }}.txt
+          asset_path: release/${{ steps.create-check-sum.outputs.check_sum_file }}
+          asset_name: ${{ steps.create-check-sum.outputs.check_sum_file }}

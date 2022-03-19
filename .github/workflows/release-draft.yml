@@ -66,7 +66,7 @@ jobs:
           echo "::set-output name=upload_path::$UPLOAD_PATH"
           ARCHIVE_TYPE="${{ matrix.archive_type }}"
           echo "::set-output name=archive_type::$ARCHIVE_TYPE"
-          ARCHIVE_FILE="$UPLOAD_PATH.$ARCHIVE_EXT"
+          ARCHIVE_FILE="$UPLOAD_PATH.${{ matrix.archive_ext }}"
           echo "::set-output name=archive_file::$ARCHIVE_FILE"
 
       - uses: actions-rs/toolchain@v1

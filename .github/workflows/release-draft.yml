@@ -133,7 +133,7 @@ jobs:
             Release for version ${{steps.tag.outputs.tag}}
             
             ## Changelog
-            * [ ]
+            *
           draft: true
           prerelease: false
 

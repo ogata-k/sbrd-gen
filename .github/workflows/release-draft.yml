@@ -100,6 +100,8 @@ jobs:
     name: Release Draft
     needs: [check-and-build]
     runs-on: ubuntu-latest
+    outputs:
+      release_upload_url: ${{ steps.createDraftRelease.outputs.upload_url }}
     steps:
       # Check out current repository
       - name: Fetch Sources
@@ -128,22 +130,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Release ${{steps.tag.outputs.tag}}
           body: |
-            Release ${{steps.tag.outputs.tag}}
+            Release for version ${{steps.tag.outputs.tag}}
             
             ## Changelog
             * [ ]
           draft: true
           prerelease: false
-      - name: Save upload url of this draft release.
-        run: |
-          echo '${{ steps.createDraftRelease.outputs.upload_url }}' > release_upload_url.txt
-      - name: Upload `release_upload_url.txt`
-        uses: actions/upload-artifact@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          name: draft-release
-          path: release_upload_url.txt
 
   attach-assets-to-release:
     name: Attach assets into draft release
@@ -155,7 +147,6 @@ jobs:
           name: draft-release
       - id: properties
         run: |
-          echo "::set-output name=url::$(cat draft-release/release_upload_url.txt)"
           # These directory's depth is 1
           BUILD_DIR=build
           mkdir -p "$BUILD_DIR"
@@ -178,9 +169,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.properties.outputs.url }}
+          upload_url: ${{ needs.draft-release.outputs.release_upload_url }}
           asset_path: ${{ steps.properties.outputs.release_dir }}/${{ needs.check-and-build.outputs.archive_file }}
           asset_name: ${{ needs.check-and-build.outputs.archive_file }}
+          asset_content_type: application/zip
       - name: Create check sum file
         id: create-check-sum
         shell: bash
@@ -195,6 +187,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.properties.outputs.url }}
+          upload_url: ${{ needs.draft-release.outputs.release_upload_url }}
           asset_path: ${{ steps.properties.outputs.release_dir }}/${{ steps.create-check-sum.outputs.check_sum_file }}
           asset_name: ${{ steps.create-check-sum.outputs.check_sum_file }}
+          asset_content_type: text/plain

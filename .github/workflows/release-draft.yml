@@ -139,7 +139,7 @@ jobs:
             content_type: application/zip
           - name: windows-gnu
             target: x86_64-pc-windows-gnu
-            exe_file: sbrd-gen
+            exe_file: sbrd-gen.gen
             archive_type: zip
             archive_ext: zip
             content_type: application/zip

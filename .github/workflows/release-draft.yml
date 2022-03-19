@@ -25,49 +25,24 @@ jobs:
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             exe-file: sbrd-gen
-            archive_type: tar
-            archive_ext: tar.gz
           - name: windows-msvc
             os: windows-latest
             target: x86_64-pc-windows-msvc
             exe-file: sbrd-gen.exe
-            archive_type: zip
-            archive_ext: zip
           - name: windows-gnu
             os: windows-latest
             target: x86_64-pc-windows-gnu
             exe-file: sbrd-gen.exe
-            archive_type: zip
-            archive_ext: zip
           - name: intel-macos
             os: macos-latest
             target: x86_64-apple-darwin
             exe-file: sbrd-gen
-            archive_type: zip
-            archive_ext: zip
           #- name: apple-macos
           #  os: macos-latest
           #  target: aarch64-apple-darwin
           #  exe-file: sbrd-gen
-          #  archive_type: zip
-          #  archive_ext: zip
-    outputs:
-      upload_path: ${{ steps.properties.outputs.upload_path }}
-      archive_type: ${{ steps.properties.outputs.archive_type }}
-      archive_file: ${{ steps.properties.outputs.archive_file }}
     steps:
       - uses: actions/checkout@v1
-
-      - name: Export properties
-        id: properties
-        shell: bash
-        run: |
-          UPLOAD_PATH="${{ matrix.name }}_${{ matrix.target }}"
-          echo "::set-output name=upload_path::$UPLOAD_PATH"
-          ARCHIVE_TYPE="${{ matrix.archive_type }}"
-          echo "::set-output name=archive_type::$ARCHIVE_TYPE"
-          ARCHIVE_FILE="$UPLOAD_PATH.${{ matrix.archive_ext }}"
-          echo "::set-output name=archive_file::$ARCHIVE_FILE"
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -88,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           if-no-files-found: error
-          name: ${{ steps.properties.outputs.upload_path }}
+          name: ${{ matrix.name }}_${{ matrix.target }}
           path: |
               ${{ matrix.exe-file }}
               README.md
@@ -138,13 +113,47 @@ jobs:
           prerelease: false
 
   attach-assets-to-release:
-    name: Attach assets into draft release
+    name: Attach assets into draft release for ${{ matrix.name }}
     needs: [check-and-build, draft-release]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        name:
+          - linux
+          - windows-msvc
+          - windows-gnu
+          - intel-macos
+          #- apple-macos
+        include:
+          - name: linux
+            target: x86_64-unknown-linux-gnu
+            archive_type: tar
+            archive_ext: tar.gz
+          - name: windows-msvc
+            target: x86_64-pc-windows-msvc
+            archive_type: zip
+            archive_ext: zip
+          - name: windows-gnu
+            target: x86_64-pc-windows-gnu
+            archive_type: zip
+            archive_ext: zip
+          - name: intel-macos
+            target: x86_64-apple-darwin
+            archive_type: zip
+            archive_ext: zip
+          #- name: apple-macos
+          #  target: aarch64-apple-darwin
+          #  archive_type: zip
+          #  archive_ext: zip
     steps:
       - name: Export properties
         id: properties
         run: |
+          UPLOAD_PATH="${{ matrix.name }}_${{ matrix.target }}"
+          echo "::set-output name=upload_path::$UPLOAD_PATH"
+          ARCHIVE_FILE="$UPLOAD_PATH.${{ matrix.archive_ext }}"
+          echo "::set-output name=archive_file::$ARCHIVE_FILE"
+          
           # Required: Depth of directories for build and release is 1.
           BUILD_DIR=build
           mkdir -p "$BUILD_DIR"
@@ -152,33 +161,38 @@ jobs:
           RELEASE_DIR=release
           mkdir -p "$RELEASE_DIR"
           echo "::set-output name=release_dir::$RELEASE_DIR"
-      - uses: actions/download-artifact@v1
+
+      - name: Download artifact
+        uses: actions/download-artifact@v1
         with:
-          name: ${{ needs.check-and-build.outputs.upload_path }}
+          name: ${{ steps.properties.outputs.upload_path }}
           path: ${{ steps.properties.outputs.build_dir }}/
+
       - name: zip the artifact
-        if: ${{ needs.check-and-build.outputs.archive_type == 'zip' }}
-        run: zip -j ${{ steps.properties.outputs.release_dir }}/${{ needs.check-and-build.outputs.archive_file }} ${{ steps.properties.outputs.build_dir }}/*
+        if: ${{ matrix.archive_type == 'zip' }}
+        run: zip -j ${{ steps.properties.outputs.release_dir }}/${{ steps.properties.outputs.archive_file }} ${{ steps.properties.outputs.build_dir }}/*
       - name: tar the artifact
-        if: ${{ needs.check-and-build.outputs.archive_type == 'tar' }}
-        run: tar -zcvf ${{ steps.properties.outputs.release_dir }}/${{ needs.check-and-build.outputs.archive_file }} ${{ steps.properties.outputs.build_dir }}/*
+        if: ${{ matrix.archive_type == 'tar' }}
+        run: tar -zcvf ${{ steps.properties.outputs.release_dir }}/${{ steps.properties.outputs.archive_file }} ${{ steps.properties.outputs.build_dir }}/*
+
       - name: Upload archived assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.draft-release.outputs.release_upload_url }}
-          asset_path: ${{ steps.properties.outputs.release_dir }}/${{ needs.check-and-build.outputs.archive_file }}
-          asset_name: ${{ needs.check-and-build.outputs.archive_file }}
+          asset_path: ${{ steps.properties.outputs.release_dir }}/${{ steps.properties.outputs.archive_file }}
+          asset_name: ${{ steps.properties.outputs.archive_file }}
           asset_content_type: application/zip
+
       - name: Create check sum file
         id: create-check-sum
         shell: bash
         run: |
           cd "${{ steps.properties.outputs.release_dir }}"
-          CHECK_SUM_FILE="sha256sum_${{ needs.check-and-build.outputs.upload_path }}.txt"
+          CHECK_SUM_FILE="sha256sum_${{ steps.properties.outputs.upload_path }}.txt"
           echo "::set-output name=check_sum_file::$CHECK_SUM_FILE"
-          sha256sum "${{ needs.check-and-build.outputs.archive_file }}" > "$CHECK_SUM_FILE"
+          sha256sum "${{ steps.properties.outputs.archive_file }}" > "$CHECK_SUM_FILE"
           cd ..
       - name: Upload check sum file
         uses: actions/upload-release-asset@v1
@@ -186,6 +200,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.draft-release.outputs.release_upload_url }}
-          asset_path: ${{ steps.properties.outputs.release_dir }}/${{ steps.create-check-sum.outputs.check_sum_file }}
-          asset_name: ${{ steps.create-check-sum.outputs.check_sum_file }}
+          asset_path: ${{ steps.properties.outputs.release_dir }}/${{ steps.properties.outputs.check_sum_file }}
+          asset_name: ${{ steps.properties.outputs.check_sum_file }}
           asset_content_type: text/plain

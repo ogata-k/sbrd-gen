@@ -113,7 +113,7 @@ jobs:
           prerelease: false
 
   attach-assets-to-release:
-    name: Attach assets into draft release for ${{ matrix.name }}
+    name: Attach assets of ${{ matrix.name }} for draft release
     needs: [check-and-build, draft-release]
     runs-on: ubuntu-latest
     strategy:

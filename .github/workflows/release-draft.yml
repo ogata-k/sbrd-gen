@@ -113,12 +113,21 @@ jobs:
             | jq '.[] | select(.draft == true) | .id' \
             | xargs -I '{}' \
           curl -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/$GITHUB_REPOSITORY/releases/{}
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+        with:
+          # Optionally strip `v` prefix
+          strip_v: false
       - name: Create a draft release
         uses: softprops/action-gh-release@v1
         id: createDraftRelease
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          name: Release ${{steps.tag.outputs.tag}}
           body: |
+            Release ${{steps.tag.outputs.tag}}
+            
             ## Changelog
             * [ ]
           draft: true

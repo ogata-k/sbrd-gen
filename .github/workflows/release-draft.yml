@@ -157,10 +157,10 @@ jobs:
           name: ${{ needs.check-and-build.outputs.upload_path }}
           path: ${{ steps.properties.outputs.build_dir }}/
       - name: zip the artifact
-        if: ${{ needs.check-and-build.outputs.archive_type }} == 'zip'
+        if: ${{ needs.check-and-build.outputs.archive_type == 'zip' }}
         run: zip -j ${{ steps.properties.outputs.release_dir }}/${{ needs.check-and-build.outputs.archive_file }} ${{ steps.properties.outputs.build_dir }}/*
       - name: tar the artifact
-        if: ${{ needs.check-and-build.outputs.archive_type }} == 'tar'
+        if: ${{ needs.check-and-build.outputs.archive_type == 'tar' }}
         run: tar -zcvf ${{ steps.properties.outputs.release_dir }}/${{ needs.check-and-build.outputs.archive_file }} ${{ steps.properties.outputs.build_dir }}/*
       - name: Upload archived assets
         uses: actions/upload-release-asset@v1

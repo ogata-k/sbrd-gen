@@ -155,14 +155,14 @@ jobs:
             content_type: application/zip
           - name: macos_x86_64
             exe_file: sbrd-gen
-            archive_type: zip
-            archive_ext: zip
-            content_type: application/zip
+            archive_type: tar
+            archive_ext: tar.gz
+            content_type: application/gzip
           #- name: macos_aarch64
           #  exe_file: sbrd-gen
-          #  archive_type: zip
-          #  archive_ext: zip
-          #  content_type: application/zip
+          #  archive_type: tar
+          #  archive_ext: tar.gz
+          #  content_type: application/gzip
     steps:
       - name: Export properties
         id: properties

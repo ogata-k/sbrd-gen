@@ -16,17 +16,28 @@ jobs:
       matrix:
         name:
           - linux_x86_64
+          - linux_i686
           - windows_x86_64
+          - windows_i686
           - macos_x86_64
+          # Not Support macos_i686
           #- macos_aarch64
         include:
           - name: linux_x86_64
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             exe_file: sbrd-gen
+          - name: linux_i686
+            os: ubuntu-latest
+            target: i686-unknown-linux-gnu
+            exe_file: sbrd-gen
           - name: windows_x86_64
             os: windows-latest
             target: x86_64-pc-windows-msvc
+            exe_file: sbrd-gen.exe
+          - name: windows_i686
+            os: windows-latest
+            target: i686-pc-windows-msvc
             exe_file: sbrd-gen.exe
           - name: macos_x86_64
             os: macos-latest
@@ -115,30 +126,39 @@ jobs:
       matrix:
         name:
           - linux_x86_64
+          - linux_i686
           - windows_x86_64
+          - windows_i686
           - macos_x86_64
+          # Not Support macos_i686
           #- macos_aarch64
         include:
           - name: linux_x86_64
-            target: x86_64-unknown-linux-gnu
+            exe_file: sbrd-gen
+            archive_type: tar
+            archive_ext: tar.gz
+            content_type: application/gzip
+          - name: linux_i686
             exe_file: sbrd-gen
             archive_type: tar
             archive_ext: tar.gz
             content_type: application/gzip
           - name: windows_x86_64
-            target: x86_64-pc-windows-msvc
+            exe_file: sbrd-gen.exe
+            archive_type: zip
+            archive_ext: zip
+            content_type: application/zip
+          - name: windows_i686
             exe_file: sbrd-gen.exe
             archive_type: zip
             archive_ext: zip
             content_type: application/zip
           - name: macos_x86_64
-            target: x86_64-apple-darwin
             exe_file: sbrd-gen
             archive_type: zip
             archive_ext: zip
             content_type: application/zip
           #- name: macos_aarch64
-          #  target: aarch64-apple-darwin
           #  exe_file: sbrd-gen
           #  archive_type: zip
           #  archive_ext: zip

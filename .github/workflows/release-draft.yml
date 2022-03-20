@@ -67,7 +67,14 @@ jobs:
       - name: Add Target
         run: rustup target add ${{ matrix.target }}
       - name: Test
+        if: ${{ matrix.target != 'aarch64-apple-darwin' }}
         run: cargo test --release --locked --target ${{ matrix.target }}
+      - name: Test for M1
+        if: ${{ matrix.target == 'aarch64-apple-darwin' }}
+        run: |
+          SDKROOT=$(xcrun -sdk macosx11.0 --show-sdk-path) \
+          MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.0 --show-sdk-platform-version) \
+          cargo test --release --locked --target ${{ matrix.target }}
       - name: Build
         if: ${{ matrix.target != 'aarch64-apple-darwin' }}
         run: cargo build --release --locked --target ${{ matrix.target }}

@@ -64,12 +64,6 @@ jobs:
         if: ${{ endsWith(matrix.target, '-linux-musl') }}
         run: |
           sudo apt install -qq -y musl-tools --no-install-recommends
-      - name: Setup apple silicon
-        if: ${{ matrix.name == 'macos_aarch64' }}
-        run: |
-          sudo xcode-select --switch /Applications/Xcode.app
-          SDKROOT=$(xcrun -sdk macosx11.0 --show-sdk-path)
-          MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.0 --show-sdk-platform-version)
       - name: Add Target
         run: rustup target add ${{ matrix.target }}
       - name: Test

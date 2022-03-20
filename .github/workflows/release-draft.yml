@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           if-no-files-found: error
-          name: ${{ matrix.name }}_${{ matrix.target }}
+          name: ${{ matrix.name }}
           path: |
               ${{ matrix.exe_file }}
               README.md
@@ -147,10 +147,13 @@ jobs:
       - name: Export properties
         id: properties
         run: |
-          UPLOAD_PATH="${{ matrix.name }}_${{ matrix.target }}"
+          UPLOAD_PATH="${{ matrix.name }}"
           echo "::set-output name=upload_path::$UPLOAD_PATH"
+          
           ARCHIVE_FILE="$UPLOAD_PATH.${{ matrix.archive_ext }}"
           echo "::set-output name=archive_file::$ARCHIVE_FILE"
+          CHECK_SUM_FILE="${{ steps.properties.outputs.upload_path }}_sha256sum.txt"
+          echo "::set-output name=check_sum_file::$CHECK_SUM_FILE"
           
           # Required: Depth of directories for build and release is 1.
           BUILD_DIR=build
@@ -183,7 +186,7 @@ jobs:
         with:
           upload_url: ${{ needs.draft-release.outputs.release_upload_url }}
           asset_path: ${{ steps.properties.outputs.release_dir }}/${{ steps.properties.outputs.archive_file }}
-          asset_name: release_${{ steps.properties.outputs.archive_file }}
+          asset_name: ${{ steps.properties.outputs.archive_file }}
           asset_content_type: ${{ matrix.content_type }}
 
       - name: Create check sum file
@@ -191,9 +194,7 @@ jobs:
         shell: bash
         run: |
           cd "${{ steps.properties.outputs.release_dir }}"
-          CHECK_SUM_FILE="sha256sum_${{ steps.properties.outputs.upload_path }}.txt"
-          echo "::set-output name=check_sum_file::$CHECK_SUM_FILE"
-          sha256sum "${{ steps.properties.outputs.archive_file }}" > "$CHECK_SUM_FILE"
+          sha256sum "${{ steps.properties.outputs.archive_file }}" > "${{ steps.properties.outputs.check_sum_file }}"
           cd ..
       - name: Upload check sum file
         uses: actions/upload-release-asset@v1
@@ -201,6 +202,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.draft-release.outputs.release_upload_url }}
-          asset_path: ${{ steps.properties.outputs.release_dir }}/${{ steps.create-check-sum.outputs.check_sum_file }}
-          asset_name: ${{ steps.create-check-sum.outputs.check_sum_file }}
+          asset_path: ${{ steps.properties.outputs.release_dir }}/${{ steps.properties.outputs.check_sum_file }}
+          asset_name: ${{ steps.properties.outputs.check_sum_file }}
           asset_content_type: text/plain

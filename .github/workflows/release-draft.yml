@@ -69,7 +69,14 @@ jobs:
       - name: Test
         run: cargo test --release --locked --target ${{ matrix.target }}
       - name: Build
+        if: ${{ matrix.target != 'aarch64-apple-darwin' }}
         run: cargo build --release --locked --target ${{ matrix.target }}
+      - name: Build for M1
+        if: ${{ matrix.target == 'aarch64-apple-darwin' }}
+        run: |
+          SDKROOT=$(xcrun -sdk macosx11.0 --show-sdk-path) \
+          MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.0 --show-sdk-platform-version) \
+          cargo build --release --locked --target ${{ matrix.target }}
       - name: Move executable path
         shell: bash
         run: |

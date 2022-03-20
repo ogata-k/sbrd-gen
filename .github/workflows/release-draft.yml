@@ -21,46 +21,52 @@ jobs:
           - windows_i686
           - macos_x86_64
           # Not Support macos_i686
-          #- macos_aarch64
+          - macos_aarch64
         include:
           - name: linux_x86_64
             os: ubuntu-latest
+            toolchain: stable
             target: x86_64-unknown-linux-musl
-            build_args: ""
             exe_file: sbrd-gen
           - name: linux_i686
             os: ubuntu-latest
+            toolchain: stable
             target: i686-unknown-linux-musl
-            build_args: ""
             exe_file: sbrd-gen
           - name: windows_x86_64
             os: windows-latest
+            toolchain: stable
             target: x86_64-pc-windows-msvc
-            build_args: ""
             exe_file: sbrd-gen.exe
           - name: windows_i686
             os: windows-latest
+            toolchain: stable
             target: i686-pc-windows-msvc
-            build_args: ""
             exe_file: sbrd-gen.exe
           - name: macos_x86_64
             os: macos-latest
+            toolchain: stable
             target: x86_64-apple-darwin
-            build_args: ""
             exe_file: sbrd-gen
-          #- name: macos_aarch64
-          #  os: macos-latest
-          #  target: aarch64-apple-darwin
-          #  build_args: ""
-          #  exe_file: sbrd-gen
+          - name: macos_aarch64
+            os: macos-latest
+            toolchain: beta
+            target: aarch64-apple-darwin
+            exe_file: sbrd-gen
     steps:
       - uses: actions/checkout@v1
 
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: ${{ matrix.toolchain }}
       - name: Setup musl tools
+        if: ${{ matrix.name == 'macos_aarch64' }}
+        run: |
+          xcode-select -s /Applications/Xcode.app/Contents/Developer/
+          SDKROOT=$(xcrun -sdk macosx11.0 --show-sdk-path)
+          MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.0 --show-sdk-platform-version)
+      - name: Setup apple silicon
         if: ${{ endsWith(matrix.target, '-linux-musl') }}
         run: |
           sudo apt install -qq -y musl-tools --no-install-recommends
@@ -69,7 +75,7 @@ jobs:
       - name: Test
         run: cargo test --release --locked --target ${{ matrix.target }}
       - name: Build
-        run: cargo build --release --locked --target ${{ matrix.target }} ${{ matrix.build_args }}
+        run: cargo build --release --locked --target ${{ matrix.target }}
       - name: Move executable path
         shell: bash
         run: |
@@ -141,7 +147,7 @@ jobs:
           - windows_i686
           - macos_x86_64
           # Not Support macos_i686
-          #- macos_aarch64
+          - macos_aarch64
         include:
           - name: linux_x86_64
             exe_file: sbrd-gen
@@ -168,11 +174,11 @@ jobs:
             archive_type: tar
             archive_ext: tar.gz
             content_type: application/gzip
-          #- name: macos_aarch64
-          #  exe_file: sbrd-gen
-          #  archive_type: tar
-          #  archive_ext: tar.gz
-          #  content_type: application/gzip
+          - name: macos_aarch64
+            exe_file: sbrd-gen
+            archive_type: tar
+            archive_ext: tar.gz
+            content_type: application/gzip
     steps:
       - name: Export properties
         id: properties

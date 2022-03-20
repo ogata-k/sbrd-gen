@@ -63,7 +63,7 @@ jobs:
       - name: Setup musl tools
         if: ${{ matrix.name == 'macos_aarch64' }}
         run: |
-          xcode-select -s /Applications/Xcode.app/Contents/Developer/
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer/
           SDKROOT=$(xcrun -sdk macosx11.0 --show-sdk-path)
           MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.0 --show-sdk-platform-version)
       - name: Setup apple silicon

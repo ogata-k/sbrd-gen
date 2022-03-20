@@ -61,15 +61,15 @@ jobs:
           profile: minimal
           toolchain: ${{ matrix.toolchain }}
       - name: Setup musl tools
+        if: ${{ endsWith(matrix.target, '-linux-musl') }}
+        run: |
+          sudo apt install -qq -y musl-tools --no-install-recommends
+      - name: Setup apple silicon
         if: ${{ matrix.name == 'macos_aarch64' }}
         run: |
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer/
           SDKROOT=$(xcrun -sdk macosx11.0 --show-sdk-path)
           MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx11.0 --show-sdk-platform-version)
-      - name: Setup apple silicon
-        if: ${{ endsWith(matrix.target, '-linux-musl') }}
-        run: |
-          sudo apt install -qq -y musl-tools --no-install-recommends
       - name: Add Target
         run: rustup target add ${{ matrix.target }}
       - name: Test

@@ -182,7 +182,7 @@ jobs:
           
           ARCHIVE_FILE="$UPLOAD_PATH.${{ matrix.archive_ext }}"
           echo "::set-output name=archive_file::$ARCHIVE_FILE"
-          CHECK_SUM_FILE="${{ steps.properties.outputs.upload_path }}_sha256sum.txt"
+          CHECK_SUM_FILE="$UPLOAD_PATH_sha256sum.txt"
           echo "::set-output name=check_sum_file::$CHECK_SUM_FILE"
           
           # Required: Depth of directories for build and release is 1.

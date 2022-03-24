@@ -7,6 +7,8 @@ use evalexpr::{
     eval_string_with_context_mut, ContextWithMutableFunctions, EvalexprError, Function,
     HashMapContext,
 };
+use human_string_filler::StrExt;
+use std::fmt::Write;
 
 /// Evaluator for `script` and `format`.
 /// Script and format is processed by replacing "{key}" with value based on each entry `(key, value)` of context.
@@ -24,7 +26,27 @@ pub struct Evaluator<'a> {
 /// Context for evaluator
 pub type EvalContext = HashMapContext;
 /// Error while evaluate
-pub type EvalError = EvalexprError;
+#[derive(Debug)]
+pub enum EvalError {
+    /// Fail evaluate
+    FailEval(EvalexprError),
+    /// Fail apply value context
+    FailApplyValueContext(String),
+}
+
+impl std::fmt::Display for EvalError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            EvalError::FailEval(e) => write!(f, "Fail eval with error: {}", e),
+            EvalError::FailApplyValueContext(e) => {
+                write!(f, "Fail apply value context with error: {}", e)
+            }
+        }
+    }
+}
+
+impl std::error::Error for EvalError {}
+
 /// Alias of [`Result`] for [`Evaluator`]
 ///
 /// [`Result`]: https://doc.rust-lang.org/std/result/enum.Result.html
@@ -42,42 +64,74 @@ impl<'a> Evaluator<'a> {
         let mut context = EvalContext::new();
 
         // @todo replace evalexpr-crate's function for get value at the index
-        context.set_function(
-            "get".to_string(),
-            Function::new(move |argument| {
-                let arg_tuple = argument.as_fixed_len_tuple(2)?;
-                let (values, index) = (arg_tuple[0].as_tuple()?, arg_tuple[1].as_int()?);
+        context
+            .set_function(
+                "get".to_string(),
+                Function::new(move |argument| {
+                    let arg_tuple = argument.as_fixed_len_tuple(2)?;
+                    let (values, index) = (arg_tuple[0].as_tuple()?, arg_tuple[1].as_int()?);
 
-                if index < 0 {
-                    return Err(EvalexprError::CustomMessage(
-                        "Invalid index in a script.".to_string(),
-                    ));
-                }
-                match values.get(index as usize) {
-                    None => Err(EvalexprError::CustomMessage(format!(
-                        "Not found value in {} at tuple index {}",
-                        argument, index
-                    ))),
-                    Some(value) => Ok(value.clone()),
-                }
-            }),
-        )?;
+                    if index < 0 {
+                        return Err(EvalexprError::CustomMessage(
+                            "Invalid index in a script.".to_string(),
+                        ));
+                    }
+                    match values.get(index as usize) {
+                        None => Err(EvalexprError::CustomMessage(format!(
+                            "Not found value in {} at tuple index {}",
+                            argument, index
+                        ))),
+                        Some(value) => Ok(value.clone()),
+                    }
+                }),
+            )
+            .map_err(EvalError::FailEval)?;
 
         Ok(context)
     }
 
     /// Apply value-context to the script
-    pub fn format_script(&self, script: &str) -> EvalResult<String> {
-        // @todo スクリプトのフォーマットの正当性を判定できるようにしたい
-        let mut replaced_script = script.to_string();
-        for (key, value) in self.value_context.iter() {
-            // formatは{key}をvalueで置換して表示する
-            let format = format!("{{{}}}", key);
-            let eval_value = value.to_format_value();
-            replaced_script = replaced_script.replace(&format, &eval_value);
-        }
+    fn apply_value_context(&self, script: &str) -> EvalResult<String> {
+        let mut result = String::new();
+        script
+            .fill_into::<_, _, String>(&mut result, |output: &mut String, key: &str| {
+                match self.value_context.get(key) {
+                    Some(v) => {
+                        output
+                            .write_fmt(format_args!("{}", v))
+                            .map_err(|e| e.to_string())?;
+                    }
+                    None => {
+                        let split_index: usize = key.rfind(':').ok_or_else(|| {
+                            format!("Not found key \"{}\" at the value context.", key)
+                        })?;
+                        let _key = &key[0..split_index];
+                        match self.value_context.get(_key) {
+                            Some(v) => {
+                                let formatted = v
+                                    .format(&format!("{{{}}}", &key[split_index..key.len()]))
+                                    .ok_or_else(|| format!("Fail apply key \"{}\".", _key))?;
 
-        Ok(replaced_script)
+                                output.write_str(&formatted).map_err(|e| e.to_string())?;
+                            }
+                            None => {
+                                return Err(format!(
+                                    "Not found key \"{}\" at the value context.",
+                                    _key
+                                ));
+                            }
+                        }
+                    }
+                }
+                Ok(())
+            })
+            .map(|_| result)
+            .map_err(|e| EvalError::FailApplyValueContext(e.to_string()))
+    }
+
+    /// Get format applied value-context to the script
+    pub fn format_script(&self, script: &str) -> EvalResult<String> {
+        self.apply_value_context(script)
     }
 
     /// Evaluate the script applied the context, as [`SbrdInt`]
@@ -89,6 +143,7 @@ impl<'a> Evaluator<'a> {
             &mut Self::create_eval_context()?,
         )
         .map(|v| v as SbrdInt)
+        .map_err(EvalError::FailEval)
     }
 
     /// Evaluate the script applied the context, as [`SbrdReal`]
@@ -100,6 +155,7 @@ impl<'a> Evaluator<'a> {
             &mut Self::create_eval_context()?,
         )
         .map(|v| v as SbrdReal)
+        .map_err(EvalError::FailEval)
     }
 
     /// Evaluate the script applied the context, as [`SbrdBool`]
@@ -111,6 +167,7 @@ impl<'a> Evaluator<'a> {
             &mut Self::create_eval_context()?,
         )
         .map(|v| v as SbrdBool)
+        .map_err(EvalError::FailEval)
     }
 
     /// Evaluate the script applied the context, as [`SbrdString`]
@@ -121,5 +178,6 @@ impl<'a> Evaluator<'a> {
             &self.format_script(script)?,
             &mut Self::create_eval_context()?,
         )
+        .map_err(EvalError::FailEval)
     }
 }

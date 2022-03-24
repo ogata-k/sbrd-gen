@@ -2,8 +2,10 @@
 //! Module for value
 
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use rt_format::{Format, FormatArgument, NoNamedArguments, ParsedFormat, Specifier};
 use std::collections::BTreeMap;
 use std::fmt;
+use std::fmt::{Debug, Formatter};
 
 use serde::de::{Error, Unexpected, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -195,11 +197,158 @@ impl Serialize for DataValue {
 impl std::fmt::Display for DataValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            DataValue::Int(v) => write!(f, "{}", v),
-            DataValue::Real(v) => write!(f, "{}", v),
-            DataValue::Bool(v) => write!(f, "{}", v),
-            DataValue::String(v) => write!(f, "{}", v),
+            DataValue::Int(v) => fmt::Display::fmt(v, f),
+            DataValue::Real(v) => fmt::Display::fmt(v, f),
+            DataValue::Bool(v) => fmt::Display::fmt(v, f),
+            DataValue::String(v) => fmt::Display::fmt(v, f),
             DataValue::Null => write!(f, "null"),
+        }
+    }
+}
+
+impl FormatArgument for DataValue {
+    fn supports_format(&self, specifier: &Specifier) -> bool {
+        <&DataValue as FormatArgument>::supports_format(&self, specifier)
+    }
+
+    fn fmt_display(&self, f: &mut Formatter) -> fmt::Result {
+        <&DataValue as FormatArgument>::fmt_display(&self, f)
+    }
+
+    fn fmt_debug(&self, f: &mut Formatter) -> fmt::Result {
+        <&DataValue as FormatArgument>::fmt_debug(&self, f)
+    }
+
+    fn fmt_octal(&self, f: &mut Formatter) -> fmt::Result {
+        <&DataValue as FormatArgument>::fmt_octal(&self, f)
+    }
+
+    fn fmt_lower_hex(&self, f: &mut Formatter) -> fmt::Result {
+        <&DataValue as FormatArgument>::fmt_lower_hex(&self, f)
+    }
+
+    fn fmt_upper_hex(&self, f: &mut Formatter) -> fmt::Result {
+        <&DataValue as FormatArgument>::fmt_upper_exp(&self, f)
+    }
+
+    fn fmt_binary(&self, f: &mut Formatter) -> fmt::Result {
+        <&DataValue as FormatArgument>::fmt_binary(&self, f)
+    }
+
+    fn fmt_lower_exp(&self, f: &mut Formatter) -> fmt::Result {
+        <&DataValue as FormatArgument>::fmt_lower_exp(&self, f)
+    }
+
+    fn fmt_upper_exp(&self, f: &mut Formatter) -> fmt::Result {
+        <&DataValue as FormatArgument>::fmt_upper_exp(&self, f)
+    }
+
+    fn to_usize(&self) -> Result<usize, ()> {
+        <&DataValue as FormatArgument>::to_usize(&self)
+    }
+}
+
+impl<'a> FormatArgument for &'a DataValue {
+    fn supports_format(&self, specifier: &Specifier) -> bool {
+        // Not support debug format in release build.
+        if !cfg!(debug_assertions) && specifier.format == Format::Debug {
+            return false;
+        }
+
+        match self {
+            DataValue::Int(_) | DataValue::Null => true,
+            DataValue::Real(_) => matches!(
+                specifier.format,
+                Format::Display | Format::Debug | Format::LowerExp | Format::UpperExp
+            ),
+            DataValue::Bool(_) | DataValue::String(_) => {
+                matches!(specifier.format, Format::Display | Format::Debug)
+            }
+        }
+    }
+
+    fn fmt_display(&self, f: &mut Formatter) -> fmt::Result {
+        fmt::Display::fmt(*self, f)
+    }
+
+    fn fmt_debug(&self, f: &mut Formatter) -> fmt::Result {
+        fmt::Debug::fmt(*self, f)
+    }
+
+    fn fmt_octal(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            DataValue::Int(v) => fmt::Octal::fmt(v, f),
+            DataValue::Null => {
+                // not format null value
+                fmt::Display::fmt(*self, f)
+            }
+            _ => Err(fmt::Error),
+        }
+    }
+
+    fn fmt_lower_hex(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            DataValue::Int(v) => fmt::LowerHex::fmt(v, f),
+            DataValue::Null => {
+                // not format null value
+                fmt::Display::fmt(*self, f)
+            }
+            _ => Err(fmt::Error),
+        }
+    }
+
+    fn fmt_upper_hex(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            DataValue::Int(v) => fmt::UpperHex::fmt(v, f),
+            DataValue::Null => {
+                // not format null value
+                fmt::Display::fmt(*self, f)
+            }
+            _ => Err(fmt::Error),
+        }
+    }
+
+    fn fmt_binary(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            DataValue::Int(v) => fmt::Binary::fmt(v, f),
+            DataValue::Null => {
+                // not format null value
+                fmt::Display::fmt(*self, f)
+            }
+            _ => Err(fmt::Error),
+        }
+    }
+
+    fn fmt_lower_exp(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            DataValue::Int(v) => fmt::LowerExp::fmt(v, f),
+            DataValue::Real(v) => fmt::LowerExp::fmt(v, f),
+            DataValue::Null => {
+                // not format null value
+                fmt::Display::fmt(*self, f)
+            }
+            _ => Err(fmt::Error),
+        }
+    }
+
+    fn fmt_upper_exp(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            DataValue::Int(v) => fmt::UpperExp::fmt(v, f),
+            DataValue::Real(v) => fmt::UpperExp::fmt(v, f),
+            DataValue::Null => {
+                // not format null value
+                fmt::Display::fmt(*self, f)
+            }
+            _ => Err(fmt::Error),
+        }
+    }
+
+    fn to_usize(&self) -> Result<usize, ()> {
+        match self {
+            DataValue::Int(v) => (*v).try_into().map_err(|_| ()),
+            DataValue::String(s) => Ok(s.len()),
+            DataValue::Null => Ok(0),
+            _ => Err(()),
         }
     }
 }
@@ -227,14 +376,13 @@ impl DataValue {
         }
     }
 
-    /// Convert to String to use when evaluate script and format
-    pub fn to_format_value(&self) -> String {
-        match self {
-            DataValue::Int(v) => v.to_string(),
-            DataValue::Real(v) => v.to_string(),
-            DataValue::Bool(v) => v.to_string(),
-            DataValue::String(v) => v.to_string(),
-            DataValue::Null => "null".to_string(),
+    /// Format this value
+    pub fn format(&self, format: &str) -> Option<String> {
+        let pos_args = [self];
+        let parsed_args = ParsedFormat::parse(format, &pos_args, &NoNamedArguments);
+        match parsed_args {
+            Ok(args) => Some(format!("{}", args)),
+            Err(_) => None,
         }
     }
 }

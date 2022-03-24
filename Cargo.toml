@@ -16,6 +16,8 @@ keywords = ["generator", "cli", "random", "faker", "development"]
 rand = { version = "0.8.4", features = ["alloc"] }
 rand_distr = "0.4.3"
 chrono = "0.4.19"
+human-string-filler = "1.0.0"
+rt-format = "0.3.0"
 evalexpr = "7.0.0"
 either = "1.6.1"
 

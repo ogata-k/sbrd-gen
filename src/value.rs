@@ -185,8 +185,8 @@ impl Serialize for DataValue {
         S: Serializer,
     {
         match &self {
-            DataValue::Int(v) => serializer.serialize_i64(*v as i64),
-            DataValue::Real(v) => serializer.serialize_f64(*v as f64),
+            DataValue::Int(v) => serializer.serialize_i32(*v),
+            DataValue::Real(v) => serializer.serialize_f32(*v),
             DataValue::Bool(v) => serializer.serialize_bool(*v),
             DataValue::String(v) => serializer.serialize_str(v),
             DataValue::Null => serializer.serialize_unit(),

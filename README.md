@@ -2,6 +2,7 @@
 [日本語](https://github.com/ogata-k/sbrd-gen/blob/v0.1.x/README-ja.md)
 
 [crates.io](https://crates.io/crates/sbrd-gen )
+
 [API Document](https://docs.rs/sbrd-gen/0.1.0/sbrd_gen/ )
 
 This is a crate (Schema-Based Random Data GENerator, i.e. SBRD GEN) that can generate random dummy data based on a schema. It is available both as a library and as a CLI tool.

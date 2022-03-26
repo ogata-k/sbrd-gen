@@ -2,6 +2,7 @@
 [In English](https://github.com/ogata-k/sbrd-gen/blob/v0.1.x/README.md)
 
 [crates.io](https://crates.io/crates/sbrd-gen )
+
 [APIドキュメント](https://docs.rs/sbrd-gen/0.1.0/sbrd_gen/ )
 
 これはスキーマをベースにしてランダムにダミーデータを生成することができるクレート（Schema-Based Random Data GENerator、i.e. SBRD GEN）です。 ライブラリとしてもCLIツールとしても利用可能です。

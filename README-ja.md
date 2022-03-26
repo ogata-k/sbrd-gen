@@ -1,7 +1,8 @@
 # クレートについて
-[crates.io](https://crates.io/crates/sbrd-gen )
-
 [In English](https://github.com/ogata-k/sbrd-gen/blob/v0.1.x/README.md)
+
+[crates.io](https://crates.io/crates/sbrd-gen )
+[APIドキュメント](https://docs.rs/sbrd-gen/0.1.0/sbrd_gen/ )
 
 これはスキーマをベースにしてランダムにダミーデータを生成することができるクレート（Schema-Based Random Data GENerator、i.e. SBRD GEN）です。 ライブラリとしてもCLIツールとしても利用可能です。
 
@@ -305,13 +306,13 @@ GitHubのリリースページからインストールする場合は、[こち�
 * キー名 : `nulable`
 * 値型 : ブーリアン型
 #### フォーマット
-* 説明 : このフォーマットは、値のコンテキスト内のキーと値のペア（仮にそのペアを(key, value)とする。）を順番にフォーマット内の{key}（括弧とキーの間にはスペース無し）という文字列をvalueで置き換えてから文字列として評価されます。
+* 説明 : このフォーマットは、[値のコンテキスト](#値のコンテキスト)内のキーと値のペア（仮にそのペアを(key, value)とする。）を順番にフォーマット内の"{key}"や"{key:\<format-option>\}"（括弧とkey、コロンの間にはスペース無し）という文字列をフォーマットしたvalueで置き換えてから文字列として評価されます。文法について詳しくはこのクレートの[EvaluatorのAPIドキュメント](https://docs.rs/sbrd-gen/0.1.0/sbrd_gen/eval/struct.Evaluator.html )を参照してください。
 * 備考 : なし
 * 構造体 : ```String```
 * キー名 : `format`
 * 値型 : 文字列型
 #### スクリプト
-* 説明 : このスクリプトは、値のコンテキスト内のキーと値のペア（仮にそのペアを(key, value)とする。）を順番にスクリプト内の{key}（括弧とキーの間にはスペース無し）という文字列をvalueで置き換えてから式として評価されます。文法や式などについて詳しくはEvaluatorのAPIドキュメントを参照してください。
+* 説明 : このスクリプトは、[値のコンテキスト](#値のコンテキスト)内のキーと値のペア（仮にそのペアを(key, value)とする。）を順番にスクリプト内の"{key}"や"{key:\<format-option>\}"（括弧とkey、コロンの間にはスペース無し）という文字列をフォーマットしたvalueで置き換えてから式として評価されます。文法や式などについて詳しくはこのクレートの[EvaluatorのAPIドキュメント](https://docs.rs/sbrd-gen/0.1.0/sbrd_gen/eval/struct.Evaluator.html )を参照してください。
 * 備考 : なし
 * 構造体 : ```String```
 * キー名 : `script`

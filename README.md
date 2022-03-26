@@ -1,7 +1,8 @@
 # About
-[crates.io](https://crates.io/crates/sbrd-gen )
-
 [日本語](https://github.com/ogata-k/sbrd-gen/blob/v0.1.x/README-ja.md)
+
+[crates.io](https://crates.io/crates/sbrd-gen )
+[API Document](https://docs.rs/sbrd-gen/0.1.0/sbrd_gen/ )
 
 This is a crate (Schema-Based Random Data GENerator, i.e. SBRD GEN) that can generate random dummy data based on a schema. It is available both as a library and as a CLI tool.
 
@@ -306,13 +307,13 @@ The available options vary from generator to generator, but all other options ar
 * Key name : `nulable`
 * Value type : Boolean
 #### Format
-* Description : This format is used for key/value pairs in [Value Context](#Value-Context) (let's say the pair is (key, value)). in turn, the string {key} (no space between the parentheses and the key) in the format is replaced by value before being evaluated as a String.
+* Description : This format is used for key/value pairs in [Value Context](#Value-Context) (let's say the pair is (key, value)). is in turn evaluated as a String after replacing the string "{key}" or "{key:\<format-option>\}" (no space between the parentheses, key and colon) in the format with the formatted value. Please refer to [the API documentation of the Evaluator](https://docs.rs/sbrd-gen/0.1.0/sbrd_gen/eval/struct.Evaluator.html ) in this sbrd-gen crate for more information on syntax.
 * Remarks : None
 * Struct : ```String```
 * Key name : `format`
 * Value type : String
 #### Script
-* Description : This script is a key/value pair (let's say the pair is (key, value)) in [Value Context](#Value-Context). in turn, the string {key} (no space between the parentheses and the key) in the script is replaced by value before being evaluated as an expression. Please refer to the Evaluator API documentation for more information on syntax, expressions, etc.
+* Description : This script is a key/value pair (let's say the pair is (key, value)) in [Value Context](#Value-Context). is in turn replaced by the string "{key}" or "{key:\<format-option>\}" (no space between the parentheses, key and colon) in the script with the formatted value before being evaluated as an expression. Please refer to [the API documentation of the Evaluator](https://docs.rs/sbrd-gen/0.1.0/sbrd_gen/eval/struct.Evaluator.html ) in this sbrd-gen crate for more information on syntax and expressions.
 * Remarks : None
 * Struct : ```String```
 * Key name : `script`

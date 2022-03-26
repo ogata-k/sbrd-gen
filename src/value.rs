@@ -381,6 +381,21 @@ impl DataValue {
     /// Support [`Rust-format syntax`]. But not support position, variable, padding with character and [`Pointer`] format (`{:p}`).
     /// [`Debug`] format is not supported in release build.
     ///
+    /// # Examples
+    /// ```
+    /// fn main(){
+    ///     use sbrd_gen::value::DataValue;
+    ///
+    ///     assert_eq!(Some("ignore value".to_string()), DataValue::Int(12).format("ignore value"));
+    ///     assert_eq!(Some("12".to_string()), DataValue::Int(12).format("{}"));
+    ///     assert_eq!(Some("Rate= +12.35".to_string()), DataValue::Real(12.345).format("Rate={:+7.2}"));
+    ///     assert_eq!(Some("Rate=+012.35".to_string()), DataValue::Real(12.345).format("Rate={:+07.2}"));
+    ///     assert_eq!(Some(" aiueoあいうえお ".to_string()), DataValue::String("aiueoあいうえお".to_string()).format("{:^12}"));
+    ///     assert_eq!(Some("true    ".to_string()), DataValue::Bool(true).format("{:<8}"));
+    ///     assert_eq!(Some("".to_string()), DataValue::Null.format("{}"));
+    /// }
+    /// ```
+    ///
     /// [`Rust-format syntax`]: https://doc.rust-lang.org/std/fmt/index.html#syntax
     /// [`Pointer`]: https://doc.rust-lang.org/std/fmt/trait.Pointer.html
     /// [`Debug`]: https://doc.rust-lang.org/std/fmt/trait.Debug.html

@@ -57,13 +57,13 @@ generators:
     script: 10 * 10
   - key: eval-real-key
     type: eval-real
-    script: "({dist-normal-key}-50)/10"
+    script: "{dist-normal-key:5.2}"
   - key: eval-bool-key
     type: eval-bool
     script: "{dist-normal-key} < 50"
   - key: eval-string-key
     type: eval-string
-    script: "\"string: {dist-normal-key}\""
+    script: "\"string: {dist-normal-key:4.2}\""
   - key: increment-id-key
     type: increment-id
     increment:

@@ -92,7 +92,7 @@
     {
       "key": "eval-real-key",
       "type": "eval-real",
-      "script": "({dist-normal-key}-50)/10"
+      "script": "{dist-normal-key:5.2}"
     },
     {
       "key": "eval-bool-key",
@@ -102,7 +102,7 @@
     {
       "key": "eval-string-key",
       "type": "eval-string",
-      "script": "\"string: {dist-normal-key}\""
+      "script": "\"string: {dist-normal-key:4.2}\""
     },
     {
       "key": "int-key",

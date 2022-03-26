@@ -384,6 +384,7 @@ impl DataValue {
     ///
     ///     assert_eq!(Some("ignore value".to_string()), DataValue::Int(12).format("ignore value"));
     ///     assert_eq!(Some("12".to_string()), DataValue::Int(12).format("{}"));
+    ///     assert_eq!(Some("{}".to_string()), DataValue::Int(12).format("{{}}"));
     ///     assert_eq!(Some("Rate= +12.35".to_string()), DataValue::Real(12.345).format("Rate={:+7.2}"));
     ///     assert_eq!(Some("Rate=+012.35".to_string()), DataValue::Real(12.345).format("Rate={:+07.2}"));
     ///     assert_eq!(Some(" aiueoあいうえお ".to_string()), DataValue::String("aiueoあいうえお".to_string()).format("{:^12}"));

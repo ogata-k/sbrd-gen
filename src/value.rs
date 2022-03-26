@@ -268,6 +268,10 @@ impl<'a> FormatArgument for &'a DataValue {
     }
 
     fn fmt_display(&self, f: &mut Formatter) -> fmt::Result {
+        if *self == &DataValue::Null {
+            return Ok(());
+        }
+
         fmt::Display::fmt(*self, f)
     }
 
@@ -280,7 +284,7 @@ impl<'a> FormatArgument for &'a DataValue {
             DataValue::Int(v) => fmt::Octal::fmt(v, f),
             DataValue::Null => {
                 // not format null value
-                fmt::Display::fmt(*self, f)
+                self.fmt_display(f)
             }
             _ => Err(fmt::Error),
         }
@@ -291,7 +295,7 @@ impl<'a> FormatArgument for &'a DataValue {
             DataValue::Int(v) => fmt::LowerHex::fmt(v, f),
             DataValue::Null => {
                 // not format null value
-                fmt::Display::fmt(*self, f)
+                self.fmt_display(f)
             }
             _ => Err(fmt::Error),
         }
@@ -302,7 +306,7 @@ impl<'a> FormatArgument for &'a DataValue {
             DataValue::Int(v) => fmt::UpperHex::fmt(v, f),
             DataValue::Null => {
                 // not format null value
-                fmt::Display::fmt(*self, f)
+                self.fmt_display(f)
             }
             _ => Err(fmt::Error),
         }
@@ -313,7 +317,7 @@ impl<'a> FormatArgument for &'a DataValue {
             DataValue::Int(v) => fmt::Binary::fmt(v, f),
             DataValue::Null => {
                 // not format null value
-                fmt::Display::fmt(*self, f)
+                self.fmt_display(f)
             }
             _ => Err(fmt::Error),
         }
@@ -325,7 +329,7 @@ impl<'a> FormatArgument for &'a DataValue {
             DataValue::Real(v) => fmt::LowerExp::fmt(v, f),
             DataValue::Null => {
                 // not format null value
-                fmt::Display::fmt(*self, f)
+                self.fmt_display(f)
             }
             _ => Err(fmt::Error),
         }
@@ -337,19 +341,15 @@ impl<'a> FormatArgument for &'a DataValue {
             DataValue::Real(v) => fmt::UpperExp::fmt(v, f),
             DataValue::Null => {
                 // not format null value
-                fmt::Display::fmt(*self, f)
+                self.fmt_display(f)
             }
             _ => Err(fmt::Error),
         }
     }
 
     fn to_usize(&self) -> Result<usize, ()> {
-        match self {
-            DataValue::Int(v) => (*v).try_into().map_err(|_| ()),
-            DataValue::String(s) => Ok(s.len()),
-            DataValue::Null => Ok(0),
-            _ => Err(()),
-        }
+        // Not support
+     Err(())
     }
 }
 
@@ -377,6 +377,13 @@ impl DataValue {
     }
 
     /// Format this value
+    ///
+    /// Support [`Rust-format syntax`]. But not support position, variable, padding with character and [`Pointer`] format (`{:p}`).
+    /// [`Debug`] format is not supported in release build.
+    ///
+    /// [`Rust-format syntax`]: https://doc.rust-lang.org/std/fmt/index.html#syntax
+    /// [`Pointer`]: https://doc.rust-lang.org/std/fmt/trait.Pointer.html
+    /// [`Debug`]: https://doc.rust-lang.org/std/fmt/trait.Debug.html
     pub fn format(&self, format: &str) -> Option<String> {
         let pos_args = [self];
         let parsed_args = ParsedFormat::parse(format, &pos_args, &NoNamedArguments);

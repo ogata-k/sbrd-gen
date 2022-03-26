@@ -11,11 +11,41 @@ use human_string_filler::StrExt;
 use std::fmt::Write;
 
 /// Evaluator for `script` and `format`.
-/// Script and format is processed by replacing "{key}" with value based on each entry `(key, value)` of context.
+/// Script and format is processed by replacing a replace-key-syntax for the key with value based on each entry `(key, value)` of context.
+/// Replace-key-syntax is "{key}" and "{key:\<format-option\>}". It specified by Rust format syntax with the key as name position. But not support index position, variable, padding with character and [`Pointer`] format (`{:p}`).
+/// [`Debug`] format is not supported in release build.
+/// If you want to know, you will see [`Rust-format syntax`] and [`DataValue::format`].
 ///
 /// All values, variables and functions are available as described in the [`evalexpr`] except the regex functions.
 /// If you'll know syntax and available them more, you can see [`this document`].
 ///
+/// # Examples
+/// ```
+/// fn main(){
+///     use sbrd_gen::eval::Evaluator;
+///     use sbrd_gen::value::{DataValue, DataValueMap};
+///
+///     let mut value_context = DataValueMap::new();
+///     value_context.insert("Key-Int", DataValue::Int(12));
+///     value_context.insert("キー Real", DataValue::Real(12.345));
+///     value_context.insert("Key:String", DataValue::String("aiueoあいうえお".to_string()));
+///     value_context.insert("Key Bool:", DataValue::Bool(true));
+///     value_context.insert("key Null ", DataValue::Null);
+///     let evaluator = Evaluator::new(&value_context);
+///
+///     assert_eq!(Ok("no key".to_string()), evaluator.format_script("no key"));
+///     assert_eq!(Ok("12".to_string()), evaluator.format_script("{Key-Int}"));
+///     assert_eq!(Ok("+012.35".to_string()), evaluator.format_script("{キー Real:+07.2}"));
+///     assert_eq!(Ok(" aiueoあいうえお ".to_string()), evaluator.format_script("{Key:String:^12}"));
+///     assert_eq!(Ok("true    ".to_string()), evaluator.format_script("{Key Bool::<8}"));
+///     assert_eq!(Ok("".to_string()), evaluator.format_script("{key Null }"));
+/// }
+/// ```
+///
+/// [`Rust-format syntax`]: https://doc.rust-lang.org/std/fmt/index.html#syntax
+/// [`Pointer`]: https://doc.rust-lang.org/std/fmt/trait.Pointer.html
+/// [`Debug`]: https://doc.rust-lang.org/std/fmt/trait.Debug.html
+/// [`DataValue::format`]: ../value/enum.DataValue.html#method.format
 /// [`evalexpr`]: https://crates.io/crates/evalexpr/7.0.1
 /// [`this document`]: https://docs.rs/evalexpr/7.0.1/evalexpr/index.html#features
 #[derive(Debug, PartialEq, Clone)]
@@ -26,7 +56,7 @@ pub struct Evaluator<'a> {
 /// Context for evaluator
 pub type EvalContext = HashMapContext;
 /// Error while evaluate
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum EvalError {
     /// Fail evaluate
     FailEval(EvalexprError),
@@ -97,9 +127,11 @@ impl<'a> Evaluator<'a> {
             .fill_into::<_, _, String>(&mut result, |output: &mut String, key: &str| {
                 match self.value_context.get(key) {
                     Some(v) => {
-                        output
-                            .write_fmt(format_args!("{}", v))
-                            .map_err(|e| e.to_string())?;
+                        let formatted = v
+                            .format("{}")
+                            .ok_or_else(|| format!("Fail apply key \"{}\".", key))?;
+
+                        output.write_str(&formatted).map_err(|e| e.to_string())?;
                     }
                     None => {
                         let split_index: usize = key.rfind(':').ok_or_else(|| {
@@ -129,7 +161,11 @@ impl<'a> Evaluator<'a> {
             .map_err(|e| EvalError::FailApplyValueContext(e.to_string()))
     }
 
-    /// Get format applied value-context to the script
+    /// Get format applied value-context to the script.
+    ///
+    /// If you want to know syntax, you will see [`Evaluator`]'s document.
+    ///
+    /// [`Evaluator`]: ./struct.Evaluator.html
     pub fn format_script(&self, script: &str) -> EvalResult<String> {
         self.apply_value_context(script)
     }

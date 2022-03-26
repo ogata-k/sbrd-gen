@@ -39,7 +39,7 @@ use std::fmt::Write;
 ///     assert_eq!(Ok("Rate=+012.35".to_string()), evaluator.format_script("Rate={キー Real:+07.2}"));
 ///     assert_eq!(Ok(" aiueoあいうえお ".to_string()), evaluator.format_script("{Key:String:^12}"));
 ///     assert_eq!(Ok("true    ".to_string()), evaluator.format_script("{Key Bool::<8}"));
-///     assert_eq!(Ok("".to_string()), evaluator.format_script("{key Null }"));
+///     assert_eq!(Ok("null".to_string()), evaluator.format_script("{key Null :<10}"));
 /// }
 /// ```
 ///

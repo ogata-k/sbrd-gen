@@ -268,10 +268,6 @@ impl<'a> FormatArgument for &'a DataValue {
     }
 
     fn fmt_display(&self, f: &mut Formatter) -> fmt::Result {
-        if *self == &DataValue::Null {
-            return Ok(());
-        }
-
         fmt::Display::fmt(*self, f)
     }
 
@@ -392,7 +388,7 @@ impl DataValue {
     ///     assert_eq!(Some("Rate=+012.35".to_string()), DataValue::Real(12.345).format("Rate={:+07.2}"));
     ///     assert_eq!(Some(" aiueoあいうえお ".to_string()), DataValue::String("aiueoあいうえお".to_string()).format("{:^12}"));
     ///     assert_eq!(Some("true    ".to_string()), DataValue::Bool(true).format("{:<8}"));
-    ///     assert_eq!(Some("".to_string()), DataValue::Null.format("{}"));
+    ///     assert_eq!(Some("null".to_string()), DataValue::Null.format("{:<10}"));
     /// }
     /// ```
     ///

@@ -345,7 +345,7 @@ impl<'a> FormatArgument for &'a DataValue {
 
     fn to_usize(&self) -> Result<usize, ()> {
         // Not support
-     Err(())
+        Err(())
     }
 }
 

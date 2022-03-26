@@ -3,9 +3,9 @@
 
 use crate::value::{DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
 use evalexpr::{
-    eval_boolean_with_context_mut, eval_float_with_context_mut, eval_int_with_context_mut,
-    eval_string_with_context_mut, eval_with_context_mut, ContextWithMutableFunctions,
-    EvalexprError, FloatType, Function, HashMapContext, Value,
+    eval_boolean_with_context_mut, eval_int_with_context_mut, eval_string_with_context_mut,
+    eval_with_context_mut, ContextWithMutableFunctions, EvalexprError, FloatType, Function,
+    HashMapContext, Value,
 };
 use human_string_filler::StrExt;
 use std::fmt::Write;

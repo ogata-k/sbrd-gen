@@ -3,9 +3,8 @@
 
 use crate::value::{DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
 use evalexpr::{
-    eval_boolean_with_context_mut, eval_int_with_context_mut, eval_string_with_context_mut,
-    eval_with_context_mut, ContextWithMutableFunctions, EvalexprError, FloatType, Function,
-    HashMapContext, Value,
+    eval_boolean_with_context, eval_int_with_context, eval_string_with_context, eval_with_context,
+    ContextWithMutableFunctions, EvalexprError, FloatType, Function, HashMapContext, Value,
 };
 use human_string_filler::StrExt;
 use std::fmt::Write;
@@ -176,22 +175,16 @@ impl<'a> Evaluator<'a> {
     ///
     /// [`SbrdInt`]: ../value/type.SbrdInt.html
     pub fn eval_int(&self, script: &str) -> EvalResult<SbrdInt> {
-        eval_int_with_context_mut(
-            &self.format_script(script)?,
-            &mut Self::create_eval_context()?,
-        )
-        .map(|v| v as SbrdInt)
-        .map_err(EvalError::FailEval)
+        eval_int_with_context(&self.format_script(script)?, &Self::create_eval_context()?)
+            .map(|v| v as SbrdInt)
+            .map_err(EvalError::FailEval)
     }
 
     /// Evaluate the script applied the context, as [`SbrdReal`]
     ///
     /// [`SbrdReal`]: ../value/type.SbrdReal.html
     pub fn eval_real(&self, script: &str) -> EvalResult<SbrdReal> {
-        match eval_with_context_mut(
-            &self.format_script(script)?,
-            &mut Self::create_eval_context()?,
-        ) {
+        match eval_with_context(&self.format_script(script)?, &Self::create_eval_context()?) {
             Ok(Value::Float(float)) => Ok(float),
             // Support int to float.
             Ok(Value::Int(int)) => Ok(int as FloatType),
@@ -206,22 +199,16 @@ impl<'a> Evaluator<'a> {
     ///
     /// [`SbrdBool`]: ../value/type.SbrdBool.html
     pub fn eval_bool(&self, script: &str) -> EvalResult<SbrdBool> {
-        eval_boolean_with_context_mut(
-            &self.format_script(script)?,
-            &mut Self::create_eval_context()?,
-        )
-        .map(|v| v as SbrdBool)
-        .map_err(EvalError::FailEval)
+        eval_boolean_with_context(&self.format_script(script)?, &Self::create_eval_context()?)
+            .map(|v| v as SbrdBool)
+            .map_err(EvalError::FailEval)
     }
 
     /// Evaluate the script applied the context, as [`SbrdString`]
     ///
     /// [`SbrdString`]: ../value/type.SbrdString.html
     pub fn eval_string(&self, script: &str) -> EvalResult<SbrdString> {
-        eval_string_with_context_mut(
-            &self.format_script(script)?,
-            &mut Self::create_eval_context()?,
-        )
-        .map_err(EvalError::FailEval)
+        eval_string_with_context(&self.format_script(script)?, &Self::create_eval_context()?)
+            .map_err(EvalError::FailEval)
     }
 }

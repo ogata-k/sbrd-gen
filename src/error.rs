@@ -219,7 +219,7 @@ impl std::fmt::Display for BuildError {
 impl std::error::Error for BuildError {}
 
 /// Error for generator builder
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum GenerateError {
     /// Evaluate error while generating value
     ///

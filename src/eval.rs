@@ -3,8 +3,8 @@
 
 use crate::value::{DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
 use evalexpr::{
-    eval_boolean_with_context, eval_int_with_context, eval_string_with_context, eval_with_context,
-    ContextWithMutableFunctions, EvalexprError, FloatType, Function, HashMapContext, Value,
+    eval_boolean_with_context, eval_int_with_context, eval_number_with_context,
+    eval_string_with_context, ContextWithMutableFunctions, EvalexprError, Function, HashMapContext,
 };
 use human_string_filler::StrExt;
 use std::fmt::Write;
@@ -184,15 +184,9 @@ impl<'a> Evaluator<'a> {
     ///
     /// [`SbrdReal`]: ../value/type.SbrdReal.html
     pub fn eval_real(&self, script: &str) -> EvalResult<SbrdReal> {
-        match eval_with_context(&self.format_script(script)?, &Self::create_eval_context()?) {
-            Ok(Value::Float(float)) => Ok(float),
-            // Support int to float.
-            Ok(Value::Int(int)) => Ok(int as FloatType),
-            Ok(value) => Err(EvalexprError::expected_float(value)),
-            Err(error) => Err(error),
-        }
-        .map(|v| v as SbrdReal)
-        .map_err(EvalError::FailEval)
+        eval_number_with_context(&self.format_script(script)?, &Self::create_eval_context()?)
+            .map(|v| v as SbrdReal)
+            .map_err(EvalError::FailEval)
     }
 
     /// Evaluate the script applied the context, as [`SbrdBool`]

@@ -1,9 +1,10 @@
 use crate::builder::GeneratorBuilder;
 use crate::error::{BuildError, GenerateError};
-use crate::eval::Evaluator;
+use crate::eval::{EvalError, Evaluator};
 use crate::generator::{GeneratorBase, Randomizer, ValueGeneratorBase};
 use crate::value::{DataValue, DataValueMap, SbrdInt, SbrdReal, SbrdString};
 use crate::GeneratorType;
+use evalexpr::EvalexprError;
 use std::str::FromStr;
 
 /// The generator that gets a T value from the values with the value evaluated by `script` as the index of 0-index.
@@ -67,7 +68,16 @@ impl<R: Randomizer + ?Sized, T: ForGetValueAtGeneratorType> GeneratorBase<R>
         let evaluator = Evaluator::new(context);
         let index: usize = evaluator
             .eval_int(&self.script)
-            .map(|v| v as usize)
+            .and_then(|v| {
+                if v < 0 {
+                    Err(EvalError::FailEval(EvalexprError::CustomMessage(format!(
+                        "Expected a not negative integer, actual {} is negative.",
+                        v
+                    ))))
+                } else {
+                    Ok(v as usize)
+                }
+            })
             .map_err(|e| {
                 GenerateError::FailEval(
                     e,

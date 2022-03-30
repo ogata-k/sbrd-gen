@@ -21,7 +21,6 @@ jobs:
           - windows_i686
           - macos_x86_64
           # Not Support macos_i686
-          #- macos_aarch64
         include:
           - name: linux_x86_64
             os: ubuntu-latest
@@ -43,10 +42,6 @@ jobs:
             os: macos-latest
             target: x86_64-apple-darwin
             exe_file: sbrd-gen
-          #- name: macos_aarch64
-          #  os: macos-latest
-          #  target: aarch64-apple-darwin
-          #  exe_file: sbrd-gen
     steps:
       - uses: actions/checkout@v1
 
@@ -135,7 +130,6 @@ jobs:
           - windows_i686
           - macos_x86_64
           # Not Support macos_i686
-          #- macos_aarch64
         include:
           - name: linux_x86_64
             exe_file: sbrd-gen
@@ -162,11 +156,6 @@ jobs:
             archive_type: tar
             archive_ext: tar.gz
             content_type: application/gzip
-          #- name: macos_aarch64
-          #  exe_file: sbrd-gen
-          #  archive_type: tar
-          #  archive_ext: tar.gz
-          #  content_type: application/gzip
     steps:
       - name: Export properties
         id: properties

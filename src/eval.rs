@@ -4,7 +4,7 @@
 use crate::value::{DataValueMap, SbrdBool, SbrdInt, SbrdReal, SbrdString};
 use evalexpr::{
     eval_boolean_with_context, eval_int_with_context, eval_number_with_context,
-    eval_string_with_context, ContextWithMutableFunctions, EvalexprError, Function, HashMapContext,
+    eval_string_with_context, EvalexprError, HashMapContext,
 };
 use human_string_filler::StrExt;
 use std::fmt::Write;
@@ -94,7 +94,8 @@ impl<'a> Evaluator<'a> {
     fn create_eval_context() -> EvalResult<EvalContext> {
         let mut context = EvalContext::new();
 
-        // @todo replace evalexpr-crate's function for get value at the index
+        // @todo If you need impl custom function, do impl. e.g. function for get value at the index
+        /*
         context
             .set_function(
                 "get".to_string(),
@@ -117,6 +118,7 @@ impl<'a> Evaluator<'a> {
                 }),
             )
             .map_err(EvalError::FailEval)?;
+         */
 
         Ok(context)
     }

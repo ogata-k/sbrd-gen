@@ -92,6 +92,7 @@ impl<'a> Evaluator<'a> {
 
     /// Create context when use evaluate
     fn create_eval_context() -> EvalResult<EvalContext> {
+        #[allow(unused_mut)]
         let mut context = EvalContext::new();
 
         // @todo If you need impl custom function, do impl. e.g. function for get value at the index

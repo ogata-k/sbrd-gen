@@ -177,7 +177,7 @@ jobs:
           echo "::set-output name=release_dir::$RELEASE_DIR"
 
       - name: Download artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ${{ steps.properties.outputs.upload_path }}
           path: ${{ steps.properties.outputs.build_dir }}/

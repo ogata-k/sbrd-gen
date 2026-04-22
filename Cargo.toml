@@ -13,7 +13,7 @@ keywords = ["generator", "cli", "random", "faker", "development"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = { version = "0.8.4", features = ["alloc"] }
+rand = { version = "0.8.6", features = ["alloc"] }
 rand_distr = "0.4.3"
 chrono = "0.4.19"
 human-string-filler = "1.0.0"
